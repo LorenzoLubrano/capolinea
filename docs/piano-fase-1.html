@@ -1,0 +1,888 @@
+<title>Piano dell'app spese</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: colonna di lettura unica (max 980px), sezioni a respiro ampio; i telefoni mostrano la direzione proposta con i token dell'app. */
+:root{
+  --bg:#F5F4F1; --surface:#FFFFFF; --sunken:#ECEAE5;
+  --fg:#141413; --fg2:#5C5A55; --fg3:#85827B;
+  --line:rgba(20,20,19,.10); --accent:#3D4FD6; --accent-soft:rgba(61,79,214,.09);
+  --pos:#1B7A4A; --warn:#9A5A00; --neg:#C0392B;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Geist Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0C10; --surface:#15161B; --sunken:#1E1F25;
+  --fg:#F3F2EF; --fg2:#A3A29D; --fg3:#7A7975;
+  --line:rgba(255,255,255,.09); --accent:#8D9BFF; --accent-soft:rgba(141,155,255,.12);
+  --pos:#45C486; --warn:#F2B54A; --neg:#FF6B5B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0C10; --surface:#15161B; --sunken:#1E1F25;
+  --fg:#F3F2EF; --fg2:#A3A29D; --fg3:#7A7975;
+  --line:rgba(255,255,255,.09); --accent:#8D9BFF; --accent-soft:rgba(141,155,255,.12);
+  --pos:#45C486; --warn:#F2B54A; --neg:#FF6B5B; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans);padding-inline:20px;padding-block:0 80px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto}
+.num,td.num{font-variant-numeric:tabular-nums}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+code{font-family:var(--mono);font-size:.86em;background:var(--sunken);padding:.1em .38em;border-radius:6px;overflow-wrap:anywhere}
+pre{font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;overflow-x:auto;margin:0}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.02em;line-height:1.15;margin:0}
+h1{font-size:clamp(34px,6vw,52px);font-weight:600}
+h2{font-size:clamp(24px,3.4vw,30px);font-weight:600}
+h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
+p{margin:0;max-width:68ch}
+ul,ol{margin:0;padding-left:1.2em}
+li{margin-block:.25em}
+.muted{color:var(--fg2)}
+.small{font-size:14px}
+
+header.top{padding-block:56px 32px;display:grid;gap:18px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--fg2)}
+.lede{font-size:19px;line-height:1.5;color:var(--fg2);max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--fg2)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;padding-block:20px;border-bottom:1px solid var(--line)}
+.toc a{font-size:14px;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);padding:6px 12px;border-radius:999px}
+.toc a:hover{border-color:var(--accent)}
+
+section{padding-block:56px 8px;display:grid;gap:22px}
+section > .intro{display:grid;gap:10px}
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 24px;display:grid;gap:12px}
+.callout.ask{border-color:var(--accent);background:linear-gradient(var(--accent-soft),var(--accent-soft)),var(--surface)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+.grid.wide{grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{font-size:16px}
+.card p,.card li{font-size:15px;color:var(--fg2)}
+.card ul{color:var(--fg2)}
+.tag{display:inline-block;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;background:var(--sunken);color:var(--fg2);white-space:nowrap}
+.tag.go{background:var(--accent-soft);color:var(--accent)}
+.tag.no{background:var(--sunken);color:var(--fg3)}
+.tag.pos{color:var(--pos)}
+
+.principles{display:grid;gap:0;border-top:1px solid var(--line)}
+.principles div{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr);gap:6px 24px;padding-block:14px;border-bottom:1px solid var(--line)}
+.principles b{font-weight:600}
+.principles span{color:var(--fg2)}
+@media (max-width:640px){.principles div{grid-template-columns:1fr}}
+
+.layers{display:grid;gap:6px}
+.layer{display:grid;grid-template-columns:minmax(0,14em) minmax(0,1fr);gap:4px 20px;padding:14px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.layer b{font-weight:600}
+.layer span{color:var(--fg2);font-size:15px}
+.layer.opt{border-style:dashed;background:transparent}
+.layer.now{border-color:var(--accent)}
+@media (max-width:640px){.layer{grid-template-columns:1fr}}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:11px 14px;border-bottom:1px solid var(--line)}
+th{font-weight:600;font-size:13px;color:var(--fg2);background:var(--sunken)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:500}
+
+.nav{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr))}
+.nav .col{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:8px;align-content:start}
+.nav .col.plus{border-color:var(--accent)}
+.nav h3{font-size:15px}
+.nav ul{list-style:none;padding:0;font-size:14px;color:var(--fg2);display:grid;gap:5px}
+.nav li{margin:0;padding-left:12px;position:relative}
+.nav li::before{content:"";position:absolute;left:0;top:.7em;width:5px;height:1px;background:var(--fg3)}
+
+.flows{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.flow{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.flow h3{font-size:15px}
+.steps{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 4px;font-size:13.5px}
+.steps li{margin:0;display:flex;align-items:center;gap:4px}
+.steps li span{background:var(--sunken);padding:3px 9px;border-radius:8px}
+.steps li + li::before{content:"";width:10px;height:1px;background:var(--fg3)}
+.flow p{font-size:13.5px;color:var(--fg2)}
+
+/* ---------- Anteprime dell'app (token propri, indipendenti dal tema della pagina) ---------- */
+.app-light{--a-bg:#F5F4F1;--a-surface:#FFFFFF;--a-sunken:#ECEAE5;--a-fg:#141413;--a-fg2:#5C5A55;--a-fg3:#85827B;--a-line:rgba(20,20,19,.08);--a-accent:#3D4FD6;--a-pos:#1B7A4A;--a-warn:#9A5A00;--a-neg:#C0392B;--a-glass:rgba(255,255,255,.72);--a-glass-line:rgba(20,20,19,.08);--a-ink:#141413;--a-on-ink:#FFFFFF;--a-track:#E4E1DB;--a-shadow:0 1px 2px rgba(20,20,19,.04),0 6px 20px rgba(20,20,19,.06);--a-scrim:rgba(20,20,19,.18)}
+.app-dark{--a-bg:#0B0C10;--a-surface:#15161B;--a-sunken:#1E1F25;--a-fg:#F3F2EF;--a-fg2:#A3A29D;--a-fg3:#7A7975;--a-line:rgba(255,255,255,.08);--a-accent:#8D9BFF;--a-pos:#45C486;--a-warn:#F2B54A;--a-neg:#FF6B5B;--a-glass:rgba(30,31,37,.62);--a-glass-line:rgba(255,255,255,.10);--a-ink:#F3F2EF;--a-on-ink:#0B0C10;--a-track:#262730;--a-shadow:none;--a-scrim:rgba(0,0,0,.45)}
+.shots{display:flex;flex-wrap:wrap;gap:28px 24px;justify-content:center;padding-block:8px}
+figure.shot{margin:0;display:grid;gap:10px;justify-items:center}
+figure.shot figcaption{font-size:13px;color:var(--fg2)}
+.phone{width:288px;max-width:100%;height:600px;border-radius:46px;background:var(--a-bg);color:var(--a-fg);position:relative;overflow:hidden;font-family:var(--sans);font-size:13px;line-height:1.35;box-shadow:0 0 0 7px #121214,0 0 0 8px #3a3a3e,0 24px 60px rgba(0,0,0,.18)}
+.ph-in{padding:0 18px;display:grid;gap:0}
+.ph-status{display:flex;justify-content:space-between;align-items:center;height:38px;padding:0 10px;font-weight:600;font-size:12px}
+.ph-status i{width:56px;height:16px;border-radius:10px;background:#000;display:block}
+.ph-top{display:flex;justify-content:space-between;align-items:center;height:38px}
+.ph-greet{font-size:13px;color:var(--a-fg2)}
+.ph-actions{display:flex;gap:10px;align-items:center;color:var(--a-fg)}
+.ph-av{width:30px;height:30px;border-radius:50%;background:var(--a-sunken);display:grid;place-items:center;font-size:11px;font-weight:600}
+.ph-label{margin-top:14px;font-size:14px;color:var(--a-fg2);font-weight:500}
+.ph-hero{font-size:46px;line-height:1.05;font-weight:600;letter-spacing:-.035em;margin-top:2px}
+.ph-hero small{font-size:26px;letter-spacing:-.02em;color:var(--a-fg2);font-weight:500}
+.ph-delta{display:flex;gap:6px;align-items:center;margin-top:8px;font-size:12px;color:var(--a-fg2)}
+.ph-pill{display:inline-flex;gap:3px;align-items:center;font-weight:600;color:var(--a-pos);background:color-mix(in srgb,var(--a-pos) 12%,transparent);padding:2px 7px;border-radius:999px}
+.ph-budget{margin-top:18px;display:grid;gap:7px}
+.ph-bar{position:relative;height:8px;border-radius:99px;background:var(--a-track)}
+.ph-fill{position:absolute;inset:0 auto 0 0;border-radius:99px;background:var(--a-ink)}
+.ph-pace{position:absolute;top:-4px;width:2px;height:16px;border-radius:2px;background:var(--a-accent)}
+.ph-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--a-fg2)}
+.ph-row b{color:var(--a-fg);font-weight:600}
+.ph-note{font-size:11.5px;color:var(--a-fg2);display:flex;gap:5px;align-items:center}
+.ph-note i{width:6px;height:6px;border-radius:50%;background:var(--a-accent);display:inline-block}
+.ph-card{background:var(--a-surface);border-radius:20px;box-shadow:var(--a-shadow);border:1px solid var(--a-line);padding:14px}
+.ph-fin{margin-top:18px;display:grid;gap:12px}
+.ph-fin-top{display:flex;justify-content:space-between;align-items:end}
+.ph-small{font-size:11px;color:var(--a-fg2)}
+.ph-bal{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.ph-dots{display:flex}
+.ph-dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--a-surface);margin-left:-6px;display:block}
+.ph-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid var(--a-line);padding-top:10px}
+.ph-metrics div{display:grid;gap:1px;font-size:13px;font-weight:600}
+.ph-pos{color:var(--a-pos)}
+.ph-chart{margin-top:12px;display:grid;gap:6px}
+.ph-h{font-size:13px;font-weight:600;color:var(--a-fg)}
+.ph-legend{display:flex;gap:12px;font-size:10.5px;color:var(--a-fg2)}
+.ph-legend span{display:flex;align-items:center;gap:4px}
+.ph-legend i{width:12px;height:2px;background:var(--a-ink);display:block}
+.ph-legend i.d{background:repeating-linear-gradient(90deg,var(--a-fg3) 0 3px,transparent 3px 5px)}
+.ph-tx{margin-top:12px;display:grid;gap:0;padding:6px 14px}
+.ph-txr{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--a-line)}
+.ph-txr:last-child{border-bottom:0}
+.ph-ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700}
+.ph-txr b{font-weight:600;font-size:12.5px;display:block}
+.ph-txr span{font-size:11px;color:var(--a-fg2)}
+.ph-amt{font-weight:600;font-size:12.5px}
+.ph-tab{position:absolute;left:12px;right:12px;bottom:16px;height:62px;border-radius:26px;background:var(--a-glass);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border:1px solid var(--a-glass-line);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;justify-items:center;box-shadow:0 8px 24px rgba(0,0,0,.10)}
+.ph-tab span{display:grid;justify-items:center;gap:2px;font-size:9.5px;color:var(--a-fg2)}
+.ph-tab span.on{color:var(--a-fg)}
+.ph-plus{width:44px;height:44px;border-radius:50%;background:var(--a-ink);color:var(--a-on-ink);display:grid;place-items:center}
+.ph-plus.x svg{transform:rotate(45deg)}
+.ph-dim{filter:blur(5px);opacity:.75}
+.ph-scrim{position:absolute;inset:0;background:var(--a-scrim)}
+.ph-sheet{position:absolute;left:0;right:0;bottom:0;border-radius:30px 30px 0 0;background:var(--a-glass);-webkit-backdrop-filter:blur(30px) saturate(1.5);backdrop-filter:blur(30px) saturate(1.5);border-top:1px solid var(--a-glass-line);padding:10px 16px 96px;display:grid;gap:12px}
+.ph-handle{width:36px;height:5px;border-radius:9px;background:var(--a-fg3);opacity:.5;justify-self:center}
+.ph-sheet h4{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.ph-primary{background:var(--a-ink);color:var(--a-on-ink);border-radius:20px;padding:14px 16px;display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center}
+.ph-primary b{font-size:15px;font-weight:600;display:block}
+.ph-primary span{font-size:11.5px;opacity:.75}
+.ph-primary .ico{width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--a-on-ink) 16%,transparent);display:grid;place-items:center}
+.ph-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ph-tiles div{background:var(--a-surface);border:1px solid var(--a-line);border-radius:16px;padding:12px 8px;display:grid;justify-items:center;gap:6px;font-size:11.5px;font-weight:500}
+.ph-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ph-chip{font-size:11.5px;padding:6px 10px;border-radius:999px;background:var(--a-surface);border:1px solid var(--a-line);white-space:nowrap}
+.ph-chip.sel{border-color:transparent;font-weight:600}
+.ph-hdr{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:40px;font-size:13px}
+.ph-hdr b{font-weight:600}
+.ph-hdr span:last-child{justify-self:end;color:var(--a-fg2)}
+.ph-amount{text-align:center;font-size:44px;font-weight:600;letter-spacing:-.035em;padding-block:10px 2px}
+.ph-amount small{font-size:24px;color:var(--a-fg2);font-weight:500}
+.ph-caret{display:inline-block;width:2px;height:34px;background:var(--a-accent);vertical-align:-4px;margin-left:2px}
+.ph-hint{text-align:center;font-size:11px;color:var(--a-fg2)}
+.ph-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ph-keys span{height:38px;border-radius:12px;background:var(--a-surface);border:1px solid var(--a-line);display:grid;place-items:center;font-size:17px;font-weight:500}
+.ph-save{height:46px;border-radius:16px;background:var(--a-ink);color:var(--a-on-ink);display:grid;place-items:center;font-weight:600;font-size:14px}
+.ph-more{display:flex;justify-content:space-between;font-size:12px;color:var(--a-fg2);padding:6px 2px;border-top:1px solid var(--a-line);border-bottom:1px solid var(--a-line)}
+
+/* ---------- Token ---------- */
+.sw{display:inline-block;width:22px;height:22px;border-radius:7px;background:var(--c);border:1px solid var(--line);vertical-align:middle;margin-right:8px}
+.swcell{white-space:nowrap}
+.cats{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr))}
+.cat{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.cat i{width:34px;height:34px;border-radius:50%;background:color-mix(in srgb,var(--c) 16%,transparent);display:grid;place-items:center}
+.cat i::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--c)}
+.cat b{font-size:14px;font-weight:500;display:block;line-height:1.2}
+.cat span{font-size:12px;color:var(--fg2);font-family:var(--mono)}
+.type{display:grid;border-top:1px solid var(--line)}
+.type div{display:grid;grid-template-columns:minmax(0,10em) minmax(0,8em) minmax(0,1fr);gap:4px 16px;align-items:baseline;padding-block:12px;border-bottom:1px solid var(--line)}
+.type .lbl{font-size:13px;color:var(--fg2)}
+.type .spec{font-size:12.5px;font-family:var(--mono);color:var(--fg2)}
+.type .smp{min-width:0;overflow-wrap:anywhere}
+@media (max-width:640px){.type div{grid-template-columns:1fr 1fr}.type .smp{grid-column:1/-1}}
+.scale{display:flex;flex-wrap:wrap;gap:14px;align-items:end}
+.scale div{display:grid;gap:6px;justify-items:center;font-size:12px;color:var(--fg2);font-family:var(--mono)}
+.scale i{display:block;background:var(--accent);border-radius:3px;width:var(--s);height:var(--s);opacity:.85}
+.radii{display:flex;flex-wrap:wrap;gap:14px}
+.radii div{display:grid;gap:6px;justify-items:center;font-size:12px;color:var(--fg2)}
+.radii i{display:block;width:64px;height:48px;border:1.5px solid var(--fg2);border-radius:var(--r)}
+
+.names{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))}
+.name{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:grid;gap:8px;align-content:start}
+.name.top{border-color:var(--accent)}
+.name h3{font-size:24px;letter-spacing:-.03em;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.name .tl{font-size:15px;font-style:italic;color:var(--fg)}
+.name p{font-size:14px;color:var(--fg2)}
+.name .vi{font-size:13.5px}
+
+.work{counter-reset:w;display:grid;gap:10px;list-style:none;padding:0}
+.work li{counter-increment:w;display:grid;grid-template-columns:36px 1fr;gap:4px 14px;margin:0;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.work li::before{content:counter(w);width:28px;height:28px;border-radius:50%;background:var(--sunken);display:grid;place-items:center;font-weight:600;font-size:14px;grid-row:span 2}
+.work li.stop{border-color:var(--accent)}
+.work li b{font-weight:600}
+.work li p{font-size:14.5px;color:var(--fg2)}
+.stopflag{color:var(--accent);font-weight:600}
+
+.dec{display:grid;gap:12px}
+.dec .card{grid-template-columns:minmax(0,1fr);}
+.dec h3{display:flex;gap:10px;align-items:baseline}
+.dec h3 em{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--accent)}
+.rec{font-size:14.5px}
+.rec b{color:var(--fg)}
+
+@media (prefers-reduced-motion:no-preference){.toc a{transition:border-color .15s}}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Fase 1 · progettazione</div>
+  <h1>Piano dell'app spese</h1>
+  <p class="lede">Come funziona l'app, com'è fatta e con quali strumenti la costruisco. Nessun file del progetto è stato ancora creato: parto solo dopo il tuo ok su questo piano e sulle decisioni in fondo.</p>
+  <div class="meta"><span>7 ottobre 2026</span><span>Nome dell'app: da scegliere (proposte più sotto)</span><span>Dati e cifre negli esempi: finti</span></div>
+</header>
+
+<nav class="toc" aria-label="Indice">
+  <a href="#decisioni">Decisioni da prendere</a>
+  <a href="#principi">Principi</a>
+  <a href="#architettura">Architettura</a>
+  <a href="#ia">Mappa dell'app</a>
+  <a href="#flussi">Flussi</a>
+  <a href="#home">Home</a>
+  <a href="#aggiungi">Aggiungi spesa</a>
+  <a href="#schermate">Schermate</a>
+  <a href="#design-system">Design system</a>
+  <a href="#componenti">Componenti</a>
+  <a href="#movimento">Animazioni</a>
+  <a href="#nomi">Nomi</a>
+  <a href="#prototipo">Prototipo</a>
+  <a href="#skill">Skill</a>
+  <a href="#lavori">Ordine dei lavori</a>
+  <a href="#rischi">Rischi</a>
+</nav>
+
+<section id="partenza">
+  <div class="intro">
+    <h2>Punto di partenza</h2>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>Repository</h3><p>Non esiste ancora: si parte da zero. Cartella proposta <code>Desktop\Progetti\app-spese</code>, con nome provvisorio finché non scegli quello vero.</p></div>
+    <div class="card"><h3>Strumenti sul PC</h3><p>Node 24.15, npm 11.13, Git 2.52. Su npm l'ultima versione di Expo è la SDK 57.</p></div>
+    <div class="card"><h3>Dove la provi</h3><p>Sul tuo Galaxy S24 Ultra (Expo Go o build di sviluppo via USB), nell'emulatore <code>test36</code> e in anteprima web su Brave. Senza Mac, iOS si prova solo con Expo Go su un iPhone.</p></div>
+  </div>
+</section>
+
+<section id="decisioni">
+  <div class="intro">
+    <h2>Decisioni da prendere</h2>
+    <p class="muted">Per ognuna c'è la mia proposta. Se ti va bene tutto, basta un ok.</p>
+  </div>
+  <div class="dec">
+    <div class="card"><h3><em>D1</em> Tecnologia del prototipo</h3><p class="rec"><b>Proposta: Expo + React Native + TypeScript da subito.</b> Il prototipo diventa la base dell'app vera, senza riscriverlo. Animazioni, vetro e vibrazioni li giudichi sul telefono. In alternativa: prototipo web più veloce da fare, ma da rifare in React Native dopo.</p></div>
+    <div class="card"><h3><em>D2</em> Lingua dell'interfaccia</h3><p class="rec"><b>Proposta: italiano, con tutti i testi in un file solo</b> per aggiungere l'inglese dopo. Importi nel formato italiano: <span class="num">1.284,62 €</span>. Il codice resta in inglese, adatto a un repository pubblico.</p></div>
+    <div class="card"><h3><em>D3</em> Nome</h3><p class="rec"><b>Proposta: lavoro con il nome provvisorio «app-spese»</b> e tu scegli tra i nomi quando vuoi. Il nome sta in una costante sola, cambiarlo costa pochi minuti.</p></div>
+    <div class="card"><h3><em>D4</em> Spese divise</h3><p class="rec"><b>Proposta: nelle statistiche conta solo la tua quota.</b> Cena da 60 € divisa con Mario: il conto scende di 60 €, la spesa del mese sale di 30 €, gli altri 30 € diventano un credito verso Mario.</p></div>
+    <div class="card"><h3><em>D5</em> Saldo totale</h3><p class="rec"><b>Proposta: somma i conti con «Incluso nel saldo totale» attivo.</b> Di base tutti tranne il conto deposito; lo cambi conto per conto. La carta di credito entra con il suo saldo negativo.</p></div>
+    <div class="card"><h3><em>D6</em> Inizio del mese di budget</h3><p class="rec"><b>Proposta: dal giorno 1 nel prototipo.</b> Il modello dati prevede già un giorno di inizio diverso (per esempio il 27, giorno dello stipendio); la schermata per sceglierlo arriva dopo.</p></div>
+    <div class="card"><h3><em>D7</em> Data finta del prototipo</h3><p class="rec"><b>Proposta: il prototipo vive al 24 ottobre 2026</b>, così il mese ha abbastanza movimenti da giudicare la Home. Dal pannello del prototipo passi alla data vera o a un primo avvio vuoto.</p></div>
+    <div class="card"><h3><em>D8</em> Skill</h3><p class="rec"><b>Proposta: le skill installate elencate in «Skill», più 5 cartelle di expo/skills</b> (team Expo, MIT) copiate a mano dopo averne letto tutti i file, senza il plugin, che porta hook, telemetria e un server remoto.</p></div>
+    <div class="card"><h3><em>D9</em> iPhone</h3><p class="rec">Hai un iPhone su cui provarla? Se no, il prototipo si giudica su Android e web, e il vetro di iOS (più ricco) resta da vedere in una fase successiva.</p></div>
+  </div>
+</section>
+
+<section id="principi">
+  <div class="intro"><h2>Principi di prodotto</h2></div>
+  <div class="principles">
+    <div><b>Cinque secondi</b><span>Aprendo l'app capisci quanto hai speso, quanto ti resta e se stai andando meglio o peggio del mese scorso. Tutto il resto viene dopo.</span></div>
+    <div><b>Tre tocchi per una spesa</b><span>Importo, categoria, Salva. Ogni altro campo è facoltativo e sta dietro «Dettagli».</span></div>
+    <div><b>Il telefono è la casa dei dati</b><span>Funziona tutto offline, senza account e senza costi fissi. Il cloud è un'aggiunta facoltativa: se sparisce, l'app continua a funzionare.</span></div>
+    <div><b>Privacy di serie</b><span>Blocco con impronta o Face ID, modalità privacy che nasconde ogni importo in tutta l'app, nessun segreto nel codice (il repository può diventare pubblico).</span></div>
+    <div><b>Calma, non allarme</b><span>Gli stati si leggono con parola, icona e colore insieme. Niente rossi urlati, niente notifiche inutili.</span></div>
+    <div><b>Prima il riassunto</b><span>Ogni schermata apre con la risposta e lascia i dettagli a un tocco. Ogni grafico risponde a una domanda precisa.</span></div>
+    <div><b>Regole spiegabili</b><span>Previsioni e avvisi seguono regole semplici e scritte in app («Come lo calcolo»). Niente intelligenza artificiale.</span></div>
+    <div><b>I dati sono tuoi</b><span>Esportazione completa in CSV e JSON, backup e ripristino in formati aperti. Nessun vincolo.</span></div>
+  </div>
+</section>
+
+<section id="architettura">
+  <div class="intro">
+    <h2>Architettura di prodotto</h2>
+    <p class="muted">Ogni strato conosce solo quello sotto. Le schermate non sanno se i dati arrivano da dati finti, da SQLite o da Supabase.</p>
+  </div>
+  <div class="layers">
+    <div class="layer"><b>Schermate</b><span>Rotte di Expo Router. Solo composizione di componenti, nessuna logica.</span></div>
+    <div class="layer"><b>Funzioni</b><span>Componenti e hook per ogni area (<code>useMonthSummary()</code>, <code>useTransactions(filtri)</code>).</span></div>
+    <div class="layer"><b>Dominio</b><span>Tipi e regole pure, coperte da test: denaro, previsione del mese, abbonamenti, divisioni, ricerca.</span></div>
+    <div class="layer"><b>Repository</b><span>Interfacce: <code>TransactionRepository</code>, <code>AccountRepository</code>… Sempre asincrone, come sarà SQLite.</span></div>
+    <div class="layer now"><b>Dati finti in memoria</b><span>Fase 1. Dati di esempio realistici, generati da un unico punto.</span></div>
+    <div class="layer opt"><b>SQLite sul telefono</b><span>Fase 2. Stesse interfacce, fonte di verità locale.</span></div>
+    <div class="layer opt"><b>Sincronizzazione facoltativa</b><span>Fase 3+. Coda di modifiche, dati cifrati sul telefono prima dell'invio (da decidere).</span></div>
+    <div class="layer opt"><b>Supabase facoltativo</b><span>Mai richiesto per usare l'app. Accesso con Apple, Google o link via e-mail, senza password.</span></div>
+  </div>
+
+  <h3>Modello dei dati</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Entità</th><th>Campi principali</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Movimento</td><td>tipo (spesa, entrata, trasferimento, rimborso), importo, valuta, data, conto, conto di destinazione, categoria, sottocategoria, esercente, descrizione, note, etichette, metodo di pagamento, scontrino, necessaria o superflua, ricorrente, abbonamento d'origine e data di competenza, rimborso di, pagato da, quote</td><td>I movimenti generati da un abbonamento tengono il riferimento e si modificano da soli</td></tr>
+      <tr><td>Conto</td><td>nome, tipo (corrente, Revolut, PayPal, contanti, carta di credito, deposito, altro), valuta, saldo iniziale, colore, icona, incluso nel totale, archiviato</td><td>Il saldo si calcola dai movimenti</td></tr>
+      <tr><td>Categoria</td><td>nome, icona, colore, tipo (spesa o entrata), categoria madre, predefinita, ordine</td><td>Sottocategorie = categorie con una madre</td></tr>
+      <tr><td>Abbonamento</td><td>nome, prezzo, valuta, frequenza e intervallo, inizio, prossimo addebito, fine facoltativa, categoria, conto, note, attivo</td><td>Settimanale, mensile, trimestrale, annuale o ogni N</td></tr>
+      <tr><td>Budget</td><td>globale o di categoria, importo mensile, valuta, dal mese</td><td>Previsione calcolata, non salvata</td></tr>
+      <tr><td>Obiettivo</td><td>nome, icona, traguardo, data obiettivo, conto collegato, versamenti (data, importo)</td><td>Quota mensile e data prevista calcolate</td></tr>
+      <tr><td>Persona e quota</td><td>persona, importo, saldata, data di saldo</td><td>Per le spese divise</td></tr>
+      <tr><td>Preferenze</td><td>valuta, lingua, tema, privacy, blocco</td><td>PIN e sessione in SecureStore, il resto nel database</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="grid wide">
+    <div class="card"><h3>Regole di base</h3><ul>
+      <li>Importi in centesimi interi con il codice valuta (<code>128462</code> + <code>EUR</code>), mai numeri decimali.</li>
+      <li>Data del movimento come giorno locale (<code>2026-10-24</code>); orari di sistema in UTC.</li>
+      <li>Identificativi UUID v7, ordinabili e adatti alla sincronizzazione.</li>
+      <li>Ogni record ha <code>createdAt</code>, <code>updatedAt</code>, <code>deletedAt</code> e un <code>ownerId</code> riservato al multiutente futuro.</li>
+      <li>Trasferimenti: non sono spese. Rimborsi: riducono la spesa della categoria del movimento originale.</li>
+    </ul></div>
+    <div class="card"><h3>Calcoli deterministici</h3><ul>
+      <li><b>Confronto col mese scorso</b> allo stesso giorno (1–24 ottobre contro 1–24 settembre), così a inizio mese non segna sempre −80%.</li>
+      <li><b>Previsione a fine mese</b> = già speso + addebiti ricorrenti ancora attesi nel mese + media giornaliera delle spese variabili × giorni rimasti.</li>
+      <li><b>Abbonamenti</b>: all'apertura dell'app crea i movimenti con data già passata, una sola volta per abbonamento e data, anche per i mesi persi; poi avvisa («Aggiunti 3 addebiti»).</li>
+      <li><b>Valute</b>: i totali sommano solo la valuta principale; i conti in altra valuta si vedono a parte. Niente cambi in fase 1.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="ia">
+  <div class="intro">
+    <h2>Mappa dell'app</h2>
+    <p class="muted">Barra in basso con cinque posti: Home, Movimenti, il + al centro, Budget, Analisi. Profilo e impostazioni si aprono dall'avatar in Home. Abbonamenti e obiettivi stanno in Budget perché sono pianificazione del mese; le spese condivise sono secondarie e compaiono in Home solo se c'è un credito o un debito aperto.</p>
+  </div>
+  <div class="nav">
+    <div class="col"><h3>Home</h3><ul><li>Speso nel mese, budget, saldo</li><li>Andamento e categorie</li><li>Ultimi movimenti</li><li>Card a comparsa: prossimi addebiti, crediti aperti, obiettivo vicino</li><li>Occhio: modalità privacy</li><li>Avatar: Profilo</li><li>Saldo: Conti</li></ul></div>
+    <div class="col"><h3>Movimenti</h3><ul><li>Elenco per giorno con totali</li><li>Ricerca</li><li>Filtri e ordinamento</li><li>Dettaglio movimento</li><li>Modifica, dividi, rimborso, duplica, elimina</li></ul></div>
+    <div class="col plus"><h3>+ Aggiungi</h3><ul><li>Spesa (predefinita)</li><li>Entrata</li><li>Abbonamento</li><li>Trasferimento</li><li>Recenti: ripeti con un tocco</li><li>Pressione lunga sul +: subito Spesa</li></ul></div>
+    <div class="col"><h3>Budget</h3><ul><li>Budget: globale e per categoria, crea e modifica</li><li>Abbonamenti: totale mensile e annuo, calendario, dettaglio</li><li>Obiettivi: elenco, dettaglio, versamenti</li></ul></div>
+    <div class="col"><h3>Analisi</h3><ul><li>Periodo: settimana, mese, anno</li><li>Sezioni a domanda</li><li>Dettaglio categoria</li><li>Dettaglio esercente</li></ul></div>
+    <div class="col"><h3>Profilo</h3><ul><li>Conti, Categorie, Spese condivise</li><li>Aspetto, Notifiche, Valuta e formati</li><li>Sicurezza, Privacy</li><li>Esporta e backup, Sincronizzazione cloud</li><li>Elimina dati locali, Info</li></ul></div>
+    <div class="col"><h3>Fuori dalle schede</h3><ul><li>Onboarding</li><li>Schermata di blocco</li><li>Ripristino backup</li><li>Pannello prototipo (solo sviluppo)</li></ul></div>
+  </div>
+</section>
+
+<section id="flussi">
+  <div class="intro"><h2>Flussi utente</h2><p class="muted">I passi facoltativi sono saltabili. Ogni salvataggio ha «Annulla» per 5 secondi al posto delle finestre di conferma.</p></div>
+  <div class="flows">
+    <div class="flow"><h3>Primo avvio e onboarding</h3><ol class="steps"><li><span>Benvenuto</span></li><li><span>Valuta (EUR già scelto)</span></li><li><span>Primo conto</span></li><li><span>Budget del mese</span></li><li><span>Privacy</span></li><li><span>Home vuota con guida al +</span></li></ol><p>Al massimo 5 schermate. «Ripristina da backup» sul Benvenuto. Saltando il conto si crea «Contanti».</p></div>
+    <div class="flow"><h3>Aggiungere il primo conto</h3><ol class="steps"><li><span>Profilo › Conti › +</span></li><li><span>Tipo</span></li><li><span>Nome</span></li><li><span>Saldo attuale</span></li><li><span>Colore e icona (facoltativi)</span></li><li><span>Salva</span></li></ol><p>Il conto entra nella pila di carte stile Wallet.</p></div>
+    <div class="flow"><h3>Aggiungere una spesa</h3><ol class="steps"><li><span>+</span></li><li><span>Spesa</span></li><li><span>Importo</span></li><li><span>Categoria</span></li><li><span>Salva</span></li></ol><p>Conto e data già proposti (ultimo conto usato, oggi). Scegliendo un esercente noto la categoria si propone da sola.</p></div>
+    <div class="flow"><h3>Aggiungere un'entrata</h3><ol class="steps"><li><span>+</span></li><li><span>Entrata</span></li><li><span>Importo</span></li><li><span>Tipo: stipendio, rimborso, borsa di studio, trasferimento ricevuto, altro</span></li><li><span>Salva</span></li></ol><p>Da qui la Home mostra Entrate e Netto.</p></div>
+    <div class="flow"><h3>Creare un abbonamento</h3><ol class="steps"><li><span>+</span></li><li><span>Abbonamento</span></li><li><span>Modello o personalizzato</span></li><li><span>Prezzo</span></li><li><span>Frequenza</span></li><li><span>Prossimo addebito</span></li><li><span>Salva</span></li></ol><p>I modelli (Netflix, Spotify, palestra, telefono, cloud, assicurazione) propongono categoria e frequenza. Monogrammi, niente loghi.</p></div>
+    <div class="flow"><h3>Addebito automatico</h3><ol class="steps"><li><span>Apri l'app</span></li><li><span>Il generatore trova addebiti scaduti</span></li><li><span>Crea i movimenti collegati</span></li><li><span>Avviso discreto</span></li></ol><p>Il dettaglio dice «Da abbonamento Spotify». Modificare quel movimento non tocca l'abbonamento.</p></div>
+    <div class="flow"><h3>Budget mensile</h3><ol class="steps"><li><span>Budget</span></li><li><span>Imposta budget del mese</span></li><li><span>Importo (proposta: media ultimi 3 mesi)</span></li><li><span>Salva</span></li></ol></div>
+    <div class="flow"><h3>Budget per categoria</h3><ol class="steps"><li><span>Budget</span></li><li><span>+ Categoria</span></li><li><span>Scegli categoria</span></li><li><span>Importo (proposta: media della categoria)</span></li><li><span>Salva</span></li></ol></div>
+    <div class="flow"><h3>Obiettivo di risparmio</h3><ol class="steps"><li><span>Budget › Obiettivi › +</span></li><li><span>Nome e icona</span></li><li><span>Traguardo</span></li><li><span>Data (facoltativa)</span></li><li><span>Quota mensile proposta</span></li><li><span>Salva</span></li><li><span>Versa</span></li></ol></div>
+    <div class="flow"><h3>Dividere una spesa</h3><ol class="steps"><li><span>Spesa › Dettagli</span></li><li><span>Dividi</span></li><li><span>Persone</span></li><li><span>Parti uguali, importi o percentuali</span></li><li><span>Chi ha pagato</span></li><li><span>Salva</span></li></ol><p>Il credito compare in Spese condivise, dove lo segni come saldato.</p></div>
+    <div class="flow"><h3>Cercare un movimento</h3><ol class="steps"><li><span>Movimenti</span></li><li><span>Scrivi</span></li><li><span>Risultati mentre scrivi</span></li><li><span>Filtri rapidi</span></li><li><span>Dettaglio</span></li></ol><p>Cerca esercente («Amazon»), categoria («ristoranti»), mese («settembre»), importo («29,99»), note ed etichette, anche insieme.</p></div>
+    <div class="flow"><h3>Esportare i dati</h3><ol class="steps"><li><span>Profilo › Esporta e backup</span></li><li><span>CSV, JSON o backup completo</span></li><li><span>Periodo e contenuto</span></li><li><span>Esporta</span></li><li><span>Condivisione di sistema</span></li></ol></div>
+    <div class="flow"><h3>Modalità privacy</h3><ol class="steps"><li><span>Occhio in Home</span></li><li><span>Ogni importo diventa «•••• €»</span></li><li><span>Tieni premuto un importo per vederlo un attimo</span></li></ol><p>Vale ovunque: grafici senza valori sugli assi, notifiche senza cifre, anteprima nel multitasking coperta.</p></div>
+    <div class="flow"><h3>Sblocco con biometria</h3><ol class="steps"><li><span>Apri l'app</span></li><li><span>Schermata di blocco senza importi</span></li><li><span>Impronta o Face ID</span></li><li><span>Home</span></li></ol><p>Se fallisce: PIN. Blocco automatico dopo subito, 1, 5 o 15 minuti.</p></div>
+    <div class="flow"><h3>Attivare la sincronizzazione (concept)</h3><ol class="steps"><li><span>Profilo › Sincronizzazione</span></li><li><span>Cosa succede ai dati</span></li><li><span>Accedi con Apple, Google o e-mail</span></li><li><span>Primo invio</span></li><li><span>«Aggiornato 2 min fa»</span></li></ol><p>In fase 1 solo schermate e stati, nessun server.</p></div>
+    <div class="flow"><h3>Ripristinare un backup</h3><ol class="steps"><li><span>Benvenuto o Esporta e backup</span></li><li><span>Ripristina</span></li><li><span>Scegli il file</span></li><li><span>Anteprima: movimenti, conti, data</span></li><li><span>Conferma scritta</span></li><li><span>Dati sostituiti</span></li></ol></div>
+  </div>
+</section>
+
+<section id="home">
+  <div class="intro">
+    <h2>Home</h2>
+    <p class="muted">La schermata su cui spendo più tempo. Sopra la piega solo quattro cose: quanto hai speso, il confronto, il budget con il ritmo del mese, il saldo. Il resto si scopre scorrendo.</p>
+  </div>
+  <div class="shots">
+    <figure class="shot">
+      <div class="phone app-light" role="img" aria-label="Bozza della Home in tema chiaro: speso a ottobre 1.284,62 euro, 12,4 per cento in meno di settembre allo stesso giorno, budget 1.285 su 1.600 euro, saldo totale 4.820,32 euro">
+        <div class="ph-status"><span>9:41</span><i></i><span>●●●</span></div>
+        <div class="ph-in">
+          <div class="ph-top"><span class="ph-greet">Buonasera, Lorenzo</span><span class="ph-actions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="ph-av">LL</span></span></div>
+          <div class="ph-label">Speso a ottobre</div>
+          <div class="ph-hero num">1.284<small>,62 €</small></div>
+          <div class="ph-delta"><span class="ph-pill">↓ 12,4%</span> rispetto a settembre, stesso giorno</div>
+          <div class="ph-budget">
+            <div class="ph-bar"><span class="ph-fill" style="width:80.3%"></span><span class="ph-pace" style="left:77.4%"></span></div>
+            <div class="ph-row num"><span><b>1.285 €</b> di 1.600 €</span><span>Restano <b>315 €</b></span></div>
+            <div class="ph-note"><i></i>A questo ritmo: circa 1.505 € a fine mese</div>
+          </div>
+          <div class="ph-card ph-fin">
+            <div class="ph-fin-top"><div><div class="ph-small">Saldo totale · 5 conti</div><div class="ph-bal num">4.820,32 €</div></div><div class="ph-dots"><i style="background:#3D4FD6"></i><i style="background:#1A9AAE"></i><i style="background:#C2862B"></i><i style="background:#8A8780"></i></div></div>
+            <div class="ph-metrics num"><div><span class="ph-small">Entrate</span>+1.750 €</div><div><span class="ph-small">Abbonamenti</span>120 €/mese</div><div><span class="ph-small">Netto</span><span class="ph-pos">+465 €</span></div></div>
+          </div>
+          <div class="ph-card ph-chart">
+            <div class="ph-row"><span class="ph-h">Andamento del mese</span></div>
+            <svg viewBox="0 -10 272 112" width="100%" aria-hidden="true">
+              <line x1="0" y1="5.3" x2="272" y2="5.3" stroke="var(--a-fg3)" stroke-width="1" stroke-dasharray="2 4" opacity=".6"/>
+              <polyline fill="none" stroke="var(--a-fg3)" stroke-width="1.6" stroke-dasharray="4 3" points="0,56.1 36.3,48.7 81.6,39.2 126.9,29.1 172.3,19.6 208.5,12.4 235.7,8.5 263,4.8"/>
+              <path d="M0,57.2 L18.1,52.9 L45.3,48.2 L72.5,43.4 L99.7,39.2 L126.9,34.9 L154.1,30.7 L181.3,25.9 L208.5,22 L208.5,90 L0,90 Z" fill="var(--a-ink)" opacity=".06"/>
+              <polyline fill="none" stroke="var(--a-ink)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" points="0,57.2 18.1,52.9 45.3,48.2 72.5,43.4 99.7,39.2 126.9,34.9 154.1,30.7 181.3,25.9 208.5,22"/>
+              <circle cx="208.5" cy="22" r="4" fill="var(--a-surface)" stroke="var(--a-ink)" stroke-width="2"/>
+              <line x1="0" y1="90" x2="272" y2="90" stroke="var(--a-line)"/>
+              <text x="0" y="101" font-size="9" fill="var(--a-fg2)">1 ott</text>
+              <text x="208.5" y="101" font-size="9" fill="var(--a-fg2)" text-anchor="middle">oggi</text>
+              <text x="272" y="101" font-size="9" fill="var(--a-fg2)" text-anchor="end">31</text>
+            </svg>
+            <div class="ph-legend"><span><i></i>ottobre</span><span><i class="d"></i>settembre</span></div>
+          </div>
+        </div>
+        <div class="ph-tab" aria-hidden="true">
+          <span class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</span>
+          <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Movimenti</span>
+          <span class="ph-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></span>
+          <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l6 6"/></svg>Budget</span>
+          <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9"/></svg>Analisi</span>
+        </div>
+      </div>
+      <figcaption>Tema chiaro</figcaption>
+    </figure>
+
+    <figure class="shot">
+      <div class="phone app-dark" role="img" aria-label="Bozza della Home in tema scuro con gli stessi contenuti">
+        <div class="ph-status"><span>9:41</span><i></i><span>●●●</span></div>
+        <div class="ph-in">
+          <div class="ph-top"><span class="ph-greet">Buonasera, Lorenzo</span><span class="ph-actions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="ph-av">LL</span></span></div>
+          <div class="ph-label">Speso a ottobre</div>
+          <div class="ph-hero num">1.284<small>,62 €</small></div>
+          <div class="ph-delta"><span class="ph-pill">↓ 12,4%</span> rispetto a settembre, stesso giorno</div>
+          <div class="ph-budget">
+            <div class="ph-bar"><span class="ph-fill" style="width:80.3%"></span><span class="ph-pace" style="left:77.4%"></span></div>
+            <div class="ph-row num"><span><b>1.285 €</b> di 1.600 €</span><span>Restano <b>315 €</b></span></div>
+            <div class="ph-note"><i></i>A questo ritmo: circa 1.505 € a fine mese</div>
+          </div>
+          <div class="ph-card ph-fin">
+            <div class="ph-fin-top"><div><div class="ph-small">Saldo totale · 5 conti</div><div class="ph-bal num">4.820,32 €</div></div><div class="ph-dots"><i style="background:#8D9BFF"></i><i style="background:#3FC0CF"></i><i style="background:#E0A84E"></i><i style="background:#9C9A94"></i></div></div>
+            <div class="ph-metrics num"><div><span class="ph-small">Entrate</span>+1.750 €</div><div><span class="ph-small">Abbonamenti</span>120 €/mese</div><div><span class="ph-small">Netto</span><span class="ph-pos">+465 €</span></div></div>
+          </div>
+          <div class="ph-card ph-tx">
+            <div class="ph-txr"><span class="ph-ic" style="background:rgba(58,154,91,.22);color:#6FD293">E</span><div><b>Esselunga</b><span>Spesa alimentare · oggi</span></div><span class="ph-amt num">−42,80 €</span></div>
+            <div class="ph-txr"><span class="ph-ic" style="background:rgba(52,119,217,.24);color:#86B4F5">T</span><div><b>Trenitalia</b><span>Trasporti · oggi</span></div><span class="ph-amt num">−18,90 €</span></div>
+            <div class="ph-txr"><span class="ph-ic" style="background:rgba(224,116,47,.22);color:#F4A06A">B</span><div><b>Bar Centrale</b><span>Ristoranti · ieri</span></div><span class="ph-amt num">−1,50 €</span></div>
+            <div class="ph-txr"><span class="ph-ic" style="background:rgba(127,92,230,.24);color:#B7A2FF">S</span><div><b>Spotify</b><span>Abbonamenti · ieri</span></div><span class="ph-amt num">−10,99 €</span></div>
+          </div>
+        </div>
+        <div class="ph-tab" aria-hidden="true">
+          <span class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</span>
+          <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Movimenti</span>
+          <span class="ph-plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></span>
+          <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l6 6"/></svg>Budget</span>
+          <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9"/></svg>Analisi</span>
+        </div>
+      </div>
+      <figcaption>Tema scuro, più in basso nella pagina (ultimi movimenti)</figcaption>
+    </figure>
+  </div>
+  <p class="small muted" style="text-align:center;max-width:none">Bozze per discutere gerarchia e tono, non il disegno finale. Il disegno vero nasce con le skill di design nel passo 2 dei lavori.</p>
+
+  <div class="grid wide">
+    <div class="card"><h3>Ordine di lettura</h3><ol>
+      <li><b>Speso a ottobre</b>: la cifra più grande dell'app, centesimi attenuati.</li>
+      <li><b>Confronto</b> con lo stesso giorno del mese scorso, con freccia e parole («in meno», «in più»).</li>
+      <li><b>Budget</b>: barra con il segno del ritmo (dove dovresti essere oggi), quanto resta, previsione a fine mese.</li>
+      <li><b>Saldo totale</b> con i conti in piccolo; sotto Entrate, Abbonamenti, Netto.</li>
+      <li><b>Andamento del mese</b>: spesa cumulativa contro settembre. Trascinando il dito leggi ogni giorno.</li>
+      <li><b>Categorie</b>: le prime 4 con barre e budget di categoria, poi «Tutte».</li>
+      <li><b>Ultimi movimenti</b>: 5 righe, poi «Vedi tutti».</li>
+    </ol></div>
+    <div class="card"><h3>Regole della Home</h3><ul>
+      <li>Senza entrate registrate: al posto di Entrate e Netto compaiono «Media al giorno» e «Giorni rimasti», mai metriche vuote.</li>
+      <li>Al massimo 2 card a comparsa (prossimi addebiti, crediti aperti, obiettivo vicino), solo quando servono.</li>
+      <li>Scorrendo, la cifra grande si rimpicciolisce e finisce nella barra in alto, in vetro.</li>
+      <li>Il segno del ritmo è di colore accento; lo stato del budget si legge anche a parole («In linea», «Sopra il ritmo», «Sforato di 12 €»).</li>
+      <li>Primo avvio: la Home mostra «0,00 €» e una guida al + con tre spese di esempio da toccare.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="aggiungi">
+  <div class="intro">
+    <h2>Aggiungi spesa</h2>
+    <p class="muted">Obiettivo: una spesa comune in meno di 5 secondi. Il + apre prima un menu, come chiedi; per chi ha fretta, la pressione lunga sul + porta direttamente alla spesa.</p>
+  </div>
+  <div class="shots">
+    <figure class="shot">
+      <div class="phone app-light" role="img" aria-label="Bozza del menu Aggiungi: Spesa in evidenza, poi Entrata, Abbonamento, Trasferimento e tre spese recenti da ripetere">
+        <div class="ph-dim">
+          <div class="ph-status"><span>9:41</span><i></i><span>●●●</span></div>
+          <div class="ph-in">
+            <div class="ph-top"><span class="ph-greet">Buonasera, Lorenzo</span><span class="ph-av">LL</span></div>
+            <div class="ph-label">Speso a ottobre</div>
+            <div class="ph-hero num">1.284<small>,62 €</small></div>
+            <div class="ph-budget"><div class="ph-bar"><span class="ph-fill" style="width:80.3%"></span></div></div>
+          </div>
+        </div>
+        <div class="ph-scrim"></div>
+        <div class="ph-sheet">
+          <div class="ph-handle"></div>
+          <h4>Aggiungi</h4>
+          <div class="ph-primary"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></span><div><b>Spesa</b><span>Importo, categoria, fatto</span></div></div>
+          <div class="ph-tiles">
+            <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Entrata</div>
+            <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>Abbonamento</div>
+            <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h14l-3-3M20 16H6l3 3"/></svg>Trasferimento</div>
+          </div>
+          <div class="ph-small">Recenti</div>
+          <div class="ph-chips num"><span class="ph-chip">Caffè · 1,50 €</span><span class="ph-chip">Esselunga · 42,80 €</span><span class="ph-chip">Trenitalia · 18,90 €</span></div>
+        </div>
+        <div class="ph-tab" aria-hidden="true" style="background:transparent;border-color:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none">
+          <span></span><span></span>
+          <span class="ph-plus x"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></span>
+          <span></span><span></span>
+        </div>
+      </div>
+      <figcaption>Menu del +: il + ruota e diventa ×</figcaption>
+    </figure>
+
+    <figure class="shot">
+      <div class="phone app-light" role="img" aria-label="Bozza della nuova spesa: 18,90 euro, Trenitalia, categoria Trasporti selezionata, tastierino e pulsante Salva">
+        <div class="ph-status"><span>9:41</span><i></i><span>●●●</span></div>
+        <div class="ph-in" style="gap:8px">
+          <div class="ph-hdr"><span>Annulla</span><b>Nuova spesa</b><span></span></div>
+          <div class="ph-chips" style="justify-content:center"><span class="ph-chip">Revolut ▾</span><span class="ph-chip">Oggi ▾</span></div>
+          <div class="ph-amount num">18<small>,90 €</small><span class="ph-caret"></span></div>
+          <div class="ph-hint">Trenitalia · categoria proposta</div>
+          <div class="ph-chips">
+            <span class="ph-chip sel" style="background:rgba(52,119,217,.14);color:#1F5FB8">✓ Trasporti</span>
+            <span class="ph-chip">Spesa alimentare</span><span class="ph-chip">Ristoranti</span><span class="ph-chip">Shopping</span><span class="ph-chip">Casa</span><span class="ph-chip">Tutte…</span>
+          </div>
+          <div class="ph-more"><span>Dettagli: esercente, note, scontrino, dividi…</span><span>›</span></div>
+          <div class="ph-keys num"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>,</span><span>0</span><span>⌫</span></div>
+          <div class="ph-save num">Salva 18,90 €</div>
+        </div>
+      </div>
+      <figcaption>Nuova spesa: importo, categoria, Salva</figcaption>
+    </figure>
+  </div>
+
+  <div class="grid wide">
+    <div class="card"><h3>Come diventa veloce</h3><ul>
+      <li>Conto e data già scelti (ultimo conto usato, oggi): si cambiano dai due chip in alto.</li>
+      <li>Le 5 categorie più usate sono già visibili; «Tutte» apre l'elenco completo con ricerca.</li>
+      <li>«Recenti» nel menu ripete una spesa abituale con un tocco, importo modificabile.</li>
+      <li>Un esercente già visto propone la sua ultima categoria.</li>
+      <li>Salvataggio: vibrazione di successo, il foglio scende, la cifra in Home scorre al nuovo totale, toast con «Annulla».</li>
+    </ul></div>
+    <div class="card"><h3>Campi facoltativi in «Dettagli»</h3><p>Esercente, descrizione, note, etichette, sottocategoria, metodo di pagamento, scontrino o foto, ricorrente, necessaria o superflua, chi ha pagato, divisione. Il tastierino ha la virgola, massimo due decimali, ogni tasto ha un'etichetta per lo screen reader e si può passare alla tastiera di sistema.</p></div>
+  </div>
+</section>
+
+<section id="schermate">
+  <div class="intro"><h2>Schermate del prototipo</h2><p class="muted">49 schermate. Ognuna avrà gli stati caricamento, vuoto, errore e privacy dove servono.</p></div>
+  <div class="grid">
+    <div class="card"><h3>Ingresso <span class="tag">7</span></h3><p>Benvenuto, Valuta, Primo conto, Budget del mese, Privacy, Schermata di blocco (biometria e PIN), Ripristino backup.</p></div>
+    <div class="card"><h3>Home <span class="tag">1</span></h3><p>Con le varianti: primo avvio, senza entrate, modalità privacy, mese sforato.</p></div>
+    <div class="card"><h3>Aggiungi <span class="tag">6</span></h3><p>Menu del +, Nuova spesa con dettagli, Nuova entrata, Nuovo abbonamento, Trasferimento, Dividi spesa.</p></div>
+    <div class="card"><h3>Movimenti <span class="tag">5</span></h3><p>Elenco per giorno, Ricerca, Filtri e ordinamento, Dettaglio movimento, Modifica.</p></div>
+    <div class="card"><h3>Budget <span class="tag">9</span></h3><p>Panoramica budget, Crea o modifica budget, Dettaglio budget di categoria, Abbonamenti, Dettaglio abbonamento, Obiettivi, Dettaglio obiettivo, Nuovo obiettivo, Versamento.</p></div>
+    <div class="card"><h3>Analisi <span class="tag">3</span></h3><p>Panoramica a sezioni, Dettaglio categoria, Dettaglio esercente.</p></div>
+    <div class="card"><h3>Profilo <span class="tag">17</span></h3><p>Profilo e impostazioni, Conti, Dettaglio conto, Nuovo conto, Categorie, Modifica categoria, Spese condivise, Dettaglio persona, Sicurezza, Privacy, Notifiche, Aspetto, Valuta e formati, Esporta e backup, Sincronizzazione cloud, Elimina dati locali, Info.</p></div>
+    <div class="card"><h3>Prototipo <span class="tag">1</span></h3><p>Pannello prototipo: insieme di dati (pieno, primo avvio, senza entrate, casi limite), data finta, stato della sincronizzazione, caricamento lento, errore di lettura.</p></div>
+  </div>
+
+  <div class="grid wide">
+    <div class="card"><h3>Analisi: una domanda per sezione</h3><ul>
+      <li>Quanto sto spendendo rispetto al solito? Barre degli ultimi 6 mesi con la media.</li>
+      <li>Dove vanno i soldi? Classifica delle categorie con barre orizzontali.</li>
+      <li>In quali giorni spendo? Barre giornaliere o settimanali.</li>
+      <li>Da chi compro di più? Elenco degli esercenti.</li>
+      <li>Quali sono le spese più grandi? Le prime 5.</li>
+      <li>Quanto pesano gli abbonamenti? Una cifra, la quota sulla spesa, il costo annuo.</li>
+      <li>Come sono andati i budget? Ultimi 6 mesi, rispettato o sforato.</li>
+    </ul><p>Al massimo 3 grafici visibili insieme; il resto sono elenchi.</p></div>
+    <div class="card"><h3>Notifiche (regole configurabili)</h3><ul>
+      <li>Budget quasi raggiunto (soglia, di base 80%) e budget superato.</li>
+      <li>Abbonamento in arrivo (1, 2 o 3 giorni prima) e addebito ricorrente creato.</li>
+      <li>Spesa grande (sopra una cifra che scegli).</li>
+      <li>Riepilogo settimanale e mensile, promemoria serale solo se oggi non hai inserito nulla.</li>
+      <li>Obiettivi: 25, 50, 75 e 100%.</li>
+    </ul><p>Notifiche locali, nessun server. Con la privacy attiva non mostrano cifre.</p></div>
+    <div class="card"><h3>Sincronizzazione: stati disegnati</h3><ul>
+      <li>Disattivata (predefinito): «I tuoi dati sono solo su questo telefono».</li>
+      <li>Attiva: «Aggiornato 2 min fa». In corso. Offline: «Puoi usare l'app normalmente».</li>
+      <li>Errore: «I dati sul telefono sono al sicuro» e Riprova.</li>
+      <li>Conflitto: tieni questo, tieni l'altro, tieni entrambi.</li>
+    </ul></div>
+    <div class="card"><h3>Sicurezza e privacy</h3><ul>
+      <li>Blocco con impronta o Face ID, PIN di riserva (4–6 cifre), blocco automatico.</li>
+      <li>Modalità privacy, avvio con importi nascosti, anteprima coperta nel multitasking.</li>
+      <li>Elimina dati locali con conferma scritta. Esci (solo con la sincronizzazione attiva).</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="design-system">
+  <div class="intro">
+    <h2>Design system</h2>
+    <p class="muted">Direzione proposta: carta e inchiostro. Fondi carta appena caldi in chiaro, inchiostro profondo in scuro; le cifre sono le protagoniste; il colore serve solo a dire qualcosa (categorie, stati); il vetro solo dove le cose galleggiano: barra delle schede, intestazione che si riduce, fogli, toast, carta selezionata. Prima proposta, da rifinire con le skill nel passo 2.</p>
+  </div>
+
+  <h3>Colori semantici</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Token</th><th>Uso</th><th>Chiaro</th><th>Scuro</th></tr></thead>
+    <tbody>
+      <tr><td>canvas</td><td>Sfondo delle schermate</td><td class="swcell"><span class="sw" style="--c:#F5F4F1"></span><code>#F5F4F1</code></td><td class="swcell"><span class="sw" style="--c:#0B0C10"></span><code>#0B0C10</code></td></tr>
+      <tr><td>surface</td><td>Card e gruppi di righe</td><td class="swcell"><span class="sw" style="--c:#FFFFFF"></span><code>#FFFFFF</code></td><td class="swcell"><span class="sw" style="--c:#15161B"></span><code>#15161B</code></td></tr>
+      <tr><td>surface-2</td><td>Elementi dentro le card, tasti</td><td class="swcell"><span class="sw" style="--c:#ECEAE5"></span><code>#ECEAE5</code></td><td class="swcell"><span class="sw" style="--c:#1E1F25"></span><code>#1E1F25</code></td></tr>
+      <tr><td>ink</td><td>Importi, titoli, pulsante primario</td><td class="swcell"><span class="sw" style="--c:#141413"></span><code>#141413</code></td><td class="swcell"><span class="sw" style="--c:#F3F2EF"></span><code>#F3F2EF</code></td></tr>
+      <tr><td>text-2</td><td>Etichette e informazioni secondarie</td><td class="swcell"><span class="sw" style="--c:#5C5A55"></span><code>#5C5A55</code></td><td class="swcell"><span class="sw" style="--c:#A3A29D"></span><code>#A3A29D</code></td></tr>
+      <tr><td>text-3</td><td>Solo testi grandi o decorativi</td><td class="swcell"><span class="sw" style="--c:#85827B"></span><code>#85827B</code></td><td class="swcell"><span class="sw" style="--c:#7A7975"></span><code>#7A7975</code></td></tr>
+      <tr><td>accent</td><td>Selezione, focus, link, segno del ritmo</td><td class="swcell"><span class="sw" style="--c:#3D4FD6"></span><code>#3D4FD6</code></td><td class="swcell"><span class="sw" style="--c:#8D9BFF"></span><code>#8D9BFF</code></td></tr>
+      <tr><td>positive</td><td>Entrate, «nel budget»</td><td class="swcell"><span class="sw" style="--c:#1B7A4A"></span><code>#1B7A4A</code></td><td class="swcell"><span class="sw" style="--c:#45C486"></span><code>#45C486</code></td></tr>
+      <tr><td>warning</td><td>Vicino al limite</td><td class="swcell"><span class="sw" style="--c:#9A5A00"></span><code>#9A5A00</code></td><td class="swcell"><span class="sw" style="--c:#F2B54A"></span><code>#F2B54A</code></td></tr>
+      <tr><td>negative</td><td>Sforato, errori</td><td class="swcell"><span class="sw" style="--c:#C0392B"></span><code>#C0392B</code></td><td class="swcell"><span class="sw" style="--c:#FF6B5B"></span><code>#FF6B5B</code></td></tr>
+      <tr><td>glass</td><td>Barra schede, fogli, toast</td><td><code>bianco 72%</code> + sfocatura 24</td><td><code>#1E1F25 62%</code> + sfocatura 28</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">Contrasti calcolati sul canvas: text-2 circa 6:1, accent e semantici oltre 4,5:1 in entrambi i temi. In scuro niente ombre: la profondità viene da superfici un gradino più chiare e da un filo di bordo.</p>
+
+  <h3>Categorie predefinite</h3>
+  <div class="cats">
+    <div class="cat" style="--c:#3A9A5B"><i></i><div><b>Spesa alimentare</b><span>ShoppingCart</span></div></div>
+    <div class="cat" style="--c:#E0742F"><i></i><div><b>Ristoranti</b><span>ForkKnife</span></div></div>
+    <div class="cat" style="--c:#3477D9"><i></i><div><b>Trasporti</b><span>Train</span></div></div>
+    <div class="cat" style="--c:#D2477F"><i></i><div><b>Shopping</b><span>ShoppingBag</span></div></div>
+    <div class="cat" style="--c:#C2862B"><i></i><div><b>Casa</b><span>House</span></div></div>
+    <div class="cat" style="--c:#A89A1E"><i></i><div><b>Bollette</b><span>Lightning</span></div></div>
+    <div class="cat" style="--c:#7F5CE6"><i></i><div><b>Abbonamenti</b><span>ArrowsClockwise</span></div></div>
+    <div class="cat" style="--c:#D94A4A"><i></i><div><b>Salute</b><span>Heartbeat</span></div></div>
+    <div class="cat" style="--c:#B54BC2"><i></i><div><b>Svago</b><span>FilmSlate</span></div></div>
+    <div class="cat" style="--c:#1A9AAE"><i></i><div><b>Viaggi</b><span>AirplaneTilt</span></div></div>
+    <div class="cat" style="--c:#2F8BC9"><i></i><div><b>Istruzione</b><span>GraduationCap</span></div></div>
+    <div class="cat" style="--c:#5A7590"><i></i><div><b>Tecnologia</b><span>Laptop</span></div></div>
+    <div class="cat" style="--c:#D9779B"><i></i><div><b>Cura personale</b><span>Sparkle</span></div></div>
+    <div class="cat" style="--c:#E05A47"><i></i><div><b>Regali</b><span>Gift</span></div></div>
+    <div class="cat" style="--c:#8A8780"><i></i><div><b>Altro</b><span>DotsThree</span></div></div>
+  </div>
+  <p class="small muted">Icona su cerchio tinto (16% in chiaro, 22% in scuro). Il colore non è mai l'unico segnale: icona e nome sempre presenti. Nei grafici le prime 5 categorie più «Altro». Distinguibilità e contrasto da validare con lo strumento della skill dataviz.</p>
+
+  <h3>Tipografia</h3>
+  <p class="muted small">Geist (licenza OFL, gratuita, cifre tabellari) per tutto, così i numeri restano allineati. Alternative da provare nel passo 2: Instrument Sans e Hanken Grotesk. La scala segue il testo dinamico del sistema; la cifra della Home cresce al massimo di 1,3 volte.</p>
+  <div class="type">
+    <div><span class="lbl">Cifra principale</span><span class="spec">56/60 · 600 · −3%</span><span class="smp num" style="font-size:56px;line-height:1;font-weight:600;letter-spacing:-.035em">1.284<span style="font-size:.55em;color:var(--fg2);font-weight:500">,62 €</span></span></div>
+    <div><span class="lbl">Display</span><span class="spec">34/40 · 600</span><span class="smp num" style="font-size:34px;font-weight:600;letter-spacing:-.025em;line-height:1.15">4.820,32 €</span></div>
+    <div><span class="lbl">Titolo 1</span><span class="spec">28/34 · 600</span><span class="smp" style="font-size:28px;font-weight:600;letter-spacing:-.02em">Movimenti</span></div>
+    <div><span class="lbl">Titolo 2</span><span class="spec">22/28 · 600</span><span class="smp" style="font-size:22px;font-weight:600;letter-spacing:-.015em">Ottobre 2026</span></div>
+    <div><span class="lbl">Titolo 3</span><span class="spec">18/24 · 600</span><span class="smp" style="font-size:18px;font-weight:600">Ultimi movimenti</span></div>
+    <div><span class="lbl">Corpo</span><span class="spec">16/22 · 400</span><span class="smp" style="font-size:16px">Esselunga · Spesa alimentare</span></div>
+    <div><span class="lbl">Corpo forte</span><span class="spec">16/22 · 600</span><span class="smp num" style="font-size:16px;font-weight:600">−42,80 €</span></div>
+    <div><span class="lbl">Secondario</span><span class="spec">14/19 · 400</span><span class="smp" style="font-size:14px;color:var(--fg2)">Oggi, 18:42 · Revolut</span></div>
+    <div><span class="lbl">Nota</span><span class="spec">13/18 · 400</span><span class="smp" style="font-size:13px;color:var(--fg2)">Previsione calcolata sulla media dei giorni passati</span></div>
+    <div><span class="lbl">Didascalia</span><span class="spec">12/16 · 500</span><span class="smp" style="font-size:12px;font-weight:500;color:var(--fg2)">1 ott · 15 ott · 31 ott</span></div>
+  </div>
+
+  <div class="grid wide">
+    <div class="card"><h3>Spaziatura (base 4)</h3>
+      <div class="scale"><div><i style="--s:4px"></i>4</div><div><i style="--s:8px"></i>8</div><div><i style="--s:12px"></i>12</div><div><i style="--s:16px"></i>16</div><div><i style="--s:20px"></i>20</div><div><i style="--s:24px"></i>24</div><div><i style="--s:32px"></i>32</div><div><i style="--s:40px"></i>40</div><div><i style="--s:56px"></i>56</div></div>
+      <p>Margine laterale 20, interno card 16–20, tra sezioni 32.</p></div>
+    <div class="card"><h3>Raggi</h3>
+      <div class="radii"><div><i style="--r:8px"></i>8 chip piccoli</div><div><i style="--r:12px"></i>12 tasti, campi</div><div><i style="--r:16px"></i>16 righe, riquadri</div><div><i style="--r:24px"></i>24 card</div><div><i style="--r:32px"></i>32 fogli</div></div>
+      <p>Angoli continui (squircle) su iOS; pillola per chip e badge.</p></div>
+  </div>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>Elemento</th><th>Valori</th></tr></thead>
+    <tbody>
+      <tr><td>Ombre (solo chiaro)</td><td>card: 0 1 2 / 4% + 0 4 16 / 4% · elementi che galleggiano: 0 8 24 / 10% · fogli: 0 −8 40 / 14%</td></tr>
+      <tr><td>Sfocatura</td><td>leggera 12 (intestazione) · media 24 (barra schede, toast) · forte 40 (fogli, schermata di blocco). Con «Riduci trasparenza» diventa superficie piena.</td></tr>
+      <tr><td>Icone</td><td>Phosphor (MIT): 16 nel testo, 20 nelle righe, 24 barra e intestazioni, 28 il +. Contorno di base, piena quando selezionata. Icona categoria 40 nelle righe, 56 nei dettagli.</td></tr>
+      <tr><td>Movimento</td><td>pressione 120 ms · dissolvenze 200 ms · molla «scatto» (smorzamento 22, rigidità 320) per interruttori · molla «foglio» (26, 220) · molla «morbida» (18, 140) per le barre · cifre che scorrono 600 ms</td></tr>
+      <tr><td>Vibrazioni</td><td>selezione: chip, segmenti, giorni del grafico · leggera: +, occhio · successo: salvataggio · avviso: budget superato (una volta per mese e budget) · tastierino: spenta di base</td></tr>
+      <tr><td>Bersagli</td><td>minimo 44 × 44 pt (48 dp su Android), anche dove l'elemento visibile è più piccolo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="componenti">
+  <div class="intro"><h2>Componenti</h2><p class="muted">Un solo componente per ogni cosa, con varianti. Nessun colore, misura o durata scritta a mano: solo token.</p></div>
+  <div class="grid">
+    <div class="card"><h3>Base</h3><p>Testo (varianti della scala), Importo (segno, dimensione, centesimi attenuati, privacy, lettura per lo screen reader), Icona, Pulsante (primario inchiostro, secondario, terziario, distruttivo, solo icona), Superficie (piana, raggruppata, vetro, selezionata), Riga elenco (valore, interruttore, freccia), Chip (filtro, categoria, stato), Badge, Monogramma, Interruttore, Segmenti, Campo di testo, Campo importo con tastierino, Selettore data, Selettore conto.</p></div>
+    <div class="card"><h3>Struttura</h3><p>Barra delle schede in vetro con + centrale, Intestazione grande che si riduce, Foglio inferiore, Menu azioni, Modale a tutto schermo, Toast con Annulla, Selettore del mese, Barra di ricerca, Pannello filtri.</p></div>
+    <div class="card"><h3>Finanza</h3><p>Riga movimento (con varianti generata, divisa, rimborso, trasferimento), Intestazione del giorno con totale, Icona categoria, Carta conto stile Wallet, Card budget, Barra con segno del ritmo, Anello obiettivo, Riga abbonamento, Calendario addebiti, Riepilogo divisione, Interruttore privacy, Stato sincronizzazione.</p></div>
+    <div class="card"><h3>Grafici</h3><p>Andamento cumulativo con confronto, Barre (giorno, settimana, mese) con linea della media, Classifica categorie, Sparkline, Anello. Disegnati in SVG, con riassunto a parole per lo screen reader e valori nascosti in privacy.</p></div>
+    <div class="card"><h3>Stati</h3><p>Scheletro di caricamento, Vuoto (icona, una frase su cosa fare, un'azione), Errore (cosa è successo e come rimediare), Successo, Privacy (•••• a larghezza fissa, letto «importo nascosto»), Offline e sincronizzazione.</p></div>
+  </div>
+</section>
+
+<section id="movimento">
+  <div class="intro"><h2>Animazioni e vibrazioni</h2><p class="muted">Brevi, interrompibili, come su iOS. Con «Riduci movimento» diventano dissolvenze.</p></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Momento</th><th>Cosa succede</th><th>Con «Riduci movimento»</th><th>Vibrazione</th></tr></thead>
+    <tbody>
+      <tr><td>Aprire il menu +</td><td>Il + ruota e diventa ×, il foglio sale con la molla, le opzioni entrano a 30 ms una dall'altra, lo sfondo si sfoca</td><td>Dissolvenza 150 ms</td><td>Leggera</td></tr>
+      <tr><td>Salvare una spesa</td><td>Il pulsante diventa ✓, il foglio scende, la cifra della Home scorre al nuovo totale, la barra si allunga, la riga nuova entra in cima</td><td>Valori aggiornati senza scorrere</td><td>Successo</td></tr>
+      <tr><td>Budget che cambia stato</td><td>La barra cresce, colore, icona e parola cambiano in dissolvenza («Sforato di 12 €»)</td><td>Solo dissolvenza</td><td>Avviso, una volta</td></tr>
+      <tr><td>Cambiare mese</td><td>Il contenuto scivola di 24 pt nella direzione e sfuma, le cifre si incrociano</td><td>Dissolvenza</td><td>Selezione</td></tr>
+      <tr><td>Nascondere gli importi</td><td>Ogni importo si sfoca e diventa ••••, stessa larghezza, niente salti; l'occhio si chiude</td><td>Cambio immediato</td><td>Leggera</td></tr>
+      <tr><td>Cambiare scheda</td><td>Dissolvenza breve, icona da contorno a piena con un piccolo rimbalzo, niente scorrimento laterale</td><td>Dissolvenza</td><td>Nessuna</td></tr>
+      <tr><td>Aprire un movimento</td><td>La riga si abbassa alla pressione, il dettaglio sale come foglio a tutta altezza</td><td>Dissolvenza</td><td>Nessuna</td></tr>
+      <tr><td>Scorrere sul grafico</td><td>Un cursore segue il dito, il valore del giorno compare sopra</td><td>Uguale</td><td>Selezione a ogni giorno</td></tr>
+      <tr><td>Scorrere la Home</td><td>La cifra grande si rimpicciolisce e finisce nella barra in alto</td><td>Cambio senza animazione</td><td>Nessuna</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card"><h3>Accessibilità</h3><ul>
+    <li>Contrasto AA in entrambi i temi: testo 4,5:1, elementi grafici 3:1.</li>
+    <li>Testo dinamico fino alle dimensioni per l'accessibilità: le righe vanno a capo e le metriche passano in colonna.</li>
+    <li>Screen reader: ogni icona ha un'etichetta, gli importi si leggono per esteso, i grafici hanno un riassunto a parole e una tabella alternativa.</li>
+    <li>Stato mai affidato al solo colore: sempre icona e parola («Sopra il ritmo», «+» per le entrate).</li>
+    <li>«Riduci movimento» e «Riduci trasparenza» del sistema rispettati.</li>
+  </ul></div>
+</section>
+
+<section id="nomi">
+  <div class="intro"><h2>Nomi</h2><p class="muted">Dieci proposte, i tre consigliati per primi. Accanto a ogni nome il rischio di confusione con app o marchi esistenti, da un controllo rapido sul web (non legale): prima della scelta servono App Store, Google Play e registro marchi EUIPO, classi 9, 36 e 42.</p></div>
+  <div class="names">
+    <div class="name top"><h3>Stilla <span class="tag go">Consigliato · rischio basso</span></h3><p>«Goccia», in italiano letterario e in latino. Le spese si tengono d'occhio goccia a goccia. Sei lettere, si pronuncia uguale in ogni lingua, nessuna app di finanza trovata.</p><p class="tl">«Goccia dopo goccia, tutto chiaro.» · Every drop, accounted for.</p><p class="vi">Identità: una goccia geometrica come segno, nome in minuscolo, inchiostro e un solo accento blu.</p></div>
+    <div class="name top"><h3>Sereno <span class="tag go">Consigliato · rischio basso</span></h3><p>Il cielo sereno e il principio guida dell'app: guardare i soldi senza ansia. Parola positiva in italiano e spagnolo, facile anche per chi non la conosce.</p><p class="tl">«I tuoi soldi, a cielo sereno.» · Money, clear skies.</p><p class="vi">Identità: blu cielo profondo su carta, una linea d'orizzonte che diventa la barra del budget, forme morbide.</p></div>
+    <div class="name top"><h3>Kivo <span class="tag go">Consigliato · rischio basso</span></h3><p>Nome inventato: corto, netto, senza significati da tradurre e quindi più facile da registrare. Ha il suono delle app di finanza moderne.</p><p class="tl">«Le tue spese, in un colpo d'occhio.» · Your money at a glance.</p><p class="vi">Identità: nome geometrico in cui la «o» è un anello di avanzamento; monocromo con un accento.</p></div>
+    <div class="name"><h3>Nido <span class="tag">Rischio medio</span></h3><p>Il nido: i dati restano a casa, sul telefono, e il gruzzolo cresce. Il concetto è il più vicino alla privacy, ma esistono il latte Nido di Nestlé, molto noto, e una piccola fintech «Mi Nido».</p><p class="tl">«I tuoi soldi, al sicuro a casa.»</p><p class="vi">Identità: toni caldi ocra e inchiostro, segno circolare intrecciato.</p></div>
+    <div class="name"><h3>Orma <span class="tag">Rischio basso</span></h3><p>Ogni spesa lascia un'orma: la storia dei tuoi soldi. Trovati solo una libreria per sviluppatori e app di diario.</p><p class="tl">«Ogni spesa lascia un'orma.»</p><p class="vi">Identità: impronte che diventano i punti di un grafico; grafite e verde salvia.</p></div>
+    <div class="name"><h3>Quanto <span class="tag">Rischio basso</span></h3><p>La domanda a cui l'app risponde per prima. In finanza «quanto» è anche un tipo di derivato, curiosità innocua.</p><p class="tl">«Quanto? Eccolo.»</p><p class="vi">Identità: tipografia protagonista, cifre enormi, punto interrogativo che diventa un numero.</p></div>
+    <div class="name"><h3>Vela <span class="tag">Rischio medio</span></h3><p>Andare avanti con calma tenendo la rotta. Però esistono VELA, che gestisce pagamenti per aziende, e VelaFi, pagamenti in stablecoin: stesso settore.</p><p class="tl">«Tieni la rotta.»</p><p class="vi">Identità: triangolo di vela, blu mare profondo, linee pulite.</p></div>
+    <div class="name"><h3>Lume <span class="tag">Rischio medio</span></h3><p>Luce, chiarezza: dalla tua lista iniziale. Esiste Lume Finance, app di finanza decentralizzata: rischio di sembrare un'app crypto.</p><p class="tl">«Fai luce sulle tue spese.»</p><p class="vi">Identità: alone tenue, giallo caldo su inchiostro.</p></div>
+    <div class="name"><h3>Ambra <span class="tag">Rischio basso-medio</span></h3><p>Calda, preziosa, conserva: richiama il risparmio. Esistono Ambr Payments e Ambrpay, ed è un nome di persona comune.</p><p class="tl">«Quello che conta, conservato.»</p><p class="vi">Identità: ambra come accento caldo su fondi scuri eleganti.</p></div>
+    <div class="name"><h3>Grano <span class="tag">Rischio basso</span></h3><p>Il chicco che si accumula e il «grano» del gergo italiano per i soldi. In spagnolo vuol dire anche brufolo, e il tono è più scherzoso degli altri.</p><p class="tl">«Chicco dopo chicco.»</p><p class="vi">Identità: colori del grano, spiga stilizzata come grafico a barre.</p></div>
+  </div>
+  <p class="small muted">Scartati dopo il controllo: Moneo, Kept e Saldo (app o banche con lo stesso nome), Noma (in inglese è una malattia grave), Pari (in francese vuol dire «scommessa»), Ebb (in inglese vuol dire «declino»).</p>
+</section>
+
+<section id="prototipo">
+  <div class="intro"><h2>Architettura del prototipo</h2><p class="muted">Strutturato perché la fase 2 sostituisca solo i dati finti con SQLite, senza riscrivere le schermate.</p></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Libreria</th><th>A cosa serve</th><th>Licenza</th></tr></thead>
+    <tbody>
+      <tr><td>Expo SDK 57 + Expo Router</td><td>App iOS, Android e web; navigazione a file, schede, modali</td><td>MIT</td></tr>
+      <tr><td>TypeScript strict</td><td>Tipi rigorosi, niente <code>any</code></td><td>Apache 2.0</td></tr>
+      <tr><td>Reanimated + Gesture Handler</td><td>Animazioni e gesti fluidi sul thread dell'interfaccia</td><td>MIT</td></tr>
+      <tr><td>@gorhom/bottom-sheet</td><td>Fogli inferiori uguali su iOS, Android e web</td><td>MIT</td></tr>
+      <tr><td>expo-blur, expo-haptics</td><td>Vetro e vibrazioni</td><td>MIT</td></tr>
+      <tr><td>react-native-svg + d3-shape</td><td>Grafici disegnati su misura, leggeri e accessibili</td><td>MIT / ISC</td></tr>
+      <tr><td>FlashList</td><td>Elenchi lunghi di movimenti</td><td>MIT</td></tr>
+      <tr><td>TanStack Query</td><td>Dati dai repository, stessa forma con SQLite</td><td>MIT</td></tr>
+      <tr><td>Zustand</td><td>Stato dell'interfaccia: privacy, tema, blocco</td><td>MIT</td></tr>
+      <tr><td>date-fns + Intl</td><td>Calcoli di date; formati di importi e date</td><td>MIT</td></tr>
+      <tr><td>phosphor-react-native</td><td>Icone con pesi contorno, pieno, duotone</td><td>MIT</td></tr>
+      <tr><td>Geist (expo-font)</td><td>Carattere dell'app</td><td>OFL 1.1</td></tr>
+      <tr><td>Jest (jest-expo) + Testing Library</td><td>Test di regole, formati e componenti chiave</td><td>MIT</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted">Tutte gratuite e senza servizi a pagamento. Versioni fissate e licenze ricontrollate all'installazione.</p>
+<pre>app-spese/
+  app/                       rotte di Expo Router: solo composizione
+    _layout.tsx              tema, provider, blocco
+    (tabs)/                  index (Home), transactions, budget, analytics
+    add/                     menu del + e flussi di inserimento (modali)
+    transaction/[id].tsx     e così account/, subscription/, goal/
+    settings/  onboarding/
+  src/
+    design/                  token, temi chiaro e scuro, tipografia, movimento
+    ui/                      componenti base: Text, Money, Button, Card, Sheet, Chip…
+    features/                home, transactions, add, budget, subscriptions, goals,
+                             analytics, accounts, categories, splits, settings,
+                             privacy, sync, onboarding (components/ hooks/ screens/)
+    domain/                  tipi e regole pure: denaro, previsione, abbonamenti, divisioni
+    data/
+      repositories.ts        interfacce
+      mock/                  implementazione in memoria + dati di esempio
+    services/                orologio, formati, vibrazioni, biometria simulata
+    state/                   privacy, tema, blocco, pannello prototipo
+    i18n/                    testi in italiano
+  docs/                      architettura, flussi, schermate, decisioni</pre>
+  <div class="grid wide">
+    <div class="card"><h3>Regole del codice</h3><ul>
+      <li>Le schermate non toccano mai i dati finti: passano da hook e repository.</li>
+      <li>Un solo punto per formattare importi e date; un solo componente Importo, che applica la privacy ovunque.</li>
+      <li>Componenti piccoli; le schermate compongono, non calcolano.</li>
+      <li>Nessuna chiave o segreto nel codice; <code>.env.example</code> vuoto per le fasi future.</li>
+      <li>Test prima delle regole di dominio: previsione, generatore abbonamenti, divisioni, ricerca, formati.</li>
+    </ul></div>
+    <div class="card"><h3>Dati di esempio</h3><ul>
+      <li>Agosto–ottobre 2026, circa 160 movimenti (Esselunga 42,80 €, Trenitalia 18,90 €, Amazon 29,99 €, caffè 1,50 €…).</li>
+      <li>6 conti: Conto corrente, Revolut, PayPal, Contanti, Carta di credito, Conto deposito.</li>
+      <li>7 abbonamenti: Netflix, Spotify, Palestra, Telefono, iCloud, Amazon Prime, Assicurazione auto.</li>
+      <li>3 obiettivi: MacBook (850 di 2.000 €), Fondo emergenza, Viaggio in Giappone. Persone: Mario, Giulia.</li>
+      <li>Budget globale 1.600 € e 5 di categoria. Nomi di negozi come testo, mai loghi.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="skill">
+  <div class="intro"><h2>Skill</h2><p class="muted">Quali uso, in quale passo dei lavori (numeri in «Ordine dei lavori»), quali scarto e cosa ho trovato online.</p></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Skill installata</th><th>A cosa serve qui</th><th>Passo</th></tr></thead>
+    <tbody>
+      <tr><td>impeccable <code>init</code></td><td>PRODUCT.md con il contesto del prodotto, piattaforma iOS + Android</td><td>1</td></tr>
+      <tr><td>impeccable <code>shape</code></td><td>Progetto UX di Home e Aggiungi spesa prima del codice, poi la direzione visiva</td><td>2</td></tr>
+      <tr><td>impeccable <code>typeset</code>, <code>colorize</code></td><td>Solo se la direzione scelta ha bisogno di ritocchi a caratteri o colore</td><td>2–3</td></tr>
+      <tr><td>impeccable <code>critique</code>, <code>audit</code> (versione per app native)</td><td>Revisione UX con punteggio; controllo accessibilità, prestazioni, adattamento</td><td>6</td></tr>
+      <tr><td>impeccable <code>onboard</code>, <code>harden</code>, <code>polish</code></td><td>Primo avvio e stati vuoti; errori, testi lunghi, casi limite; passata finale</td><td>6</td></tr>
+      <tr><td>impeccable <code>document</code></td><td>DESIGN.md ricavato dal prototipo finito</td><td>7</td></tr>
+      <tr><td>ui-ux-pro-max</td><td>Ricerca su palette fintech, coppie di caratteri, linee guida UX mobile e grafici</td><td>2</td></tr>
+      <tr><td>ui-ux-pro-max:design-system</td><td>Token a tre livelli: primitivi, semantici, di componente</td><td>2–3</td></tr>
+      <tr><td>apple-design</td><td>Molle, materiali e vetro, tipografia in stile iOS</td><td>2, 4</td></tr>
+      <tr><td>dataviz</td><td>Grafici leggibili, palette delle categorie con il suo validatore di contrasto</td><td>2, 5</td></tr>
+      <tr><td>animate-expo</td><td>Reanimated, gesti, fogli, vibrazioni in Expo</td><td>4–5</td></tr>
+      <tr><td>emil-design-eng</td><td>Rifinitura dei componenti e dei dettagli invisibili</td><td>3–4</td></tr>
+      <tr><td>superpowers:test-driven-development</td><td>Test prima delle regole: previsione, abbonamenti, divisioni, formati</td><td>3</td></tr>
+      <tr><td>run</td><td>Avviare l'app e catturare schermate su web ed emulatore</td><td>4–6</td></tr>
+      <tr><td>break-ui</td><td>Dati estremi: importi enormi, nomi lunghissimi, zero movimenti</td><td>6</td></tr>
+      <tr><td>find-animation-opportunities, improve-animations</td><td>Revisione delle animazioni, solo proposte</td><td>6</td></tr>
+      <tr><td>agenti impeccable-finish-reviewer e impeccable-documenter</td><td>Controllo finale contro la direzione scelta; stesura di DESIGN.md</td><td>6–7</td></tr>
+      <tr><td>verification-before-completion, code-review</td><td>Prove prima di dire «fatto», revisione del codice a fine blocco</td><td>3–7</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="grid wide">
+    <div class="card"><h3>Installate ma scartate</h3><ul>
+      <li><b>frontend-design</b>: si sovrappone a impeccable, che ha anche la guida per app native.</li>
+      <li><b>animate, mobile-native, modern-web-guidance, ask-sonner, ui-ux-pro-max:ui-styling</b>: pensate per il web; il prototipo è nativo.</li>
+      <li><b>ui-ux-pro-max: design, brand, banner-design, slides</b>: servono per logo e marchio quando il nome è scelto; la generazione di loghi usa servizi IA esterni.</li>
+      <li><b>animation-vocabulary</b>: glossario, non serve per costruire.</li>
+      <li><b>superpowers:brainstorming, writing-plans</b>: la pianificazione è questo piano, come vuole la tua regola.</li>
+      <li><b>claude-security</b>: in fase 1 non c'è backend; la uso in fase 2–3 (SQLite, SecureStore, sincronizzazione).</li>
+      <li><b>write-swift, remotion, openscad</b>: fuori tema.</li>
+    </ul></div>
+    <div class="card"><h3>Trovate online</h3><ul>
+      <li><b>Consigliata ora: <a href="https://github.com/expo/skills">expo/skills</a></b> (team Expo, MIT, aggiornata il 07/10/2026). Porta Expo Router aggiornato (schede native, fogli nativi «form sheet»), regole per un design system in React Native e una lista di difetti tipici delle app generate. <b>Solo 5 cartelle copiate a mano</b>: expo-design-system, expo-native-ui, expo-router, expo-project-structure, expo-data-fetching. Il plugin intero no: ha hook che a ogni uso di una skill avviano uno script di telemetria (spenta di base), un server MCP remoto (mcp.expo.dev) e suggerisce comandi <code>npx</code>. Prima di copiarle leggo tutti i file.</li>
+      <li><b>Più avanti: <a href="https://github.com/callstackincubator/agent-skills">callstackincubator/agent-skills</a></b> (Callstack, MIT, 06/10/2026): prestazioni, FlashList, profilazione. Utile in fase 2 con SQLite e liste lunghe.</li>
+      <li><b>Più avanti: <a href="https://github.com/supabase/agent-skills">supabase/agent-skills</a></b>: solo se farai la sincronizzazione; licenza da verificare.</li>
+      <li><b>No per ora: <a href="https://github.com/vercel-labs/agent-skills/tree/main/skills/react-native-skills">vercel-labs react-native-skills</a></b> (licenza non verificata, ultimo aggiornamento gennaio 2026, si sovrappone) e <b><a href="https://github.com/software-mansion-labs/skills">software-mansion-labs/skills</a></b> (nessuna licenza: non si può copiare, al massimo consultare).</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="lavori">
+  <div class="intro"><h2>Ordine dei lavori</h2><p class="muted">Tre fermate in cui mi fermo e aspetto il tuo ok.</p></div>
+  <ol class="work">
+    <li><b>Preparazione</b><p>Cartella e Git, progetto Expo SDK 57 in TypeScript strict, documenti in <code>docs/</code> tratti da questo piano, PRODUCT.md con impeccable <code>init</code>.</p></li>
+    <li class="stop"><b>Direzione visiva</b><p>impeccable <code>shape</code> su Home e Aggiungi spesa, token con ui-ux-pro-max, apple-design e dataviz. Due varianti della Home, chiaro e scuro, da vedere sul telefono. <span class="stopflag">Fermata 1: scegli la direzione.</span></p></li>
+    <li><b>Fondamenta</b><p>Token e temi, componenti base, Importo con privacy, modello dati, repository finti, formati e regole con i test.</p></li>
+    <li class="stop"><b>Home e inserimento</b><p>Home, barra delle schede, menu del + e Nuova spesa complete di animazioni e vibrazioni. <span class="stopflag">Fermata 2: la provi sul S24.</span></p></li>
+    <li><b>Tutte le altre schermate</b><p>A blocchi: Movimenti, ricerca e dettaglio; Budget, abbonamenti e obiettivi; Analisi; Conti, categorie e spese condivise; Impostazioni (sicurezza, privacy, notifiche, export, aspetto, sincronizzazione); Onboarding e blocco.</p></li>
+    <li class="stop"><b>Verifica e rifinitura</b><p>impeccable <code>critique</code> e <code>audit</code> per app native, break-ui con dati estremi, <code>harden</code>, <code>onboard</code> per gli stati vuoti, revisione delle animazioni, <code>polish</code>. Schermate chiaro e scuro. <span class="stopflag">Fermata 3: consegna del prototipo.</span></p></li>
+    <li><b>Documentazione</b><p>impeccable <code>document</code> scrive DESIGN.md dal prototipo finito; README con le istruzioni per avviarlo.</p></li>
+  </ol>
+  <p class="small muted">Fuori dalla fase 1, come chiedi: autenticazione vera, Supabase, motore di sincronizzazione, banche e PSD2, OCR, IA, cambi valuta, notifiche di produzione, store.</p>
+</section>
+
+<section id="rischi">
+  <div class="intro"><h2>Rischi per l'esperienza</h2></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Rischio</th><th>Cosa faccio</th></tr></thead>
+    <tbody>
+      <tr><td>Il vetro su Android è più pesante e diverso da iOS</td><td>Sfocatura solo su barra, fogli e intestazione; se scatta sul S24, superficie traslucida senza sfocatura. Il disegno deve reggere anche senza vetro.</td></tr>
+      <tr><td>A inizio mese il confronto inganna</td><td>Confronto allo stesso giorno del mese scorso.</td></tr>
+      <tr><td>Affitto e spese fisse falsano la previsione</td><td>Ricorrenti separati dalle variabili; «Come lo calcolo» spiega la formula.</td></tr>
+      <tr><td>La Home si riempie col tempo</td><td>Sopra la piega solo quattro blocchi; al massimo due card a comparsa.</td></tr>
+      <tr><td>La privacy lascia scoperto qualcosa</td><td>Un solo componente Importo; privacy anche su grafici, notifiche, multitasking; test dedicato.</td></tr>
+      <tr><td>Abbonamenti mentre l'app resta chiusa</td><td>Generatore che recupera i mesi persi senza doppioni e mostra un riepilogo.</td></tr>
+      <tr><td>Spese divise e trasferimenti confondono i totali</td><td>Regole scritte nel dettaglio del movimento; trasferimenti mai contati come spesa.</td></tr>
+      <tr><td>Più valute senza cambi</td><td>Totali solo nella valuta principale; gli altri conti a parte con una nota.</td></tr>
+      <tr><td>Dati solo sul telefono: un telefono perso è un archivio perso</td><td>Promemoria di backup e export completo in formati aperti.</td></tr>
+      <tr><td>Il web non è il telefono</td><td>Animazioni, vetro e vibrazioni si giudicano sul S24; il web serve solo per occhiate veloci.</td></tr>
+      <tr><td>Loghi di marchi in un repository pubblico</td><td>Monogrammi colorati e nomi in testo, niente loghi.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</div>
