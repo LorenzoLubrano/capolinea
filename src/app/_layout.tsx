@@ -17,7 +17,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastHost } from '@/components/toast-host';
 import { DataProvider } from '@/data/provider';
-import { useTheme } from '@/theme';
+import { it } from '@/i18n/it';
+import { fonts, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +31,22 @@ function AppStack() {
   };
   // iOS 26: a transparent sheet background becomes Liquid Glass. Elsewhere sheets are solid.
   const sheetBackground = Platform.OS === 'ios' && isLiquidGlassAvailable() ? 'transparent' : colors.background;
+  const sheet = {
+    presentation: 'formSheet',
+    sheetGrabberVisible: true,
+    sheetCornerRadius: 28,
+    contentStyle: { backgroundColor: colors.background },
+  } as const;
+  // Pushed screens (profile, settings): native header and back gesture, same look on both platforms.
+  const pushed = {
+    headerShown: true,
+    headerShadowVisible: false,
+    headerStyle: { backgroundColor: colors.background },
+    headerTintColor: colors.ink,
+    headerTitleStyle: { fontFamily: fonts.bold, fontSize: 17, color: colors.ink },
+    headerBackButtonDisplayMode: 'minimal',
+    contentStyle: { backgroundColor: colors.background },
+  } as const;
 
   return (
     <ThemeProvider value={navigationTheme}>
@@ -46,16 +63,11 @@ function AppStack() {
             contentStyle: { backgroundColor: sheetBackground },
           }}
         />
-        <Stack.Screen
-          name="add-expense"
-          options={{
-            presentation: 'formSheet',
-            sheetGrabberVisible: true,
-            sheetAllowedDetents: [1],
-            sheetCornerRadius: 28,
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        />
+        <Stack.Screen name="add-expense" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="transaction/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="transaction-filters" options={{ ...sheet, sheetAllowedDetents: [0.75, 1] }} />
+        <Stack.Screen name="profile" options={{ ...pushed, title: it.profile.title }} />
+        <Stack.Screen name="settings/appearance" options={{ ...pushed, title: it.appearance.title }} />
       </Stack>
       <ToastHost />
     </ThemeProvider>

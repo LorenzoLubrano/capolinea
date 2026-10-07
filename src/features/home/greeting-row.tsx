@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Icon } from '@/components/icon';
@@ -40,6 +41,7 @@ export function GreetingRow({ name }: { name: string }) {
         <PressableScale
           accessibilityRole="button"
           accessibilityLabel={it.home.profile}
+          onPress={() => router.push('/profile')}
           style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
         >
           <View

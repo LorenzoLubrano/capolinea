@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useRepositories } from './provider';
-import type { NewTransaction } from './repositories';
+import type { NewTransaction, TransactionChanges } from './repositories';
 
 const SNAPSHOT_KEY = ['snapshot'] as const;
 
@@ -24,6 +24,24 @@ export function useDeleteTransaction() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => repos.deleteTransaction(id),
+    onSuccess: () => client.invalidateQueries({ queryKey: SNAPSHOT_KEY }),
+  });
+}
+
+export function useUpdateTransaction() {
+  const repos = useRepositories();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, changes }: { id: string; changes: TransactionChanges }) => repos.updateTransaction(id, changes),
+    onSuccess: () => client.invalidateQueries({ queryKey: SNAPSHOT_KEY }),
+  });
+}
+
+export function useRestoreTransaction() {
+  const repos = useRepositories();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => repos.restoreTransaction(id),
     onSuccess: () => client.invalidateQueries({ queryKey: SNAPSHOT_KEY }),
   });
 }

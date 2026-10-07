@@ -14,11 +14,17 @@ import { backdrop as backdropTokens, layout, spacing, useTheme } from '@/theme';
 
 /**
  * A tab screen: themed background, safe-area top, room for the tab bar at the bottom.
- * On iPad and web the content stays in a phone-wide column.
+ * On iPad and web the content stays in a phone-wide column. `variant="stack"` is for pushed screens:
+ * the native header already clears the status bar and there is no tab bar.
  * An optional `backdrop` sits behind the content: it scrolls slower than the content (with it, under
  * Reduce Motion) and fades out as the content passes over it, so text never sits on the drawing.
  */
-export function Screen({ children, backdrop, ...props }: { children: ReactNode; backdrop?: ReactNode } & ScrollViewProps) {
+export function Screen({
+  children,
+  backdrop,
+  variant = 'tab',
+  ...props
+}: { children: ReactNode; backdrop?: ReactNode; variant?: 'tab' | 'stack' } & ScrollViewProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
@@ -49,8 +55,8 @@ export function Screen({ children, backdrop, ...props }: { children: ReactNode; 
         scrollEventThrottle={16}
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{
-          paddingTop: insets.top + spacing.sm,
-          paddingBottom: insets.bottom + layout.tabBarHeight + spacing.xl,
+          paddingTop: variant === 'tab' ? insets.top + spacing.sm : spacing.md,
+          paddingBottom: insets.bottom + (variant === 'tab' ? layout.tabBarHeight : 0) + spacing.xl,
           paddingHorizontal: spacing.gutter,
           width: '100%',
           maxWidth: layout.maxContentWidth,

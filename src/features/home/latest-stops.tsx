@@ -1,15 +1,13 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { View } from 'react-native';
 
-import { Money } from '@/components/money';
 import { PressableScale } from '@/components/pressable-scale';
+import { StopRow } from '@/components/stop-row';
 import { AppText } from '@/components/text';
-import type { Category, Transaction } from '@/domain/types';
+import type { Category, Id, Transaction } from '@/domain/types';
 import { it } from '@/i18n/it';
 import { dayLabel } from '@/services/format/dates';
-import { spacing, useTheme } from '@/theme';
-
-const DOT = 14;
+import { spacing } from '@/theme';
 
 /** The latest movements read as stops along one line. */
 export function LatestStops({
@@ -17,13 +15,14 @@ export function LatestStops({
   categories,
   today,
   currency,
+  meId,
 }: {
   transactions: Transaction[];
   categories: Category[];
   today: string;
   currency: string;
+  meId: Id;
 }) {
-  const { colors, lineColor } = useTheme();
   const byId = new Map(categories.map((c) => [c.id, c]));
 
   return (
@@ -39,49 +38,20 @@ export function LatestStops({
         </Link>
       </View>
       <View>
-        <View
-          style={{
-            position: 'absolute',
-            left: DOT / 2 - 1,
-            top: spacing.lg,
-            bottom: spacing.lg,
-            width: 2,
-            backgroundColor: colors.hairline,
-          }}
-        />
-        {transactions.map((tx) => {
+        {transactions.map((tx, i) => {
           const category = tx.categoryId ? byId.get(tx.categoryId) : undefined;
-          const line = lineColor(category?.color ?? 'grey');
-          const title = tx.merchant ?? tx.description ?? category?.name ?? '';
-          const isIncome = tx.type === 'income' || tx.type === 'refund';
           return (
-            <View key={tx.id} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, paddingVertical: spacing.sm, minHeight: 52 }}>
-              <View
-                style={{
-                  width: DOT,
-                  height: DOT,
-                  borderRadius: DOT / 2,
-                  borderWidth: 3,
-                  borderColor: tx.type === 'transfer' ? colors.inkTertiary : line.fill,
-                  backgroundColor: colors.background,
-                }}
-              />
-              <View style={{ flex: 1, gap: spacing.xxs }}>
-                <AppText variant="bodyStrong" numberOfLines={1}>
-                  {title}
-                </AppText>
-                <AppText variant="footnote" tone="secondary" numberOfLines={1}>
-                  {[category?.name, dayLabel(tx.date, today)].filter(Boolean).join(' · ')}
-                </AppText>
-              </View>
-              <Money
-                minor={tx.amountMinor}
-                currency={currency}
-                sign={tx.type === 'transfer' ? 'none' : isIncome ? 'income' : 'expense'}
-                variant="bodyStrong"
-                label={title}
-              />
-            </View>
+            <StopRow
+              key={tx.id}
+              tx={tx}
+              category={category}
+              subtitle={[category?.name, dayLabel(tx.date, today)].filter(Boolean).join(' · ')}
+              currency={currency}
+              meId={meId}
+              first={i === 0}
+              last={i === transactions.length - 1}
+              onPress={() => router.push({ pathname: '/transaction/[id]', params: { id: tx.id } })}
+            />
           );
         })}
       </View>

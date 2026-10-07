@@ -65,7 +65,7 @@ export function HomeScreen() {
               <MonthBand summary={summary} />
               <BalanceSection summary={summary} today={data.today} />
               <LinesList summary={summary} />
-              <LatestStops transactions={summary.latest} categories={data.categories} today={data.today} currency={summary.currency} />
+              <LatestStops transactions={summary.latest} categories={data.categories} today={data.today} currency={summary.currency} meId={data.meId} />
             </>
           )}
         </View>

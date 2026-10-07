@@ -4,15 +4,17 @@ import { useMemo, useState } from 'react';
 import { ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
 import { LineBadge } from '@/components/line-badge';
 import { PressableScale } from '@/components/pressable-scale';
 import { AppText } from '@/components/text';
 import { useRepositories } from '@/data/provider';
-import { useAddTransaction, useSnapshot } from '@/data/queries';
+import { useAddTransaction, useSnapshot, useUpdateTransaction } from '@/data/queries';
+import type { Snapshot } from '@/data/repositories';
 import { addDays } from '@/domain/dates';
 import { appendKeypadKey, inputToMinor, minorToInput, type KeypadKey } from '@/domain/money';
-import type { Id } from '@/domain/types';
+import type { Id, LocalDate, Transaction } from '@/domain/types';
 import { it } from '@/i18n/it';
 import { dayLabel, shortDate } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
@@ -33,76 +35,48 @@ function groupInput(input: string): string {
   return decimals === undefined ? grouped : `${grouped},${decimals}`;
 }
 
-function Chip({
-  label,
-  selected,
-  onPress,
-  leading,
-  accessibilityLabel,
-}: {
-  label: string;
-  selected?: boolean;
-  onPress: () => void;
-  leading?: React.ReactNode;
-  accessibilityLabel?: string;
-}) {
-  const { colors } = useTheme();
-  return (
-    <PressableScale
-      accessibilityRole="button"
-      accessibilityState={{ selected: !!selected }}
-      accessibilityLabel={accessibilityLabel ?? label}
-      onPress={onPress}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: spacing.xs + 2,
-        minHeight: 40,
-        paddingLeft: leading ? spacing.xs + 2 : spacing.smd,
-        paddingRight: spacing.smd,
-        borderRadius: radius.full,
-        backgroundColor: selected ? colors.ink : colors.surface,
-        borderWidth: 1,
-        borderColor: selected ? colors.ink : colors.hairline,
-      }}
-    >
-      {leading}
-      <AppText variant="subheadStrong" tone={selected ? 'onInk' : 'primary'} numberOfLines={1}>
-        {label}
-      </AppText>
-    </PressableScale>
-  );
+type Params = { id?: string; merchant?: string; amount?: string; category?: string; account?: string };
+
+/** New expense, or an existing one to edit when the route carries its `id`. */
+export function ExpenseForm() {
+  const params = useLocalSearchParams<Params>();
+  const { data } = useSnapshot();
+  if (!data) return <View style={{ flex: 1 }} />;
+  const editing = params.id ? data.transactions.find((t) => t.id === params.id) : undefined;
+  return <ExpenseFormBody key={editing?.id ?? 'new'} data={data} editing={editing} params={params} />;
 }
 
-/** New expense: amount, category, save. Account and date are already chosen; everything else is optional. */
-export function ExpenseForm() {
+/** Amount, category, save. Account and date are already chosen; everything else is optional. */
+function ExpenseFormBody({ data, editing, params }: { data: Snapshot; editing?: Transaction; params: Params }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ merchant?: string; amount?: string; category?: string; account?: string }>();
-  const { data } = useSnapshot();
   const addTransaction = useAddTransaction();
+  const updateTransaction = useUpdateTransaction();
   const repos = useRepositories();
   const queryClient = useQueryClient();
   const showToast = useToast((s) => s.show);
   const masked = useSettings((s) => s.privacy);
 
-  const [input, setInput] = useState(params.amount ? minorToInput(Number(params.amount)) : '');
-  const [categoryId, setCategoryId] = useState<Id | undefined>(params.category);
-  const [accountId, setAccountId] = useState<Id | undefined>(params.account);
-  const [dayOffset, setDayOffset] = useState(0);
+  const [input, setInput] = useState(() => {
+    const minor = editing?.amountMinor ?? (params.amount ? Number(params.amount) : 0);
+    return minor ? minorToInput(minor) : '';
+  });
+  const [categoryId, setCategoryId] = useState<Id | undefined>(editing?.categoryId ?? params.category);
+  const [accountId, setAccountId] = useState<Id | undefined>(editing?.accountId ?? params.account);
+  const [date, setDate] = useState<LocalDate>(editing?.date ?? data.today);
   const [picker, setPicker] = useState<'account' | 'date' | null>(null);
   const [allCategories, setAllCategories] = useState(false);
-  const [details, setDetails] = useState(false);
-  const [merchant, setMerchant] = useState(params.merchant ?? '');
-  const [note, setNote] = useState('');
+  const [details, setDetails] = useState(!!(editing?.merchant || editing?.notes));
+  const [merchant, setMerchant] = useState(editing?.merchant ?? params.merchant ?? '');
+  const [note, setNote] = useState(editing?.notes ?? '');
 
-  const quick = useMemo(() => (data ? frequentCategories(data, QUICK_CATEGORIES) : []), [data]);
-  if (!data) return <View style={{ flex: 1 }} />;
+  const quick = useMemo(() => frequentCategories(data, QUICK_CATEGORIES), [data]);
 
   const account = accountId ?? defaultAccountId(data);
   const accounts = [...data.accounts].filter((a) => !a.archived).sort((a, b) => a.sortOrder - b.sortOrder);
   const accountName = accounts.find((a) => a.id === account)?.name ?? '';
-  const date = addDays(data.today, -dayOffset);
+  const recentDays = Array.from({ length: 7 }, (_, offset) => addDays(data.today, -offset));
+  const dayChoices = recentDays.includes(date) ? recentDays : [...recentDays, date];
   const expenseCategories = data.categories
     .filter((c) => c.kind === 'expense' && !c.archived)
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -111,24 +85,53 @@ export function ExpenseForm() {
     : [...quick, ...expenseCategories.filter((c) => c.id === categoryId && !quick.some((q) => q.id === c.id))];
   const amountMinor = inputToMinor(input);
   const ready = amountMinor > 0 && !!categoryId;
+  const busy = addTransaction.isPending || updateTransaction.isPending;
 
   const onKey = (key: KeypadKey) => setInput((current) => appendKeypadKey(current, key));
 
-  const save = () => {
-    if (!ready || addTransaction.isPending) return;
-    addTransaction.mutate(
+  const fields = {
+    amountMinor,
+    date,
+    accountId: account,
+    categoryId,
+    merchant: merchant.trim() || undefined,
+    notes: note.trim() || undefined,
+  };
+
+  const saveChanges = (tx: Transaction) => {
+    const previous = {
+      amountMinor: tx.amountMinor,
+      date: tx.date,
+      accountId: tx.accountId,
+      categoryId: tx.categoryId,
+      merchant: tx.merchant,
+      notes: tx.notes,
+    };
+    updateTransaction.mutate(
+      { id: tx.id, changes: fields },
       {
-        type: 'expense',
-        amountMinor,
-        currency: data.currency,
-        date,
-        accountId: account,
-        categoryId,
-        merchant: merchant.trim() || undefined,
-        notes: note.trim() || undefined,
-        tags: [],
-        isRecurring: false,
+        onSuccess: () => {
+          haptics.success();
+          router.back();
+          showToast({
+            text: it.add.updated,
+            actionLabel: it.add.undo,
+            onAction: () =>
+              updateTransaction.mutate({ id: tx.id, changes: previous }, { onSuccess: () => showToast({ text: it.add.reverted }) }),
+          });
+        },
       },
+    );
+  };
+
+  const save = () => {
+    if (!ready || busy) return;
+    if (editing) {
+      saveChanges(editing);
+      return;
+    }
+    addTransaction.mutate(
+      { ...fields, type: 'expense', currency: data.currency, tags: [], isRecurring: false },
       {
         onSuccess: (tx) => {
           haptics.success();
@@ -152,7 +155,9 @@ export function ExpenseForm() {
     ? it.add.typeAmount
     : !categoryId
       ? it.add.chooseCategory
-      : `${it.add.save} ${formatMoney(amountMinor, data.currency, { masked })}`;
+      : editing
+        ? it.add.saveChanges
+        : `${it.add.save} ${formatMoney(amountMinor, data.currency, { masked })}`;
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
@@ -161,7 +166,7 @@ export function ExpenseForm() {
           <AppText variant="callout">{it.add.cancel}</AppText>
         </PressableScale>
         <AppText variant="title3" accessibilityRole="header">
-          {it.add.newExpense}
+          {editing ? it.add.editExpense : it.add.newExpense}
         </AppText>
         <View style={{ minWidth: 72 }} />
       </View>
@@ -191,10 +196,9 @@ export function ExpenseForm() {
         ) : null}
         {picker === 'date' ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm }}>
-            {Array.from({ length: 7 }, (_, offset) => {
-              const day = addDays(data.today, -offset);
-              const label = offset < 2 ? dayLabel(day, data.today) : shortDate(day);
-              return <Chip key={day} label={label} selected={offset === dayOffset} onPress={() => { haptics.selection(); setDayOffset(offset); setPicker(null); }} />;
+            {dayChoices.map((day) => {
+              const label = day === data.today || day === addDays(data.today, -1) ? dayLabel(day, data.today) : shortDate(day);
+              return <Chip key={day} label={label} selected={day === date} onPress={() => { haptics.selection(); setDate(day); setPicker(null); }} />;
             })}
           </View>
         ) : null}
@@ -274,7 +278,7 @@ export function ExpenseForm() {
         <Keypad onKey={onKey} onClear={() => setInput('')} />
         <PressableScale
           accessibilityRole="button"
-          accessibilityState={{ disabled: !ready, busy: addTransaction.isPending }}
+          accessibilityState={{ disabled: !ready, busy }}
           disabled={!ready}
           onPress={save}
           style={{ height: 56, borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}

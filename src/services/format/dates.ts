@@ -36,3 +36,14 @@ export function dayLabel(date: LocalDate, today: LocalDate, locale = DEFAULT_LOC
   const text = formatter(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(toDate(date));
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+/** The twelve month names, January first, for search ("settembre"). */
+export function monthNames(locale = DEFAULT_LOCALE): string[] {
+  return Array.from({ length: 12 }, (_, i) => monthName(`2026-${String(i + 1).padStart(2, '0')}-15`, locale));
+}
+
+/** `Martedì 20 ottobre 2026` */
+export function fullDate(date: LocalDate, locale = DEFAULT_LOCALE): string {
+  const text = formatter(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(toDate(date));
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

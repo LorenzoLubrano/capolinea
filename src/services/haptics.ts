@@ -13,6 +13,8 @@ export const haptics = {
   selection: () => enabled && Haptics.selectionAsync().catch(ignore),
   /** Something commits lightly: + pressed, privacy toggled. */
   light: () => enabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(ignore),
+  /** A destructive action fires: delete. */
+  medium: () => enabled && Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(ignore),
   success: () => enabled && Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(ignore),
   warning: () => enabled && Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(ignore),
 };

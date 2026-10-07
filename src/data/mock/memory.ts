@@ -1,6 +1,6 @@
 import type { Transaction } from '@/domain/types';
 
-import type { NewTransaction, Repositories, Snapshot } from '../repositories';
+import type { NewTransaction, Repositories, Snapshot, TransactionChanges } from '../repositories';
 import { createDataset, type Dataset } from './seed';
 
 /** In-memory repositories over the example dataset. A short delay keeps loading states honest. */
@@ -26,6 +26,18 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
       const tx: Transaction = { ...draft, id: `local-${Date.now()}-${++counter}`, createdAt: stamp, updatedAt: stamp };
       state.transactions = [...state.transactions, tx];
       return tx;
+    },
+
+    async updateTransaction(id: string, changes: TransactionChanges) {
+      await wait();
+      const current = state.transactions.find((tx) => tx.id === id);
+      if (!current) throw new Error(`Transaction ${id} not found`);
+      const next: Record<string, unknown> = { ...current, ...changes, updatedAt: now() };
+      for (const [key, value] of Object.entries(changes)) if (value === undefined) delete next[key];
+      if (current.subscriptionId) next.editedAfterGeneration = true;
+      const updated = next as unknown as Transaction;
+      update(id, () => updated);
+      return updated;
     },
 
     async deleteTransaction(id) {

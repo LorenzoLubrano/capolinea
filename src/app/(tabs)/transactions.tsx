@@ -1,6 +1,3 @@
-import { ComingSoon } from '@/components/coming-soon';
-import { it } from '@/i18n/it';
+import { TransactionsScreen } from '@/features/transactions/transactions-screen';
 
-export default function Screen() {
-  return <ComingSoon title={it.tabs.transactions} body={it.placeholder.transactions} />;
-}
+export default TransactionsScreen;
