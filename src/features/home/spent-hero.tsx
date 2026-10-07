@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
@@ -15,10 +15,10 @@ import type { HomeSummary } from './summary';
 export function SpentHero({ summary }: { summary: HomeSummary }) {
   const { colors } = useTheme();
   const reduced = useReducedMotion();
-  const firstValue = useRef(summary.spentMinor);
+  const [firstValue] = useState(summary.spentMinor);
   // The new total fades in after a save; the first render just appears.
   const entering =
-    summary.spentMinor === firstValue.current ? undefined : reduced ? FadeIn.duration(200) : FadeInDown.duration(250);
+    summary.spentMinor === firstValue ? undefined : reduced ? FadeIn.duration(200) : FadeInDown.duration(250);
 
   const { change } = summary.comparison;
   const month = summary.previousMonthName;

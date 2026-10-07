@@ -71,3 +71,17 @@ export type LineKey = keyof typeof lines;
 export function lineColor(key: string): { fill: string; on: string } {
   return key in lines ? lines[key as LineKey] : lines.grey;
 }
+
+/**
+ * `foreground` laid over `background` at `amount` opacity, as one opaque #rrggbb colour.
+ * Faint drawings use it instead of transparency, so shapes that touch never darken each other.
+ */
+export function mix(foreground: string, background: string, amount: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  let out = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = Math.round(channel(foreground, i) * amount + channel(background, i) * (1 - amount));
+    out += value.toString(16).padStart(2, '0');
+  }
+  return out;
+}

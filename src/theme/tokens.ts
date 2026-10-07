@@ -1,5 +1,5 @@
 import type { TextStyle } from 'react-native';
-import { cubicBezier } from 'react-native-reanimated';
+import { cubicBezier, Easing } from 'react-native-reanimated';
 
 /** 4-point grid. Row gap < group gap < section gap. */
 export const spacing = {
@@ -41,6 +41,8 @@ export const motion = {
   slow: 400,
   easeOut: cubicBezier(0.23, 1, 0.32, 1),
   easeInOut: cubicBezier(0.77, 0, 0.175, 1),
+  /** The same ease-out as a function, for withTiming in worklets (the values above are for CSS transitions). */
+  easeOutTiming: Easing.bezier(0.23, 1, 0.32, 1),
   spring: {
     settle: { duration: 400, dampingRatio: 1 },
     sheet: { duration: 300, dampingRatio: 0.8 },
@@ -84,6 +86,39 @@ export const type = {
 } as const satisfies Record<string, TextStyle>;
 
 export type TypeVariant = keyof typeof type;
+
+/**
+ * The Home backdrop: a faint piece of the metro map (default) or soft glows, behind the hero.
+ * Decoration only: it shows category colours, never amounts.
+ */
+export const backdrop = {
+  /** Map lines: distance between parallel lines, and their stroke. */
+  pitch: 9,
+  stroke: 7,
+  /** The bundle runs this far below the top of the content, beside the hero figure. */
+  mapTop: 116,
+  /** How strongly the map shows through the page background. */
+  mapStrength: { light: 0.2, dark: 0.32 },
+  /** Centre opacity of each glow, largest category first. */
+  glowStrength: { light: [0.32, 0.26, 0.2], dark: [0.42, 0.32, 0.22] },
+  /** The backdrop travels at this share of the scroll, so it sits behind the content. */
+  parallax: 0.4,
+  /** Scroll distance over which the backdrop fades away. */
+  fadeOut: 240,
+  /** Lines drawing in at launch, one after the other. */
+  draw: 900,
+  drawStagger: 90,
+  /** The interchange appears once the lines have nearly arrived. */
+  interchangeDelay: 650,
+  interchangeFade: 300,
+  /** The saved category's line lights up once the add sheet has gone. */
+  pulseDelay: 300,
+  pulseIn: 225,
+  pulseOut: 675,
+  pulseStrength: 0.7,
+  /** One slow drift cycle per glow, deliberately out of step. */
+  drift: [19000, 23000, 27000],
+} as const;
 
 /** Content never grows wider than a phone; on iPad and web the app sits in a centred column. */
 export const layout = {

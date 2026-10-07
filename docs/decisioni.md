@@ -34,3 +34,13 @@ Registro delle decisioni di prodotto e tecniche. Il piano completo della fase 1 
 
 - Tolto `.claude/settings.json`: attivava il plugin Expo (hook di telemetria, server MCP remoto), scartato nel piano.
 - Tolto `LICENSE`: era la licenza MIT del modello con copyright di Expo. La licenza del progetto va scelta prima di pubblicare.
+
+## 07/10/2026: sfondo della Home (riscontro alla Fermata 2)
+
+- Su Android la Home piace; Lorenzo ha chiesto uno sfondo molto minimal perché non sembri statica.
+- Proposte viste dal vivo sulla Home vera (artifact `BJaPkWNKUx1kb1rStd2Xi8`): Mappa, Reticolo, Luce. Scelte **Mappa** come predefinita e **Luce** da scegliere nelle impostazioni (Aspetto, passo 5). Reticolo scartato.
+- Mappa: le prime quattro categorie del mese come linee parallele accanto al totale, con una stazione di interscambio. Si disegna una volta per avvio, scorre al 40% della pagina e svanisce nei primi 240 punti di scorrimento; la linea della categoria si accende quando si salva una spesa. Ferma il resto del tempo.
+- Luce: tre aloni nei colori delle prime linee, con una deriva lenta che si ferma quando la Home non è in vista.
+- Con «Riduci animazioni» niente disegno, deriva né parallasse (lo sfondo scorre con la pagina); l'accensione della linea resta, perché è solo opacità. Per i lettori di schermo lo sfondo non esiste. Mostra colori, mai importi.
+- Skill di Skia trovate online e non installate: bastano `react-native-svg` e Reanimated, già nel progetto e in Expo Go.
+- ESLint configurato da `expo lint` (`eslint.config.js`, versioni fissate); corretti i 2 errori del React Compiler che ha trovato in `month-band.tsx` e `spent-hero.tsx`.

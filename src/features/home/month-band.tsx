@@ -35,12 +35,10 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
     transitionTimingFunction: motion.easeOut,
   };
 
-  let offset = 0;
-  const segments = band.segments.map((segment) => {
-    const left = offset;
-    offset += segment.ratio;
-    return { ...segment, left };
-  });
+  const segments = band.segments.map((segment, i) => ({
+    ...segment,
+    left: band.segments.slice(0, i).reduce((sum, s) => sum + s.ratio, 0),
+  }));
 
   const ringX = Math.min(Math.max(band.paceRatio * width, RING / 2), width - RING / 2);
   const money = (minor: number) => formatMoney(minor, currency, { masked, wholeUnits: true });

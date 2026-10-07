@@ -8,8 +8,10 @@ import { useSnapshot } from '@/data/queries';
 import { it } from '@/i18n/it';
 import { radius, spacing, useTheme } from '@/theme';
 
+import { newestAddition } from './backdrop';
 import { BalanceSection } from './balance-section';
 import { GreetingRow } from './greeting-row';
+import { HomeBackdrop } from './home-backdrop';
 import { LatestStops } from './latest-stops';
 import { LinesList } from './lines-list';
 import { MonthBand } from './month-band';
@@ -38,7 +40,7 @@ export function HomeScreen() {
   const me = data?.people.find((p) => p.isMe);
 
   return (
-    <Screen>
+    <Screen backdrop={summary && data ? <HomeBackdrop lines={summary.lines} latest={newestAddition(data.transactions)} /> : undefined}>
       <GreetingRow name={me?.name ?? ''} />
       {isPending ? (
         <HomeSkeleton />
