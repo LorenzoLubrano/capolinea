@@ -7,6 +7,9 @@ import type { Account, Budget, Category, Goal, Id, LocalDate, Person, Subscripti
 
 export type NewTransaction = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>;
 
+/** A new subscription: its first billing date is `anchorDate`; the rest is computed. */
+export type NewSubscription = Omit<Subscription, 'id' | 'createdAt' | 'updatedAt' | 'nextBillingDate' | 'startDate'>;
+
 /** Fields to change; a field set to `undefined` is removed. */
 export type TransactionChanges = Partial<NewTransaction>;
 
@@ -32,4 +35,7 @@ export interface Repositories {
   /** Soft delete, so undo and future sync both work. */
   deleteTransaction(id: Id): Promise<void>;
   restoreTransaction(id: Id): Promise<void>;
+  /** Also creates the charges already due, so a subscription started months ago shows its history. */
+  addSubscription(draft: NewSubscription): Promise<{ subscription: Subscription; generated: number }>;
+  addPerson(name: string): Promise<Person>;
 }

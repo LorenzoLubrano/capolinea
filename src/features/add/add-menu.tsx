@@ -8,22 +8,19 @@ import { PressableScale } from '@/components/pressable-scale';
 import { AppText } from '@/components/text';
 import { useSnapshot } from '@/data/queries';
 import { it } from '@/i18n/it';
-import { useToast } from '@/state/toast';
 import { radius, spacing, useTheme } from '@/theme';
 
 import { recentTemplates } from './suggestions';
 
-function SecondaryTile({ label, icon }: { label: string; icon: IconName }) {
+type AddRoute = '/add-income' | '/add-subscription' | '/add-transfer';
+
+function SecondaryTile({ label, hint, icon, href }: { label: string; hint: string; icon: IconName; href: AddRoute }) {
   const { colors } = useTheme();
-  const show = useToast((s) => s.show);
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={() => {
-        router.back();
-        show({ text: it.add.comingSoon(label) });
-      }}
+      accessibilityLabel={`${label}. ${hint}`}
+      onPress={() => router.replace(href)}
       style={{
         flex: 1,
         minHeight: 84,
@@ -89,9 +86,9 @@ export function AddMenu() {
       </PressableScale>
 
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-        <SecondaryTile label={it.add.income} icon="ArrowUp" />
-        <SecondaryTile label={it.add.subscription} icon="ArrowsClockwise" />
-        <SecondaryTile label={it.add.transfer} icon="ArrowsLeftRight" />
+        <SecondaryTile label={it.add.income} hint={it.add.incomeHint} icon="ArrowUp" href="/add-income" />
+        <SecondaryTile label={it.add.subscription} hint={it.add.subscriptionHint} icon="ArrowsClockwise" href="/add-subscription" />
+        <SecondaryTile label={it.add.transfer} hint={it.add.transferHint} icon="ArrowsLeftRight" href="/add-transfer" />
       </View>
 
       {templates.length > 0 ? (

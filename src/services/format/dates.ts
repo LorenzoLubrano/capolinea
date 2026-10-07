@@ -47,3 +47,9 @@ export function fullDate(date: LocalDate, locale = DEFAULT_LOCALE): string {
   const text = formatter(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(toDate(date));
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+/** `Ottobre 2026` */
+export function monthYear(date: LocalDate, locale = DEFAULT_LOCALE): string {
+  const text = formatter(locale, { month: 'long', year: 'numeric' }).format(toDate(date));
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

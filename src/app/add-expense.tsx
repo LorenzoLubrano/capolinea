@@ -1,3 +1,5 @@
-import { ExpenseForm } from '@/features/add/expense-form';
+import { MovementForm } from '@/features/add/movement-form';
 
-export default ExpenseForm;
+export default function AddExpense() {
+  return <MovementForm kind="expense" />;
+}

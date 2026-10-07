@@ -10,8 +10,10 @@ import { Money } from '@/components/money';
 import { PressableScale } from '@/components/pressable-scale';
 import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
+import { ToastHost } from '@/components/toast-host';
 import { useAddTransaction, useDeleteTransaction, useRestoreTransaction, useSnapshot } from '@/data/queries';
 import type { NewTransaction, Snapshot } from '@/data/repositories';
+import { refundableMinor } from '@/domain/splits';
 import type { Transaction } from '@/domain/types';
 import { it } from '@/i18n/it';
 import { fullDate, shortDate } from '@/services/format/dates';
@@ -99,6 +101,8 @@ function SplitNote({ tx, data }: { tx: Transaction; data: Snapshot }) {
   );
 }
 
+const refundsOf = (tx: Transaction, data: Snapshot) => data.transactions.filter((t) => t.refundOfId === tx.id);
+
 function copyOf(tx: Transaction, today: string): NewTransaction {
   const {
     id: _id,
@@ -146,7 +150,7 @@ export function TransactionDetail() {
   const refunds = data.transactions.filter((t) => t.refundOfId === tx.id);
   const title = tx.merchant ?? tx.description ?? category?.name ?? it.detail.types[tx.type];
   const isIn = tx.type === 'income' || tx.type === 'refund';
-  const rule = tx.split ? it.detail.counts.split : it.detail.counts[tx.type];
+  const rule = (tx.split ? it.detail.counts.split : it.detail.counts[tx.type]) + (refundsOf(tx, data).length ? ` ${it.detail.countsRefunded}` : '');
 
   const onDelete = () => {
     haptics.medium();
@@ -177,12 +181,10 @@ export function TransactionDetail() {
   };
 
   const onEdit = () => {
-    if (tx.type !== 'expense') {
-      showToast({ text: it.detail.editSoon });
-      return;
-    }
-    router.push({ pathname: '/add-expense', params: { id: tx.id } });
+    const pathname = ({ expense: '/add-expense', income: '/add-income', transfer: '/add-transfer', refund: '/add-refund' } as const)[tx.type];
+    router.push({ pathname, params: { id: tx.id } });
   };
+  const refundable = tx.type === 'expense' ? refundableMinor(tx, data.transactions) : 0;
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
@@ -294,6 +296,21 @@ export function TransactionDetail() {
           ) : null}
         </View>
 
+        {refundable > 0 ? (
+          <PressableScale
+            accessibilityRole="button"
+            feedback="dim"
+            onPress={() => router.push({ pathname: '/add-refund', params: { of: tx.id } })}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, minHeight: 52, paddingHorizontal: spacing.md, borderRadius: radius.control, borderCurve: 'continuous', borderWidth: 1, borderColor: colors.hairline }}
+          >
+            <Icon name="ArrowUUpLeft" size={20} color={colors.ink} />
+            <AppText variant="bodyStrong" style={{ flex: 1 }}>
+              {it.detail.addRefund}
+            </AppText>
+            <Icon name="CaretRight" size={16} color={colors.inkTertiary} />
+          </PressableScale>
+        ) : null}
+
         <View style={{ gap: spacing.xs }}>
           <AppText variant="subheadStrong" tone="secondary">
             {it.detail.howItCounts}
@@ -319,6 +336,7 @@ export function TransactionDetail() {
         <Button label={it.detail.duplicate} icon="Copy" variant="secondary" stacked onPress={onDuplicate} busy={add.isPending} style={{ flex: 1 }} />
         <Button label={it.detail.delete} icon="Trash" variant="destructive" stacked onPress={onDelete} busy={remove.isPending} style={{ flex: 1 }} />
       </View>
+      <ToastHost bottom={96} />
     </View>
   );
 }

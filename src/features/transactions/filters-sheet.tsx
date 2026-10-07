@@ -8,6 +8,7 @@ import { Chip } from '@/components/chip';
 import { LineBadge } from '@/components/line-badge';
 import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
+import { ToastHost } from '@/components/toast-host';
 import { it } from '@/i18n/it';
 import { haptics } from '@/services/haptics';
 import { useTransactionFilters } from '@/state/transaction-filters';
@@ -84,6 +85,7 @@ export function FiltersSheet() {
       <View style={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.sm, paddingBottom: insets.bottom + spacing.md, borderTopWidth: 1, borderTopColor: colors.hairline }}>
         <Button label={it.filters.show(results.length)} onPress={() => router.back()} />
       </View>
+      <ToastHost bottom={88} />
     </View>
   );
 }

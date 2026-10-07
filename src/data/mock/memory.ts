@@ -1,12 +1,19 @@
-import type { Transaction } from '@/domain/types';
+import { generateDueCharges } from '@/domain/subscriptions';
+import type { Person, Subscription, Transaction } from '@/domain/types';
 
-import type { NewTransaction, Repositories, Snapshot, TransactionChanges } from '../repositories';
+import type { NewSubscription, NewTransaction, Repositories, Snapshot, TransactionChanges } from '../repositories';
 import { createDataset, type Dataset } from './seed';
 
 /** In-memory repositories over the example dataset. A short delay keeps loading states honest. */
 export function createMemoryRepositories(dataset: Dataset = createDataset(), latencyMs = 120): Repositories {
-  const state: Dataset = { ...dataset, transactions: [...dataset.transactions] };
+  const state: Dataset = {
+    ...dataset,
+    transactions: [...dataset.transactions],
+    subscriptions: [...dataset.subscriptions],
+    people: [...dataset.people],
+  };
   let counter = 0;
+  const newId = (kind: string) => `local-${kind}-${Date.now()}-${++counter}`;
   const wait = () => new Promise((resolve) => setTimeout(resolve, latencyMs));
   const now = () => new Date().toISOString();
 
@@ -23,7 +30,7 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
     async addTransaction(draft: NewTransaction) {
       await wait();
       const stamp = now();
-      const tx: Transaction = { ...draft, id: `local-${Date.now()}-${++counter}`, createdAt: stamp, updatedAt: stamp };
+      const tx: Transaction = { ...draft, id: newId('tx'), createdAt: stamp, updatedAt: stamp };
       state.transactions = [...state.transactions, tx];
       return tx;
     },
@@ -49,6 +56,35 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
     async restoreTransaction(id) {
       await wait();
       update(id, ({ deletedAt: _deleted, ...tx }) => ({ ...tx, updatedAt: now() }));
+    },
+
+    async addSubscription(draft: NewSubscription) {
+      await wait();
+      const stamp = now();
+      const created: Subscription = {
+        ...draft,
+        id: newId('sub'),
+        createdAt: stamp,
+        updatedAt: stamp,
+        startDate: draft.anchorDate,
+        nextBillingDate: draft.anchorDate,
+      };
+      const { charges, subscriptions } = generateDueCharges([created], state.transactions, state.today, {
+        makeId: () => newId('tx'),
+        now: stamp,
+      });
+      const [subscription] = subscriptions;
+      state.subscriptions = [...state.subscriptions, subscription];
+      state.transactions = [...state.transactions, ...charges];
+      return { subscription, generated: charges.length };
+    },
+
+    async addPerson(name: string) {
+      await wait();
+      const stamp = now();
+      const person: Person = { id: newId('person'), createdAt: stamp, updatedAt: stamp, name, isMe: false };
+      state.people = [...state.people, person];
+      return person;
     },
   };
 }

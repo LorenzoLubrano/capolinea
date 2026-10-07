@@ -37,3 +37,9 @@ export function minorToInput(minor: number): string {
   const cents = minor % 100;
   return cents === 0 ? String(integer) : `${integer},${String(cents).padStart(2, '0')}`;
 }
+
+/** Typed amounts (system keyboard): digits and one decimal comma, a dot read as comma, two decimals at most. */
+export function cleanAmountText(text: string): string {
+  const [integer = '', ...rest] = text.replace(/\./g, ',').replace(/[^\d,]/g, '').split(',');
+  return rest.length ? `${integer},${rest[0].slice(0, MAX_DECIMALS)}` : integer;
+}

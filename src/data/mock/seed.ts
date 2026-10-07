@@ -86,6 +86,9 @@ export const CATEGORIES: Category[] = [
   category('cat-other', 'Altro', 'DotsThree', 'grey', 14),
   category('cat-salary', 'Stipendio', 'Briefcase', 'grey', 20, 'income'),
   category('cat-refund-income', 'Rimborsi', 'ArrowCounterClockwise', 'grey', 21, 'income'),
+  category('cat-scholarship', 'Borsa di studio', 'GraduationCap', 'grey', 22, 'income'),
+  category('cat-received', 'Soldi ricevuti', 'HandCoins', 'grey', 23, 'income'),
+  category('cat-other-income', 'Altre entrate', 'DotsThree', 'grey', 24, 'income'),
 ];
 
 const sub = (

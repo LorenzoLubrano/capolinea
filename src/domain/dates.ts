@@ -70,3 +70,18 @@ export function samePeriodPreviousMonth(today: LocalDate): { from: LocalDate; to
   const previous = addMonthsClamped(today, -1);
   return { from: monthStart(previous), to: previous };
 }
+
+/** 0 for Monday … 6 for Sunday. */
+function weekdayMondayFirst(date: LocalDate): number {
+  const { year, month, day } = parse(date);
+  return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
+}
+
+/** The month as weeks of seven days, Monday first; days outside the month are `null`. */
+export function monthGrid(firstOfMonth: LocalDate): (LocalDate | null)[][] {
+  const { year, month } = parse(firstOfMonth);
+  const cells: (LocalDate | null)[] = Array.from({ length: weekdayMondayFirst(format({ year, month, day: 1 })) }, () => null);
+  for (let day = 1; day <= daysInMonth(year, month); day++) cells.push(format({ year, month, day }));
+  while (cells.length % 7) cells.push(null);
+  return Array.from({ length: cells.length / 7 }, (_, week) => cells.slice(week * 7, week * 7 + 7));
+}

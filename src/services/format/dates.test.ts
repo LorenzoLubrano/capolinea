@@ -1,4 +1,4 @@
-import { dayLabel, fullDate, monthName, monthNames, shortDate } from './dates';
+import { dayLabel, fullDate, monthName, monthNames, monthYear, shortDate } from './dates';
 
 describe('monthName', () => {
   it('names the month in Italian, lower case', () => {
@@ -36,5 +36,11 @@ describe('monthNames', () => {
 describe('fullDate', () => {
   it('writes weekday, day, month and year', () => {
     expect(fullDate('2026-10-20')).toBe('Martedì 20 ottobre 2026');
+  });
+});
+
+describe('monthYear', () => {
+  it('names month and year, capitalised', () => {
+    expect(monthYear('2026-10-24')).toBe('Ottobre 2026');
   });
 });

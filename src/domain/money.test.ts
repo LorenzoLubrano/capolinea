@@ -1,4 +1,4 @@
-import { appendKeypadKey, inputToMinor, minorToInput } from './money';
+import { appendKeypadKey, cleanAmountText, inputToMinor, minorToInput } from './money';
 
 describe('appendKeypadKey', () => {
   const type = (keys: string[]) => keys.reduce((input, key) => appendKeypadKey(input, key as never), '');
@@ -59,5 +59,15 @@ describe('minorToInput', () => {
     for (const minor of [0, 1, 99, 150, 4280, 128462]) {
       expect(inputToMinor(minorToInput(minor))).toBe(minor);
     }
+  });
+});
+
+describe('cleanAmountText', () => {
+  it('keeps digits and one decimal comma, two decimals at most', () => {
+    expect(cleanAmountText('12.5')).toBe('12,5');
+    expect(cleanAmountText('12,555')).toBe('12,55');
+    expect(cleanAmountText('1,2,3')).toBe('1,2');
+    expect(cleanAmountText('ab7c')).toBe('7');
+    expect(cleanAmountText('')).toBe('');
   });
 });

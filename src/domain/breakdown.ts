@@ -53,3 +53,17 @@ export function monthlyEquivalent(subscription: Subscription): number {
       return Math.round(perUnit / 12);
   }
 }
+
+/** What a subscription costs in a year, whatever its frequency. */
+export function yearlyEquivalent(subscription: Subscription): number {
+  const { amountMinor, frequency } = subscription;
+  const perUnit = amountMinor / frequency.interval;
+  switch (frequency.unit) {
+    case 'week':
+      return Math.round(perUnit * WEEKS_PER_MONTH * 12);
+    case 'month':
+      return Math.round(perUnit * 12);
+    case 'year':
+      return Math.round(perUnit);
+  }
+}

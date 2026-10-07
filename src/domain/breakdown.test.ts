@@ -1,5 +1,5 @@
 import { subscription, tx } from './testing/builders';
-import { incomeBetween, monthlyEquivalent, spendingByCategory } from './breakdown';
+import { incomeBetween, monthlyEquivalent, spendingByCategory, yearlyEquivalent } from './breakdown';
 
 const ME = 'person-me';
 
@@ -40,5 +40,14 @@ describe('monthlyEquivalent', () => {
     expect(monthlyEquivalent(subscription({ amountMinor: 3000, frequency: { unit: 'month', interval: 3 } }))).toBe(1000);
     // 365.25 / 7 / 12 ≈ 4.348 weeks per month
     expect(monthlyEquivalent(subscription({ amountMinor: 1000, frequency: { unit: 'week', interval: 1 } }))).toBe(4348);
+  });
+});
+
+describe('yearlyEquivalent', () => {
+  it('turns any frequency into a yearly cost', () => {
+    expect(yearlyEquivalent(subscription({ amountMinor: 1399 }))).toBe(16788);
+    expect(yearlyEquivalent(subscription({ amountMinor: 4990, frequency: { unit: 'year', interval: 1 } }))).toBe(4990);
+    expect(yearlyEquivalent(subscription({ amountMinor: 3000, frequency: { unit: 'month', interval: 3 } }))).toBe(12000);
+    expect(yearlyEquivalent(subscription({ amountMinor: 1000, frequency: { unit: 'week', interval: 1 } }))).toBe(52179);
   });
 });

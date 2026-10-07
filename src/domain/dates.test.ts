@@ -5,6 +5,7 @@ import {
   daysInMonth,
   isWithin,
   monthEnd,
+  monthGrid,
   monthStart,
   samePeriodPreviousMonth,
 } from './dates';
@@ -81,5 +82,18 @@ describe('samePeriodPreviousMonth', () => {
 
   it('crosses the year boundary', () => {
     expect(samePeriodPreviousMonth('2027-01-10')).toEqual({ from: '2026-12-01', to: '2026-12-10' });
+  });
+});
+
+describe('monthGrid', () => {
+  it('lays a month out in weeks starting on Monday', () => {
+    const weeks = monthGrid('2026-10-01');
+    expect(weeks).toHaveLength(5);
+    expect(weeks[0]).toEqual([null, null, null, '2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04']);
+    expect(weeks[4]).toEqual(['2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31', null]);
+  });
+
+  it('handles a month that starts on Monday', () => {
+    expect(monthGrid('2026-06-01')[0][0]).toBe('2026-06-01');
   });
 });
