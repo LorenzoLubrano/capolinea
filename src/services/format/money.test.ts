@@ -1,4 +1,4 @@
-import { accessibleMoney, formatMoney } from './money';
+import { accessibleMoney, formatMoney, speakable } from './money';
 
 // Intl separates number and symbol with a no-break space; tests read it as a plain space.
 const plain = (text: string) => text.replace(/ | /g, ' ');
@@ -35,5 +35,25 @@ describe('accessibleMoney', () => {
 
   it('says the amount is hidden in privacy mode', () => {
     expect(accessibleMoney(128462, 'EUR', { masked: true })).toBe('importo nascosto');
+  });
+});
+
+describe('speakable', () => {
+  it('reads hidden amounts as hidden, wherever they sit in a sentence', () => {
+    const hidden = formatMoney(1234, 'EUR', { masked: true });
+    expect(speakable(`Speso ${hidden} su un budget di ${hidden}.`)).toBe('Speso importo nascosto su un budget di importo nascosto.');
+    expect(speakable(`Ti devono ${formatMoney(1234, 'EUR', { masked: true, wholeUnits: true })}`)).toBe('Ti devono importo nascosto');
+  });
+
+  it('leaves visible amounts and plain text alone', () => {
+    expect(speakable('Restano 307 €')).toBe('Restano 307 €');
+  });
+});
+
+describe('accessibleMoney with a direction', () => {
+  it('says which way the money went', () => {
+    expect(accessibleMoney(1799, 'EUR', { kind: 'expense' })).toBe('uscita di 17,99 euro');
+    expect(accessibleMoney(32000, 'EUR', { kind: 'refund' })).toBe('rimborso di 320,00 euro');
+    expect(accessibleMoney(175000, 'EUR', { kind: 'income', masked: true })).toBe('entrata di importo nascosto');
   });
 });

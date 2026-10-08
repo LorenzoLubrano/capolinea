@@ -4,12 +4,31 @@
 export const it = {
   money: {
     hidden: 'importo nascosto',
+    spoken: {
+      expense: (amount: string) => `uscita di ${amount}`,
+      income: (amount: string) => `entrata di ${amount}`,
+      refund: (amount: string) => `rimborso di ${amount}`,
+      transfer: (amount: string) => `trasferimento di ${amount}`,
+    },
   },
   common: {
     loading: 'Caricamento',
     cancel: 'Annulla',
     undo: 'Annulla',
     back: 'Indietro',
+    retry: 'Riprova',
+  },
+  stopRow: {
+    share: (amount: string) => `tua quota ${amount}`,
+  },
+  discard: {
+    title: 'Scartare quello che hai scritto?',
+    body: 'Non viene salvato.',
+    keep: 'Continua a scrivere',
+    discard: 'Scarta',
+  },
+  toast: {
+    withAction: (text: string, action: string) => `${text}. ${action} disponibile.`,
   },
   pickers: {
     iconLabel: (name: string) => `Icona ${name}`,
@@ -91,7 +110,6 @@ export const it = {
     noBudget: 'Nessun budget',
     latest: 'Ultime fermate',
     seeAll: 'Vedi tutti',
-    privacyShow: 'Mostra gli importi',
     privacyHide: 'Nascondi gli importi',
     profile: 'Profilo e impostazioni',
     openAccounts: 'Apre i conti',

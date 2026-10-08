@@ -8,7 +8,7 @@ import { AppText } from '@/components/text';
 import type { MerchantSpending, PeriodUnit } from '@/domain/analysis';
 import type { Category } from '@/domain/types';
 import { it } from '@/i18n/it';
-import { formatMoney } from '@/services/format/money';
+import { accessibleMoney, formatMoney } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
 
@@ -78,11 +78,12 @@ export function MerchantRow({
   onPress: () => void;
 }) {
   const { colors, lineColor } = useTheme();
+  const masked = useSettings((s) => s.privacy);
   const purchases = it.analytics.merchants.purchases(merchant.count);
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityLabel={`${merchant.name}, ${purchases}`}
+      accessibilityLabel={`${merchant.name}, ${purchases}, ${accessibleMoney(merchant.spentMinor, currency, { masked })}`}
       feedback="dim"
       onPress={onPress}
       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, minHeight: 56, borderBottomWidth: 1, borderBottomColor: colors.hairline }}

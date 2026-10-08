@@ -21,6 +21,7 @@ import { openItems } from '@/domain/splits';
 import type { Person, Transaction } from '@/domain/types';
 import { ChoiceRow, TextField } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { dayLabel } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
@@ -273,6 +274,7 @@ function PersonFormBody({ editing }: { editing?: Person }) {
   const update = useUpdatePerson();
   const showToast = useToast((s) => s.show);
   const [name, setName] = useState(editing?.name ?? '');
+  const allowLeave = useDiscardGuard({ name });
   const busy = add.isPending || update.isPending;
 
   const onSave = () => {
@@ -283,6 +285,7 @@ function PersonFormBody({ editing }: { editing?: Person }) {
     }
     const done = () => {
       haptics.success();
+      allowLeave();
       router.back();
       showToast({ text: it.shared.form.saved });
     };

@@ -4,11 +4,13 @@ import { View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Icon } from '@/components/icon';
+import { PressableScale } from '@/components/pressable-scale';
 import { Screen } from '@/components/screen';
 import { AppText } from '@/components/text';
 import { useReplaceAll, useSnapshot } from '@/data/queries';
 import { TextField } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { useAnnounce } from '@/services/a11y';
 import { fullDate } from '@/services/format/dates';
 import { haptics } from '@/services/haptics';
 import { pickTextFile } from '@/services/pick-file';
@@ -39,6 +41,8 @@ export function RestoreScreen() {
   // Replacing real data asks for a written word; an empty phone does not.
   const hasData = (data?.transactions.length ?? 0) > 0;
   const confirmed = !hasData || typed.trim().toUpperCase() === it.restore.confirmWord;
+
+  useAnnounce(problem);
 
   const pick = async () => {
     setReading(true);
@@ -119,6 +123,16 @@ export function RestoreScreen() {
                     {it.restore.replaces(data?.transactions.length ?? 0)}
                   </AppText>
                 </View>
+                <PressableScale
+                  accessibilityRole="link"
+                  feedback="dim"
+                  onPress={() => router.push('/settings/export')}
+                  style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' }}
+                >
+                  <Icon name="Export" size={18} color={colors.ink} />
+                  <AppText variant="subheadStrong">{it.deleteData.backupFirst}</AppText>
+                  <Icon name="CaretRight" size={14} color={colors.ink} weight="bold" />
+                </PressableScale>
                 <TextField label={it.restore.confirmLabel} value={typed} onChangeText={setTyped} placeholder={it.restore.confirmWord} />
               </>
             ) : null}

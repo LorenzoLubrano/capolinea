@@ -40,13 +40,16 @@ export function Segmented<T extends string>({
             }}
             style={{
               flex: 1,
-              minHeight: 40,
+              minHeight: 44,
               alignItems: 'center',
               justifyContent: 'center',
               paddingHorizontal: spacing.sm,
               borderRadius: radius.control - 3,
               borderCurve: 'continuous',
-              backgroundColor: selected ? colors.surface : 'transparent',
+              // Lighter than the track in both themes, with an edge: the choice never rests on text colour alone.
+              backgroundColor: selected ? colors.selection : 'transparent',
+              borderWidth: 1,
+              borderColor: selected ? colors.glassBorder : 'transparent',
               boxShadow: selected ? shadows.floating : undefined,
             }}
           >

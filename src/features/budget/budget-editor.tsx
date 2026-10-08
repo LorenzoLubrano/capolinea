@@ -17,6 +17,7 @@ import { spendingBetween } from '@/domain/spending';
 import type { Budget, BudgetScope, Id } from '@/domain/types';
 import { AmountDisplay, ChoiceRow, SaveBar } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
 import { useSettings } from '@/state/settings';
@@ -52,6 +53,7 @@ function EditorBody({ data, existing, params }: { data: Snapshot; existing?: Bud
   const scope: BudgetScope = existing?.scope ?? (params.category ? 'category' : (params.scope ?? 'global'));
   const [categoryId, setCategoryId] = useState<Id | undefined>(existing?.categoryId ?? params.category);
   const [input, setInput] = useState(existing ? minorToInput(existing.amountMinor) : '');
+  const allowLeave = useDiscardGuard({ categoryId, input });
   const month = data.today.slice(0, 7);
   const options = { currency: data.currency, meId: data.meId };
 
@@ -78,6 +80,7 @@ function EditorBody({ data, existing, params }: { data: Snapshot; existing?: Bud
       {
         onSuccess: () => {
           haptics.success();
+          allowLeave();
           router.back();
           showToast({ text: it.budget.editor.saved });
         },
@@ -90,6 +93,7 @@ function EditorBody({ data, existing, params }: { data: Snapshot; existing?: Bud
     haptics.medium();
     remove.mutate(existing.id, {
       onSuccess: () => {
+        allowLeave();
         router.back();
         showToast({
           text: it.budget.editor.deleted,

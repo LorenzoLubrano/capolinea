@@ -32,7 +32,7 @@ export function Chip({
         flexDirection: 'row',
         alignItems: 'center',
         gap: spacing.xs + 2,
-        minHeight: 40,
+        minHeight: 44,
         paddingLeft: leading ? spacing.xs + 2 : spacing.smd,
         paddingRight: trailing ? spacing.sm : spacing.smd,
         borderRadius: radius.full,

@@ -29,7 +29,7 @@ export function GreetingRow({ name }: { name: string }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         <PressableScale
           accessibilityRole="switch"
-          accessibilityLabel={privacy ? it.home.privacyShow : it.home.privacyHide}
+          accessibilityLabel={it.home.privacyHide}
           accessibilityState={{ checked: privacy }}
           onPress={() => {
             haptics.light();

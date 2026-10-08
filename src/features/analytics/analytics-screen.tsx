@@ -16,6 +16,7 @@ import { useSnapshot } from '@/data/queries';
 import type { Snapshot } from '@/data/repositories';
 import type { Period, PeriodUnit } from '@/domain/analysis';
 import { it } from '@/i18n/it';
+import { useAnnounce } from '@/services/a11y';
 import { dayLabel, monthName, periodLabel, weekdayName } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
 import { formatShare } from '@/services/format/numbers';
@@ -47,6 +48,7 @@ function PeriodStepper({ period, current, canGoBack, canGoForward, onStep }: { p
       <Icon name={delta < 0 ? 'CaretLeft' : 'CaretRight'} size={20} weight="bold" color={enabled ? colors.ink : colors.hairline} />
     </PressableScale>
   );
+  useAnnounce(periodLabel(period), { skipInitial: true });
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: -spacing.smd }}>
       {arrow(-1, canGoBack)}

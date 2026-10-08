@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { addMonthsClamped, monthGrid, monthStart } from '@/domain/dates';
 import type { LocalDate } from '@/domain/types';
 import { it } from '@/i18n/it';
+import { useAnnounce } from '@/services/a11y';
 import { fullDate, monthYear } from '@/services/format/dates';
 import { haptics } from '@/services/haptics';
 import { radius, spacing, useTheme } from '@/theme';
@@ -45,6 +46,8 @@ export function Calendar({
       <Icon name={direction < 0 ? 'CaretLeft' : 'CaretRight'} size={18} color={colors.ink} />
     </PressableScale>
   );
+
+  useAnnounce(monthYear(month), { skipInitial: true });
 
   return (
     <View style={{ gap: spacing.xs }}>

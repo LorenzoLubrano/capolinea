@@ -7,7 +7,7 @@ import { Money } from '@/components/money';
 import { StatusLine } from '@/components/status-line';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
-import { formatMoney } from '@/services/format/money';
+import { formatMoney, speakable } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { motion, radius, spacing, useTheme } from '@/theme';
 
@@ -68,7 +68,7 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
       <View
         accessible
         accessibilityRole="image"
-        accessibilityLabel={a11y}
+        accessibilityLabel={speakable(a11y)}
         onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
         style={{ height: LABEL_ROW + BAND }}
       >

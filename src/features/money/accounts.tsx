@@ -23,6 +23,7 @@ import type { Account, AccountType } from '@/domain/types';
 import { AmountDisplay, ChoiceRow, SaveBar, TextField } from '@/features/add/form-parts';
 import { describeTransaction } from '@/features/transactions/describe';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { dayLabel, monthName } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
@@ -292,6 +293,7 @@ function AccountFormBody({ data, editing }: { data: Snapshot; editing?: Account 
   const [input, setInput] = useState(editing ? minorToInput(Math.abs(current)) : '');
   const [negative, setNegative] = useState(current < 0);
   const [includeInTotal, setIncludeInTotal] = useState(editing?.includeInTotal ?? true);
+  const allowLeave = useDiscardGuard({ name, type, color, input, negative, includeInTotal });
 
   const balanceMinor = (negative ? -1 : 1) * inputToMinor(input);
   const missing = !name.trim() ? it.accounts.form.typeName : null;
@@ -311,6 +313,7 @@ function AccountFormBody({ data, editing }: { data: Snapshot; editing?: Account 
     save.mutate(draft, {
       onSuccess: () => {
         haptics.success();
+        allowLeave();
         router.back();
         showToast({ text: it.accounts.form.saved });
       },

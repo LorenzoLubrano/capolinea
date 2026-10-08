@@ -18,6 +18,8 @@ import { addDays, addMonthsClamped } from '@/domain/dates';
 import { appendKeypadKey, inputToMinor, minorToInput } from '@/domain/money';
 import type { Frequency, Id, LocalDate, Subscription } from '@/domain/types';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
+import { useAnnounce } from '@/services/a11y';
 import { shortDate } from '@/services/format/dates';
 import { frequencyLabel } from '@/services/format/frequency';
 import { formatMoney } from '@/services/format/money';
@@ -163,6 +165,7 @@ function SubscriptionDetails({
   const [accountId, setAccountId] = useState<Id>(editing?.accountId ?? defaultAccountId(data));
   const [picker, setPicker] = useState<'account' | 'date' | null>(null);
   const [allCategories, setAllCategories] = useState(false);
+  const allowLeave = useDiscardGuard({ name, input, frequency, anchorDate, categoryId, accountId });
 
   const amountMinor = inputToMinor(input);
   const preset: Preset = custom ? 'custom' : presetOf(frequency);
@@ -204,6 +207,7 @@ function SubscriptionDetails({
         {
           onSuccess: ({ generated }) => {
             haptics.success();
+            allowLeave();
             router.back();
             showToast({ text: generated ? it.subscriptions.detail.updatedWithCharges(generated) : it.subscriptions.detail.updated });
           },
@@ -216,12 +220,15 @@ function SubscriptionDetails({
       {
         onSuccess: ({ generated }) => {
           haptics.success();
+          allowLeave();
           router.back();
           showToast({ text: generated ? it.subscriptionForm.savedWithCharges(generated) : it.subscriptionForm.saved });
         },
       },
     );
   };
+
+  useAnnounce(frequencyLabel(frequency), { skipInitial: true });
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>

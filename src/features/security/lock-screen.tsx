@@ -9,6 +9,7 @@ import { Icon } from '@/components/icon';
 import { PinDots, PinPad } from '@/components/pin-pad';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
+import { announce, useAnnounce } from '@/services/a11y';
 import { haptics } from '@/services/haptics';
 import { biometricSupport, checkPin, confirmWithBiometrics } from '@/services/security';
 import { useLock } from '@/state/lock';
@@ -88,9 +89,12 @@ export function LockScreen() {
 
   useEffect(() => {
     if (!lockedOutUntil) return;
+    announce(it.lock.wait(formatWait(lockedOutUntil - Date.now())));
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [lockedOutUntil]);
+
+  useAnnounce(error);
 
   const askBiometrics = async () => {
     if (await confirmWithBiometrics(it.lock.prompt, it.common.cancel)) done();
@@ -139,7 +143,13 @@ export function LockScreen() {
             {it.lock.title}
           </AppText>
           <PinDots slots={pin?.length ?? 4} filled={digits.length} />
-          <AppText variant="footnote" tone={waitMs > 0 ? 'warning' : 'alert'} accessibilityLiveRegion="polite" style={{ textAlign: 'center', minHeight: 36 }}>
+          <AppText
+            variant="footnote"
+            tone={waitMs > 0 ? 'warning' : 'alert'}
+            // The countdown changes every second: only the errors are read as they come.
+            accessibilityLiveRegion={waitMs > 0 ? 'none' : 'polite'}
+            style={{ textAlign: 'center', minHeight: 36 }}
+          >
             {waitMs > 0 ? it.lock.wait(formatWait(waitMs)) : (error ?? '')}
           </AppText>
         </View>

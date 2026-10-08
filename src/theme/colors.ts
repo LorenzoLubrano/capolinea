@@ -10,10 +10,12 @@ export const palettes = {
     background: '#FAFAF8',
     surface: '#FFFFFF',
     surfaceMuted: '#F0EFEB',
+    /** The chosen segment of a segmented control, above `surfaceMuted`. */
+    selection: '#FFFFFF',
     ink: '#111111',
     inkSecondary: '#5F5F5B',
-    /** Large or decorative text only: below 4.5:1 on the background. */
-    inkTertiary: '#8A8A85',
+    /** Quiet text: axes, legends, notes. Still 4.5:1 on every surface, small sizes included. */
+    inkTertiary: '#6B6B66',
     onInk: '#FFFFFF',
     hairline: 'rgba(17, 17, 17, 0.10)',
     track: '#E8E7E2',
@@ -27,9 +29,10 @@ export const palettes = {
     background: '#0D0D0E',
     surface: '#17171A',
     surfaceMuted: '#202024',
+    selection: '#3A3A40',
     ink: '#F4F4F1',
     inkSecondary: '#A3A39E',
-    inkTertiary: '#77776F',
+    inkTertiary: '#8A8A83',
     onInk: '#0D0D0E',
     hairline: 'rgba(255, 255, 255, 0.10)',
     track: '#26262A',

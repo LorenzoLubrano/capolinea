@@ -64,6 +64,8 @@ export function SettingsRow({
     <PressableScale
       accessibilityRole={role}
       accessibilityState={role === 'radio' ? { checked: !!checked } : undefined}
+      // The name (and value) as the label, the hint once as a hint: never read twice.
+      accessibilityLabel={value ? `${title}, ${value}` : title}
       accessibilityHint={hint}
       feedback="dim"
       onPress={onPress}
@@ -124,6 +126,7 @@ export function SettingsSwitchRow({
       <PressableScale
         accessibilityRole="switch"
         accessibilityState={{ checked: value, disabled: !!disabled }}
+        accessibilityLabel={title}
         accessibilityHint={hint}
         feedback="dim"
         disabled={disabled}

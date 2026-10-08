@@ -46,7 +46,7 @@ export function StopRow({
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityLabel={`${title}, ${subtitle}, ${accessibleMoney(tx.amountMinor, currency, { masked })}`}
+      accessibilityLabel={`${title}, ${subtitle}, ${accessibleMoney(tx.amountMinor, currency, { masked, kind: tx.type })}${share !== undefined ? `, ${it.stopRow.share(accessibleMoney(share, currency, { masked }))}` : ''}`}
       feedback="dim"
       disabled={!onPress}
       onPress={onPress}

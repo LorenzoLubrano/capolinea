@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 
 import { Icon } from '@/components/icon';
-import { PressableScale } from '@/components/pressable-scale';
+import { LoadError } from '@/components/load-state';
 import { Screen } from '@/components/screen';
 import { AppText } from '@/components/text';
 import { useSnapshot } from '@/data/queries';
@@ -27,7 +27,7 @@ function HomeSkeleton() {
     <View style={{ height, width, borderRadius: radius.sign, backgroundColor: colors.track }} />
   );
   return (
-    <View style={{ gap: spacing.lg, paddingTop: spacing.lg }} accessibilityLabel="Caricamento">
+    <View style={{ gap: spacing.lg, paddingTop: spacing.lg }} accessible accessibilityLabel={it.common.loading}>
       {block(18, '40%')}
       {block(54, '70%')}
       {block(52)}
@@ -48,12 +48,8 @@ export function HomeScreen() {
       {isPending ? (
         <HomeSkeleton />
       ) : isError || !summary || !data ? (
-        <View style={{ gap: spacing.sm, paddingTop: spacing.xl }}>
-          <AppText variant="title2">{it.home.error.title}</AppText>
-          <AppText tone="secondary">{it.home.error.body}</AppText>
-          <PressableScale accessibilityRole="button" onPress={() => refetch()} style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}>
-            <AppText variant="bodyStrong">{it.home.error.retry}</AppText>
-          </PressableScale>
+        <View style={{ paddingTop: spacing.xl }}>
+          <LoadError onRetry={() => refetch()} />
         </View>
       ) : (
         <View style={{ gap: spacing.xl, paddingTop: spacing.md }}>

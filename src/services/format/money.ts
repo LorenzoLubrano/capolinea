@@ -84,14 +84,27 @@ export function formatMoney(minor: number, currency: CurrencyCode, options: Mone
   return text;
 }
 
-/** Text for screen readers: the currency is spelled out, hidden amounts are announced as hidden. */
+/** Which way a movement went, said before its amount. */
+export type MoneyKind = 'expense' | 'income' | 'refund' | 'transfer';
+
+/**
+ * Text for screen readers: the currency is spelled out, hidden amounts are announced as hidden.
+ * With `kind`, the direction comes first («uscita di 17,99 euro»), since a sign is not read.
+ */
 export function accessibleMoney(
   minor: number,
   currency: CurrencyCode,
-  options: Pick<MoneyFormatOptions, 'masked' | 'locale'> = {},
+  options: Pick<MoneyFormatOptions, 'masked' | 'locale'> & { kind?: MoneyKind } = {},
 ): string {
-  const { masked = false, locale = DEFAULT_LOCALE } = options;
-  if (masked) return it.money.hidden;
-  const text = groupedParts(formatter(locale, currency, false, 'name'), Math.abs(minor) / 100);
-  return minor < 0 ? `${MINUS}${text}` : text;
+  const { masked = false, locale = DEFAULT_LOCALE, kind } = options;
+  const amount = masked ? it.money.hidden : groupedParts(formatter(locale, currency, false, 'name'), Math.abs(minor) / 100);
+  if (kind) return it.money.spoken[kind](amount);
+  return minor < 0 && !masked ? `${MINUS}${amount}` : amount;
+}
+
+const HIDDEN_AMOUNT = new RegExp(String.raw`[${MINUS}+]?${MASK}(?:[\s\u00a0\u202f]*[^\s\d.,;:]{1,3})?`, 'g');
+
+/** A visible text as a screen reader should say it: hidden amounts become «importo nascosto». */
+export function speakable(text: string): string {
+  return text.includes(MASK) ? text.replace(HIDDEN_AMOUNT, it.money.hidden) : text;
 }

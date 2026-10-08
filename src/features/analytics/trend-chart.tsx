@@ -5,7 +5,7 @@ import { BarChart } from '@/components/bar-chart';
 import { AppText } from '@/components/text';
 import type { PeriodUnit } from '@/domain/analysis';
 import { it } from '@/i18n/it';
-import { formatMoney } from '@/services/format/money';
+import { formatMoney, speakable } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
 
@@ -71,7 +71,7 @@ export function TrendChartView({ trend, unit, color, currency }: { trend: TrendC
         reference={usualMinor}
         selectedKey={key}
         onSelect={setSelected}
-        accessibilityLabel={it.analytics.usual.chartLabel(summary)}
+        accessibilityLabel={speakable(it.analytics.usual.chartLabel(summary))}
         accessibilityValue={describe(selectedIndex)}
       />
       {usualText || forecast ? (

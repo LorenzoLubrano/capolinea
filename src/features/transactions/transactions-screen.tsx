@@ -2,10 +2,10 @@ import { router } from 'expo-router';
 import { ScrollView, SectionList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Button } from '@/components/button';
 import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
-import { PressableScale } from '@/components/pressable-scale';
 import { SearchField } from '@/components/search-field';
 import { StopRow } from '@/components/stop-row';
 import { AppText } from '@/components/text';
@@ -26,7 +26,7 @@ const KINDS: KindFilter[] = ['all', 'expense', 'income', 'transfer'];
 function Skeleton() {
   const { colors } = useTheme();
   return (
-    <View style={{ gap: spacing.md, paddingTop: spacing.md }} accessibilityLabel="Caricamento">
+    <View style={{ gap: spacing.md, paddingTop: spacing.md }} accessible accessibilityLabel={it.common.loading}>
       {Array.from({ length: 6 }, (_, i) => (
         <View key={i} style={{ height: 44, borderRadius: radius.sign, backgroundColor: colors.track }} />
       ))}
@@ -40,9 +40,7 @@ function Message({ title, body, action }: { title: string; body: string; action?
       <AppText variant="title3">{title}</AppText>
       <AppText tone="secondary">{body}</AppText>
       {action ? (
-        <PressableScale accessibilityRole="button" onPress={action.onPress} style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}>
-          <AppText variant="bodyStrong">{action.label}</AppText>
-        </PressableScale>
+        <Button label={action.label} variant="secondary" onPress={action.onPress} style={{ alignSelf: 'flex-start' }} />
       ) : null}
     </View>
   );
@@ -166,6 +164,7 @@ export function TransactionsScreen() {
         renderSectionHeader={({ section }) =>
           section.date ? (
             <View
+              accessible
               accessibilityRole="header"
               style={{
                 flexDirection: 'row',

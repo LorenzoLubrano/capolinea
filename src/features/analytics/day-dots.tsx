@@ -6,7 +6,7 @@ import { magnitudeLevel, type Bucket, type Period } from '@/domain/analysis';
 import { monthGrid } from '@/domain/dates';
 import { it } from '@/i18n/it';
 import { dayLabel, monthName } from '@/services/format/dates';
-import { formatMoney } from '@/services/format/money';
+import { formatMoney, speakable } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
 import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
@@ -194,7 +194,7 @@ export function DayDots({
       <View
         accessible
         accessibilityRole={interactive ? 'adjustable' : 'image'}
-        accessibilityLabel={it.analytics.days.chartLabel(summary)}
+        accessibilityLabel={speakable(it.analytics.days.chartLabel(summary))}
         accessibilityValue={current ? { text: describe(current) } : undefined}
         accessibilityActions={interactive ? [{ name: 'increment' }, { name: 'decrement' }] : undefined}
         onAccessibilityAction={(event) => move(event.nativeEvent.actionName === 'increment' ? 1 : -1)}

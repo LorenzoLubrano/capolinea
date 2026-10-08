@@ -3,6 +3,8 @@ import { View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeOut, useReducedMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { it } from '@/i18n/it';
+import { announce, useScreenReader } from '@/services/a11y';
 import { useToast } from '@/state/toast';
 import { layout, radius, shadows, spacing, useTheme } from '@/theme';
 
@@ -11,10 +13,13 @@ import { PressableScale } from './pressable-scale';
 import { AppText } from './text';
 
 const VISIBLE_MS = 5000;
+/** With a screen reader on, a toast with Annulla waits long enough to be reached by swiping. */
+const READER_MS = 15000;
 let hostSeq = 0;
 
 /**
- * Toast with an optional action (Annulla), gone after 5 seconds. The root host sits above the tab
+ * Toast with an optional action (Annulla), gone after 5 seconds (15 with a screen reader and an
+ * action). VoiceOver hears it through `announce`, TalkBack through the live region. The root host sits above the tab
  * bar; a sheet mounts its own host, with `top` or `bottom` clearing its own controls.
  */
 export function ToastHost({ top, bottom }: { top?: number; bottom?: number }) {
@@ -23,6 +28,7 @@ export function ToastHost({ top, bottom }: { top?: number; bottom?: number }) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const reduced = useReducedMotion();
+  const reader = useScreenReader();
   // A toast stays on the screen that showed it (the store hands it down when that screen closes).
   const onTop = current?.hostId === undefined ? hosts[hosts.length - 1] === hostId : current.hostId === hostId;
 
@@ -33,9 +39,13 @@ export function ToastHost({ top, bottom }: { top?: number; bottom?: number }) {
 
   useEffect(() => {
     if (!current || !onTop) return;
-    const timer = setTimeout(() => hide(current.id), VISIBLE_MS);
+    const timer = setTimeout(() => hide(current.id), reader && current.actionLabel ? READER_MS : VISIBLE_MS);
     return () => clearTimeout(timer);
-  }, [current, hide, onTop]);
+  }, [current, hide, onTop, reader]);
+
+  useEffect(() => {
+    if (current && onTop) announce(current.actionLabel ? it.toast.withAction(current.text, current.actionLabel) : current.text);
+  }, [current, onTop]);
 
   if (!current || !onTop) return null;
   const position =

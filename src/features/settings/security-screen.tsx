@@ -11,6 +11,7 @@ import { AppText } from '@/components/text';
 import { ToastHost } from '@/components/toast-host';
 import { pinProblem } from '@/domain/pin';
 import { it } from '@/i18n/it';
+import { useAnnounce } from '@/services/a11y';
 import { haptics } from '@/services/haptics';
 import { biometricSupport, checkPin, confirmWithBiometrics, hashPin } from '@/services/security';
 import { useLock } from '@/state/lock';
@@ -156,6 +157,8 @@ export function PinSheet() {
     if (step === 'current' && value.length === expected) verify(value);
     if (step === 'confirm' && value.length === expected) confirm(value);
   };
+
+  useAnnounce(error);
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>

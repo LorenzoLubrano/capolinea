@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { useReducedMotion } from 'react-native-reanimated';
 
+import { speakable } from '@/services/format/money';
 import { motion } from '@/theme';
 
 export interface PressableScaleProps extends Omit<PressableProps, 'style' | 'children'> {
@@ -40,6 +41,9 @@ export function PressableScale({ children, style, feedback = 'scale', disabled, 
   return (
     <Pressable
       {...props}
+      accessibilityLabel={props.accessibilityLabel === undefined ? undefined : speakable(props.accessibilityLabel)}
+      // Android asks for 48 dp: the 44 pt controls reach it without growing on screen.
+      hitSlop={props.hitSlop ?? (Platform.OS === 'android' ? 2 : undefined)}
       style={placement}
       disabled={disabled}
       onPressIn={(e) => {

@@ -18,6 +18,7 @@ import type { Snapshot } from '@/data/repositories';
 import type { Category, CategoryKind } from '@/domain/types';
 import { TextField } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { haptics } from '@/services/haptics';
 import { useToast } from '@/state/toast';
 import { layout, spacing, useTheme } from '@/theme';
@@ -107,6 +108,7 @@ function CategoryFormBody({ data, editing, kind }: { data: Snapshot; editing?: C
   const [name, setName] = useState(editing?.name ?? '');
   const [icon, setIcon] = useState(editing?.icon ?? 'Tag');
   const [color, setColor] = useState(editing?.color ?? 'teal');
+  const allowLeave = useDiscardGuard({ name, icon, color });
   const usage = editing ? categoryUsage(data, editing.id) : null;
   const usedBy = usage
     ? [
@@ -130,6 +132,7 @@ function CategoryFormBody({ data, editing, kind }: { data: Snapshot; editing?: C
     save.mutate(draft, {
       onSuccess: () => {
         haptics.success();
+        allowLeave();
         router.back();
         showToast({ text: it.categoryList.form.saved });
       },
@@ -143,6 +146,7 @@ function CategoryFormBody({ data, editing, kind }: { data: Snapshot; editing?: C
       { ...editing, archived },
       {
         onSuccess: () => {
+          allowLeave();
           router.back();
           showToast({
             text: archived ? it.categoryList.form.archivedToast : it.categoryList.form.unarchivedToast,
@@ -158,6 +162,7 @@ function CategoryFormBody({ data, editing, kind }: { data: Snapshot; editing?: C
     haptics.medium();
     remove.mutate(editing.id, {
       onSuccess: () => {
+        allowLeave();
         router.back();
         showToast({
           text: it.categoryList.form.deletedToast,

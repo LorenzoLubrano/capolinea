@@ -16,6 +16,7 @@ import { appendKeypadKey, inputToMinor, minorToInput } from '@/domain/money';
 import type { Goal, Id, LocalDate } from '@/domain/types';
 import { AmountDisplay, ChoiceRow, SaveBar, TextField } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { monthYear } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
@@ -49,6 +50,7 @@ function GoalFormBody({ data, editing }: { data: Snapshot; editing?: Goal }) {
   const [targetDate, setTargetDate] = useState<LocalDate | undefined>(editing ? editing.targetDate : addMonthsClamped(data.today, 12));
   const [accountId, setAccountId] = useState<Id | undefined>(editing ? editing.accountId : savings?.id);
   const [picker, setPicker] = useState<'date' | null>(null);
+  const allowLeave = useDiscardGuard({ name, icon, color, input, targetDate, accountId });
 
   const targetMinor = inputToMinor(input);
   const money = (minor: number) => formatMoney(minor, data.currency, { masked, wholeUnits: true });
@@ -65,6 +67,7 @@ function GoalFormBody({ data, editing }: { data: Snapshot; editing?: Goal }) {
       {
         onSuccess: () => {
           haptics.success();
+          allowLeave();
           router.back();
           showToast({ text: it.goals.form.saved });
         },

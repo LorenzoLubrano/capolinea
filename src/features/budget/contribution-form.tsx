@@ -15,6 +15,7 @@ import { appendKeypadKey, inputToMinor, minorToInput } from '@/domain/money';
 import type { LocalDate } from '@/domain/types';
 import { AmountDisplay, SaveBar } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { dayLabel } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
@@ -34,6 +35,7 @@ export function ContributionForm() {
   const [input, setInput] = useState('');
   const [date, setDate] = useState<LocalDate | null>(null);
   const [picker, setPicker] = useState(false);
+  const allowLeave = useDiscardGuard({ input, date });
 
   const goal = data?.goals.find((g) => g.id === goalId);
   if (!data || !goal) return <View style={{ flex: 1 }} />;
@@ -50,6 +52,7 @@ export function ContributionForm() {
       {
         onSuccess: (updated) => {
           haptics.success();
+          allowLeave();
           router.back();
           const added = updated.contributions[updated.contributions.length - 1];
           showToast({

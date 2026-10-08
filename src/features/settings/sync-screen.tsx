@@ -7,6 +7,7 @@ import { Screen } from '@/components/screen';
 import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
+import { useAnnounce } from '@/services/a11y';
 import { haptics } from '@/services/haptics';
 import { useSync, type SyncProvider, type SyncStatus } from '@/state/sync';
 import { useToast } from '@/state/toast';
@@ -46,6 +47,8 @@ export function SyncScreen() {
   // eslint-disable-next-line react-hooks/purity -- a relative time is read when the screen draws, like a clock.
   const minutes = lastSyncAt ? Math.floor((Date.now() - lastSyncAt) / 60000) : 0;
   const body = status === 'on' ? it.sync.states.on.body(it.sync.ago(minutes)) : (state as { body: string }).body;
+
+  useAnnounce(state.title, { skipInitial: true });
 
   const resolve = () => {
     haptics.success();
