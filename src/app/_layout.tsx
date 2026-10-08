@@ -7,12 +7,10 @@ import {
   useFonts,
 } from '@expo-google-fonts/archivo';
 import { ArchivoNarrow_600SemiBold, ArchivoNarrow_700Bold } from '@expo-google-fonts/archivo-narrow';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastHost } from '@/components/toast-host';
@@ -38,8 +36,6 @@ function AppStack() {
     ...base,
     colors: { ...base.colors, background: colors.background, card: colors.background, text: colors.ink, border: colors.hairline, primary: colors.ink },
   };
-  // iOS 26: a transparent sheet background becomes Liquid Glass. Elsewhere sheets are solid.
-  const sheetBackground = Platform.OS === 'ios' && isLiquidGlassAvailable() ? 'transparent' : colors.background;
   const sheet = {
     presentation: 'formSheet',
     sheetGrabberVisible: true,
@@ -64,16 +60,6 @@ function AppStack() {
         {/* The app itself only after the onboarding; wiping the data turns the guard off again. */}
         <Stack.Protected guard={onboarded}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="add"
-            options={{
-              presentation: 'formSheet',
-              sheetGrabberVisible: true,
-              sheetAllowedDetents: [0.62, 1],
-              sheetCornerRadius: 28,
-              contentStyle: { backgroundColor: sheetBackground },
-            }}
-          />
           <Stack.Screen name="add-expense" options={{ ...sheet, sheetAllowedDetents: [1] }} />
           <Stack.Screen name="add-income" options={{ ...sheet, sheetAllowedDetents: [1] }} />
           <Stack.Screen name="add-transfer" options={{ ...sheet, sheetAllowedDetents: [1] }} />

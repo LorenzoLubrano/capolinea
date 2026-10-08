@@ -8,12 +8,12 @@ import { it } from '@/i18n/it';
 /**
  * Keeps a sheet with something written from closing by mistake: on iOS the swipe pulls back
  * instead of dismissing, and Back, Annulla or a swipe that gets through ask first. Values equal to
- * the ones the sheet opened with count as nothing written. Returns `allowLeave`, to call before
- * closing on purpose (after saving or deleting).
+ * the ones the sheet opened with (or to `baseline`, when given) count as nothing written. Returns
+ * `allowLeave`, to call before closing on purpose (after saving or deleting).
  */
-export function useDiscardGuard(values: Record<string, unknown>): () => void {
+export function useDiscardGuard(values: Record<string, unknown>, baseline?: Record<string, unknown>): () => void {
   const navigation = useNavigation();
-  const [initial] = useState(() => JSON.stringify(values));
+  const [initial] = useState(() => JSON.stringify(baseline ?? values));
   const leaving = useRef(false);
   // The web preview has no native alert to ask with.
   const guard = Platform.OS !== 'web' && JSON.stringify(values) !== initial;

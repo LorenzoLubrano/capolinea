@@ -67,18 +67,15 @@ export function LineTabBar({ state, navigation }: TabBarProps) {
                 <PressableScale
                   accessibilityRole="button"
                   accessibilityLabel={it.tabs.add}
-                  accessibilityHint={it.tabs.addHint}
+                  // Straight to a new expense: the most common entry costs no menu. Income,
+                  // transfer, subscription and the recent ones are inside the sheet.
                   onPress={() => {
-                    haptics.light();
-                    router.push('/add');
-                  }}
-                  onLongPress={() => {
                     haptics.light();
                     router.push('/add-expense');
                   }}
                   style={{
                     width: 56,
-                    height: 44,
+                    height: 48,
                     borderRadius: radius.control,
                     borderCurve: 'continuous',
                     backgroundColor: colors.ink,

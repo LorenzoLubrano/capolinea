@@ -9,44 +9,79 @@ import { Icon } from '@/components/icon';
 import { LineBadge } from '@/components/line-badge';
 import { Money } from '@/components/money';
 import { PressableScale } from '@/components/pressable-scale';
+import { Segmented } from '@/components/segmented';
 import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
 import { ToastHost } from '@/components/toast-host';
 import { useRepositories } from '@/data/provider';
 import { useAddTransaction, useSnapshot, useUpdateTransaction } from '@/data/queries';
 import type { Snapshot, TransactionChanges } from '@/data/repositories';
+import { addDays } from '@/domain/dates';
 import { appendKeypadKey, inputToMinor, minorToInput, type KeypadKey } from '@/domain/money';
 import { computeShares, refundableMinor } from '@/domain/splits';
 import type { Id, LocalDate, Transaction } from '@/domain/types';
 import { it } from '@/i18n/it';
 import { dayLabel, shortDate } from '@/services/format/dates';
+import { useDiscardGuard } from '@/services/discard-guard';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
+import { rememberedEntry, useLastEntry } from '@/state/entry-session';
 import { useSettings } from '@/state/settings';
 import { useSplitDraft } from '@/state/split-draft';
 import { useToast } from '@/state/toast';
 import { layout, radius, spacing, useTheme } from '@/theme';
 
 import { AmountDisplay, ChoiceRow, DetailsSection, SaveBar, TextField } from './form-parts';
-import { defaultAccountId, frequentCategories } from './suggestions';
+import { defaultAccountId, frequentCategories, recentTemplates } from './suggestions';
 
 export type MovementKind = 'expense' | 'income' | 'transfer' | 'refund';
 
 type Params = { id?: string; of?: string; merchant?: string; amount?: string; category?: string; account?: string };
 
 const QUICK_CATEGORIES = 5;
+const RECENT = 5;
+const SWITCHABLE: MovementKind[] = ['expense', 'income', 'transfer'];
+
+/** What a new movement keeps when it changes kind in place. */
+type Carry = { input: string; accountId: Id; date: LocalDate };
 
 /**
- * New or edited movement of any kind. The route decides the kind; `id` edits an existing one,
- * `of` names the expense a new refund belongs to.
+ * New or edited movement of any kind. The route decides the starting kind; a new expense, income
+ * or transfer can switch kind in place, keeping amount, account and date. `id` edits an existing
+ * one, `of` names the expense a new refund belongs to.
  */
-export function MovementForm({ kind }: { kind: MovementKind }) {
+export function MovementForm({ kind: routeKind }: { kind: MovementKind }) {
   const params = useLocalSearchParams<Params>();
   const { data } = useSnapshot();
+  const [kind, setKind] = useState<MovementKind>(routeKind);
+  const [carry, setCarry] = useState<Carry | undefined>(undefined);
+  // Saved in a row from this sheet, across kind switches: the header then says Fine.
+  const [savedInRow, setSavedInRow] = useState(0);
   if (!data) return <View style={{ flex: 1 }} />;
   const editing = params.id ? data.transactions.find((t) => t.id === params.id) : undefined;
   const original = kind === 'refund' ? data.transactions.find((t) => t.id === (editing?.refundOfId ?? params.of)) : undefined;
-  return <MovementFormBody key={editing?.id ?? 'new'} kind={kind} data={data} editing={editing} original={original} params={params} />;
+  const switchable = !editing && SWITCHABLE.includes(kind);
+  return (
+    <MovementFormBody
+      key={`${editing?.id ?? 'new'}-${kind}`}
+      kind={kind}
+      data={data}
+      editing={editing}
+      original={original}
+      params={params}
+      carry={carry}
+      savedInRow={savedInRow}
+      onSavedInRow={setSavedInRow}
+      onKindChange={
+        switchable
+          ? (next, kept) => {
+              setCarry(kept);
+              setKind(next);
+            }
+          : undefined
+      }
+    />
+  );
 }
 
 function initialAccount(kind: MovementKind, data: Snapshot, original?: Transaction): Id {
@@ -64,12 +99,20 @@ function MovementFormBody({
   editing,
   original,
   params,
+  carry,
+  savedInRow,
+  onSavedInRow,
+  onKindChange,
 }: {
   kind: MovementKind;
   data: Snapshot;
   editing?: Transaction;
   original?: Transaction;
   params: Params;
+  carry?: Carry;
+  savedInRow: number;
+  onSavedInRow: (count: number) => void;
+  onKindChange?: (kind: MovementKind, carry: Carry) => void;
 }) {
   const { colors } = useTheme();
   const addTransaction = useAddTransaction();
@@ -82,23 +125,35 @@ function MovementFormBody({
 
   const accounts = [...data.accounts].filter((a) => !a.archived).sort((a, b) => a.sortOrder - b.sortOrder);
   const refundLimit = original ? refundableMinor(original, data.transactions) + (editing?.amountMinor ?? 0) : Infinity;
+  // An evening of entries: a new movement starts from the date and account of the last one saved.
+  const [remembered] = useState(() => (editing || original ? null : rememberedEntry(useLastEntry.getState().last, Date.now())));
+  const rememberedAccount = remembered && accounts.some((a) => a.id === remembered.accountId) ? remembered.accountId : undefined;
 
   const [input, setInput] = useState(() => {
+    if (carry) return carry.input;
     const minor = editing?.amountMinor ?? (params.amount ? Number(params.amount) : original ? refundableMinor(original, data.transactions) : 0);
     return minor ? minorToInput(minor) : '';
   });
   const [categoryId, setCategoryId] = useState<Id | undefined>(editing?.categoryId ?? params.category ?? original?.categoryId);
-  const [accountId, setAccountId] = useState<Id>(editing?.accountId ?? params.account ?? initialAccount(kind, data, original));
+  const [accountId, setAccountId] = useState<Id>(
+    editing?.accountId ?? params.account ?? carry?.accountId ?? rememberedAccount ?? initialAccount(kind, data, original),
+  );
   const [toAccountId, setToAccountId] = useState<Id | undefined>(
     editing?.toAccountId ?? (kind === 'transfer' ? accounts.find((a) => a.id !== accountId)?.id : undefined),
   );
-  const [date, setDate] = useState<LocalDate>(editing?.date ?? data.today);
+  const [date, setDate] = useState<LocalDate>(editing?.date ?? carry?.date ?? remembered?.date ?? data.today);
   const [picker, setPicker] = useState<'account' | 'date' | null>(null);
   const [allCategories, setAllCategories] = useState(false);
   const [details, setDetails] = useState(!!(editing?.merchant || editing?.notes || editing?.description || editing?.split));
   const [merchant, setMerchant] = useState(editing?.merchant ?? params.merchant ?? original?.merchant ?? '');
   const [description, setDescription] = useState(editing?.description ?? '');
   const [note, setNote] = useState(editing?.notes ?? '');
+  const rememberEntry = useLastEntry((s) => s.remember);
+  // Something written and not saved: the sheet asks before closing. A new one compares with empty.
+  const allowLeave = useDiscardGuard(
+    editing ? { input, categoryId, accountId, toAccountId, date, merchant, description, note } : { input, categoryId, merchant, description, note },
+    editing ? undefined : { input: '', categoryId: undefined, merchant: '', description: '', note: '' },
+  );
 
   // The split sheet hands its draft back through a store: start it from this movement, or empty.
   useEffect(() => {
@@ -123,6 +178,10 @@ function MovementFormBody({
   const split = kind === 'expense' && splitDraft ? computeShares(amountMinor, splitDraft) : null;
   const money = (minor: number) => formatMoney(minor, data.currency, { masked });
   const title = editing ? it.add.titles.edit[kind] : it.add.titles.new[kind];
+  const templates = useMemo(() => (kind === 'expense' && !editing ? recentTemplates(data, RECENT) : []), [kind, editing, data]);
+  const yesterday = addDays(data.today, -1);
+  // One tap to the other likely day: yesterday from today, back to today from anything else.
+  const quickDate = date === data.today ? yesterday : data.today;
 
   const categories =
     kind === 'income'
@@ -166,7 +225,7 @@ function MovementFormBody({
     }
   };
 
-  const save = () => {
+  const save = (another = false) => {
     if (missing || busy) return;
     const changes = fields();
     if (editing) {
@@ -176,6 +235,7 @@ function MovementFormBody({
         {
           onSuccess: () => {
             haptics.success();
+            allowLeave();
             router.back();
             showToast({
               text: it.add.updated,
@@ -192,9 +252,25 @@ function MovementFormBody({
       {
         onSuccess: (tx) => {
           haptics.success();
-          router.back();
+          rememberEntry({ date, accountId, at: Date.now() });
+          const count = savedInRow + 1;
+          if (another) {
+            // The sheet stays for the next one: amount and what describes it start over,
+            // date and account stay.
+            onSavedInRow(count);
+            setInput('');
+            setCategoryId(undefined);
+            setMerchant('');
+            setDescription('');
+            setNote('');
+            setDetails(false);
+            setSplitDraft(null);
+          } else {
+            allowLeave();
+            router.back();
+          }
           showToast({
-            text: it.add.savedKinds[kind],
+            text: count > 1 ? it.add.savedInRow(it.add.savedKinds[kind], count) : it.add.savedKinds[kind],
             actionLabel: it.add.undo,
             onAction: () => {
               repos
@@ -227,7 +303,20 @@ function MovementFormBody({
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
-      <SheetHeader title={title} left={{ label: it.add.cancel, onPress: () => router.back() }} />
+      <SheetHeader
+        title={onKindChange ? it.add.title : title}
+        left={{ label: savedInRow > 0 ? it.add.done : it.add.cancel, onPress: () => router.back() }}
+      />
+      {onKindChange ? (
+        <View style={{ paddingHorizontal: spacing.gutter, paddingBottom: spacing.xs }}>
+          <Segmented
+            label={it.add.kindLabel}
+            value={kind}
+            onChange={(next) => onKindChange(next, { input, accountId, date })}
+            options={SWITCHABLE.map((value) => ({ value, label: it.add[value as 'expense' | 'income' | 'transfer'] }))}
+          />
+        </View>
+      ) : null}
 
       <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.sm, paddingTop: spacing.xs }}>
@@ -245,7 +334,48 @@ function MovementFormBody({
             onPress={() => setPicker(picker === 'date' ? null : 'date')}
             leading={<Icon name="CaretDown" size={14} color={picker === 'date' ? colors.onInk : colors.ink} />}
           />
+          <Chip
+            label={dayLabel(quickDate, data.today)}
+            accessibilityLabel={it.add.dateTo(dayLabel(quickDate, data.today))}
+            onPress={() => {
+              haptics.selection();
+              setDate(quickDate);
+              setPicker(null);
+            }}
+          />
         </View>
+
+        {templates.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            style={{ marginHorizontal: -spacing.gutter }}
+            contentContainerStyle={{ gap: spacing.sm, alignItems: 'center', paddingHorizontal: spacing.gutter }}
+          >
+            <AppText variant="footnote" tone="secondary">
+              {it.add.recent}
+            </AppText>
+            {templates.map((t) => {
+              const category = data.categories.find((c) => c.id === t.categoryId);
+              return (
+                <Chip
+                  key={t.merchant}
+                  label={`${t.merchant} · ${money(t.amountMinor)}`}
+                  accessibilityLabel={it.add.repeat(t.merchant, money(t.amountMinor))}
+                  leading={category ? <LineBadge color={category.color} name={category.name} size={28} /> : undefined}
+                  onPress={() => {
+                    haptics.selection();
+                    setInput(minorToInput(t.amountMinor));
+                    setCategoryId(t.categoryId);
+                    setMerchant(t.merchant);
+                    if (accounts.some((a) => a.id === t.accountId)) setAccountId(t.accountId);
+                  }}
+                />
+              );
+            })}
+          </ScrollView>
+        ) : null}
 
         {picker === 'account' ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm }}>
@@ -374,6 +504,21 @@ function MovementFormBody({
             </PressableScale>
           ) : null}
         </DetailsSection>
+
+        {kind === 'expense' && !editing ? (
+          <PressableScale
+            accessibilityRole="button"
+            feedback="dim"
+            onPress={() => router.replace('/add-subscription')}
+            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 48, borderBottomWidth: 1, borderColor: colors.hairline, marginTop: -spacing.md }}
+          >
+            <AppText variant="callout">
+              {it.add.subscription}
+              <AppText variant="subhead" tone="secondary">{`  ${it.add.subscriptionHint.toLowerCase()}`}</AppText>
+            </AppText>
+            <Icon name="CaretRight" size={16} color={colors.inkSecondary} />
+          </PressableScale>
+        ) : null}
       </ScrollView>
 
       <SaveBar
@@ -382,9 +527,15 @@ function MovementFormBody({
         label={saveLabel}
         ready={!missing}
         busy={busy}
-        onSave={save}
+        onSave={() => save()}
+        another={
+          !editing && kind !== 'refund'
+            ? { label: it.add.another, accessibilityLabel: it.add.anotherHint, onPress: () => save(true) }
+            : undefined
+        }
       />
-      <ToastHost top={60} />
+      {/* Under the header, and under the kind switch when there is one. */}
+      <ToastHost top={onKindChange ? 116 : 60} />
     </View>
   );
 }

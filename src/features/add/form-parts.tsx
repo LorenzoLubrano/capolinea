@@ -45,6 +45,7 @@ export function SaveBar({
   ready,
   busy,
   onSave,
+  another,
 }: {
   onKey: (key: KeypadKey) => void;
   onClear: () => void;
@@ -52,23 +53,39 @@ export function SaveBar({
   ready: boolean;
   busy: boolean;
   onSave: () => void;
+  /** «Un'altra»: save and keep the sheet open for the next one, beside the main button. */
+  another?: { label: string; accessibilityLabel: string; onPress: () => void };
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   return (
     <View style={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.sm, paddingBottom: insets.bottom + spacing.md, gap: spacing.smd, borderTopWidth: 1, borderTopColor: colors.hairline }}>
       <Keypad onKey={onKey} onClear={onClear} />
-      <PressableScale
-        accessibilityRole="button"
-        accessibilityState={{ disabled: !ready, busy }}
-        disabled={!ready}
-        onPress={onSave}
-        style={{ minHeight: 56, paddingVertical: spacing.sm, borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}
-      >
-        <AppText variant="bodyStrong" tone="onInk">
-          {label}
-        </AppText>
-      </PressableScale>
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        {another ? (
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityLabel={another.accessibilityLabel}
+            accessibilityState={{ disabled: !ready, busy }}
+            disabled={!ready}
+            onPress={another.onPress}
+            style={{ minHeight: 56, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <AppText variant="bodyStrong">{another.label}</AppText>
+          </PressableScale>
+        ) : null}
+        <PressableScale
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !ready, busy }}
+          disabled={!ready}
+          onPress={onSave}
+          style={{ flex: 1, minHeight: 56, paddingVertical: spacing.sm, borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <AppText variant="bodyStrong" tone="onInk" numberOfLines={1} adjustsFontSizeToFit>
+            {label}
+          </AppText>
+        </PressableScale>
+      </View>
     </View>
   );
 }
