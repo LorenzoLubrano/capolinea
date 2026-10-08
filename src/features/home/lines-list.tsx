@@ -6,6 +6,7 @@ import { LineBadge } from '@/components/line-badge';
 import { PressableScale } from '@/components/pressable-scale';
 import { Money } from '@/components/money';
 import { AppText } from '@/components/text';
+import { budgetStatus } from '@/domain/budget';
 import { it } from '@/i18n/it';
 import { radius, spacing, useTheme } from '@/theme';
 
@@ -23,8 +24,11 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
       </AppText>
       {summary.lines.map((line) => {
         const ratio = line.budgetMinor ? line.spentMinor / line.budgetMinor : null;
-        const over = ratio !== null && ratio > 1;
-        const near = ratio !== null && !over && ratio >= 0.9;
+        // The same words as Budget; pace 1 because the lines speak of the limit, not of the pace.
+        const status = line.budgetMinor ? budgetStatus({ spentMinor: line.spentMinor, budgetMinor: line.budgetMinor, pace: 1 }) : null;
+        const over = status === 'over';
+        const full = status === 'full';
+        const near = status === 'near' || full;
         return (
           <PressableScale
             key={line.categoryId}
@@ -72,7 +76,7 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
                     ) : (
                       <>
                         <AppText variant="footnote" tone={near ? 'warning' : 'secondary'}>
-                          {near ? `${it.home.nearLimit} · ${it.home.budget.toLowerCase()}` : it.home.budget}
+                          {near ? `${full ? it.home.atLimit : it.home.nearLimit} · ${it.home.budget.toLowerCase()}` : it.home.budget}
                         </AppText>
                         <Money minor={line.budgetMinor} currency={currency} variant="footnote" tone={near ? 'warning' : 'secondary'} wholeUnits />
                       </>

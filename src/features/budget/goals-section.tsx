@@ -17,9 +17,10 @@ import { formatPercent } from '@/services/format/numbers';
 import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
 
-/** One sentence on where the goal is going: monthly quota for the date, or the pace's arrival. */
+/** One sentence on where the goal is going: monthly quota for the date, the pace's arrival, or a date already gone. */
 export function goalOutlook(goal: Goal, progress: GoalProgress, money: (minor: number) => string): string {
   if (progress.reached) return it.goals.reached;
+  if (progress.overdue && goal.targetDate) return it.goals.overdue(monthYear(goal.targetDate).toLowerCase(), money(progress.remainingMinor));
   if (progress.monthlyNeededMinor !== null && goal.targetDate)
     return it.goals.monthly(money(progress.monthlyNeededMinor), monthYear(goal.targetDate).toLowerCase());
   if (progress.projectedDate) return it.goals.projected(monthYear(progress.projectedDate).toLowerCase());

@@ -23,7 +23,8 @@ export function GreetingRow({ name }: { name: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
       <AppText variant="callout" tone="secondary">
-        {`${greetingFor(new Date().getHours())}, ${name}`}
+        {/* While the data loads there is no name yet: the greeting alone, no dangling comma. */}
+        {name ? `${greetingFor(new Date().getHours())}, ${name}` : greetingFor(new Date().getHours())}
       </AppText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         <PressableScale
@@ -54,9 +55,13 @@ export function GreetingRow({ name }: { name: string }) {
               justifyContent: 'center',
             }}
           >
-            <AppText variant="caption" tone="onInk">
-              {name.charAt(0)}
-            </AppText>
+            {name ? (
+              <AppText variant="caption" tone="onInk">
+                {name.charAt(0)}
+              </AppText>
+            ) : (
+              <Icon name="User" size={16} color={colors.onInk} weight="bold" />
+            )}
           </View>
         </PressableScale>
       </View>

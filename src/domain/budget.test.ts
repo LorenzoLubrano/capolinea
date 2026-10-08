@@ -40,6 +40,10 @@ describe('budgetStatus', () => {
     expect(budgetStatus({ spentMinor: 160100, budgetMinor: 160000, pace })).toBe('over');
   });
 
+  it('is full when spending reaches the budget exactly', () => {
+    expect(budgetStatus({ spentMinor: 160000, budgetMinor: 160000, pace })).toBe('full');
+  });
+
   it('is near the limit from 80% of the budget', () => {
     expect(budgetStatus({ spentMinor: 128000, budgetMinor: 160000, pace: 0.9 })).toBe('near');
   });

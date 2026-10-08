@@ -29,6 +29,7 @@ export const it = {
   },
   numbers: {
     belowOnePercent: "meno dell'1%",
+    overTen: 'oltre 10',
   },
   dates: {
     today: 'Oggi',
@@ -60,6 +61,7 @@ export const it = {
     comparison: {
       less: (pct: string, month: string) => `${pct} in meno di ${month} allo stesso giorno`,
       more: (pct: string, month: string) => `${pct} in più di ${month} allo stesso giorno`,
+      times: (times: string, month: string) => `${times} volte rispetto a ${month} allo stesso giorno`,
       same: (month: string) => `Come ${month} allo stesso giorno`,
       none: 'Nessun confronto: il mese scorso è vuoto',
     },
@@ -75,6 +77,7 @@ export const it = {
         on_track: 'In linea con il mese',
         ahead: 'Sopra il ritmo di oggi',
         near: 'Vicino al capolinea',
+        full: 'Al capolinea',
         over: 'Oltre il capolinea',
       },
       a11y: (spent: string, budget: string, forecast: string) =>
@@ -94,6 +97,7 @@ export const it = {
     budget: 'Budget',
     noBudget: 'Nessun budget',
     nearLimit: 'Quasi al capolinea',
+    atLimit: 'Al capolinea',
     overBy: 'Oltre di',
     latest: 'Ultime fermate',
     seeAll: 'Vedi tutti',
@@ -371,7 +375,8 @@ export const it = {
     withoutBudget: 'Senza budget questo mese',
     addBudget: 'Aggiungi budget',
     spentOf: (spent: string, budget: string) => `${spent} di ${budget}`,
-    statusWords: { on_track: 'In linea', ahead: 'Sopra il ritmo', near: 'Quasi al capolinea', over: 'Oltre il capolinea' },
+    statusWords: { on_track: 'In linea', ahead: 'Sopra il ritmo', near: 'Quasi al capolinea', full: 'Al capolinea', over: 'Oltre il capolinea' },
+    refundedBeyond: (amount: string) => `Rimborsi oltre la spesa: ${amount}`,
     paceHint: 'La tacca indica dove dovresti essere oggi.',
     editor: {
       global: 'Budget del mese',
@@ -434,6 +439,7 @@ export const it = {
     reached: 'Raggiunto',
     monthly: (amount: string, month: string) => `${amount} al mese per arrivare a ${month}`,
     projected: (month: string) => `Al ritmo attuale arrivi a ${month}`,
+    overdue: (month: string, amount: string) => `La data di ${month} è passata: mancano ${amount}`,
     noPace: 'Ancora nessun versamento negli ultimi tre mesi.',
     add: 'Nuovo obiettivo',
     empty: { title: 'Nessun obiettivo', body: 'Un viaggio, un computer, un fondo per gli imprevisti: scegli una cifra e una data.' },
@@ -442,6 +448,7 @@ export const it = {
       remaining: 'Mancano',
       targetDate: 'Data obiettivo',
       noDate: 'Senza data',
+      datePassed: (month: string) => `${month}, passata`,
       monthlyNeeded: 'Quota mensile',
       projected: 'Arrivo previsto',
       account: 'Conto collegato',
@@ -976,6 +983,7 @@ export const it = {
       spent: 'Speso',
       more: (share: string) => `${share} in più del solito`,
       less: (share: string) => `${share} in meno del solito`,
+      times: (times: string) => `${times} volte il solito`,
       inLine: 'In linea con il solito',
       usualSoFar: (point: string, amount: string) => `A questo punto ${point} di solito eri a ${amount}`,
       usualWas: (amount: string) => `Di solito ${amount}`,

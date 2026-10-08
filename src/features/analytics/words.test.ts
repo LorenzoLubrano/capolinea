@@ -16,6 +16,12 @@ describe('comparisonWords', () => {
     });
   });
 
+  it('says how many times the usual from double upwards, never a four-digit percentage', () => {
+    expect(comparisonWords({ usualMinor: 1000, change: 1.3 }, false, 'month', String)?.text).toBe('2,3 volte il solito');
+    expect(comparisonWords({ usualMinor: 1000, change: 35.65 }, false, 'month', String)?.text).toBe('Oltre 10 volte il solito');
+    expect(comparisonWords({ usualMinor: 1000, change: 0.99 }, false, 'month', String)?.text).toBe('99% in più del solito');
+  });
+
   it('calls small changes in line', () => {
     expect(comparisonWords({ usualMinor: 1000, change: 0.04 }, false, 'month', String)?.direction).toBe('flat');
     expect(comparisonWords(null, true, 'year', String)).toBeNull();

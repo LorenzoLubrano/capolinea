@@ -2,7 +2,7 @@ import { addMonthsClamped, dayOfMonth, daysInMonth, isWithin, monthEnd, monthSta
 import { spendingBetween, spendingImpact, type SpendingOptions } from './spending';
 import type { Budget, BudgetScope, CurrencyCode, Id, LocalDate, Transaction } from './types';
 
-export type BudgetStatus = 'on_track' | 'ahead' | 'near' | 'over';
+export type BudgetStatus = 'on_track' | 'ahead' | 'near' | 'full' | 'over';
 
 function monthLength(date: LocalDate): number {
   const [year, month] = date.split('-').map(Number);
@@ -60,6 +60,7 @@ const PACE_TOLERANCE = 0.05;
 export function budgetStatus({ spentMinor, budgetMinor, pace, nearThreshold = 0.8 }: BudgetStatusInput): BudgetStatus {
   const used = spentMinor / budgetMinor;
   if (spentMinor > budgetMinor) return 'over';
+  if (spentMinor === budgetMinor) return 'full';
   if (used >= nearThreshold) return 'near';
   if (used > pace + PACE_TOLERANCE) return 'ahead';
   return 'on_track';

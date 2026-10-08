@@ -126,7 +126,9 @@ export function GoalDetail() {
             </Row>
           ) : null}
           <Row label={it.goals.detail.targetDate}>
-            <AppText variant="bodyStrong">{goal.targetDate ? monthYear(goal.targetDate) : it.goals.detail.noDate}</AppText>
+            <AppText variant="bodyStrong" tone={progress.overdue ? 'warning' : 'primary'}>
+              {goal.targetDate ? (progress.overdue ? it.goals.detail.datePassed(monthYear(goal.targetDate)) : monthYear(goal.targetDate)) : it.goals.detail.noDate}
+            </AppText>
           </Row>
           {progress.monthlyNeededMinor !== null ? (
             <Row label={it.goals.detail.monthlyNeeded}>

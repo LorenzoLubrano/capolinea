@@ -39,6 +39,18 @@ describe('goalProgress', () => {
     expect(goalProgress({ ...base, contributions: [] }, '2026-10-24').projectedDate).toBeNull();
   });
 
+  it('is late once its date has passed: no monthly amount for a month already gone', () => {
+    const late = goalProgress({ ...base, targetDate: '2026-09-30' }, '2026-10-24');
+    expect(late.overdue).toBe(true);
+    expect(late.monthlyNeededMinor).toBeNull();
+    expect(goalProgress(base, '2026-10-24').overdue).toBe(false);
+    expect(goalProgress({ ...base, targetDate: '2026-10-24' }, '2026-10-24').overdue).toBe(false);
+  });
+
+  it('is never late once reached', () => {
+    expect(goalProgress({ ...base, targetMinor: 50000, targetDate: '2026-09-30' }, '2026-10-24').overdue).toBe(false);
+  });
+
   it('is reached at the target, with nothing left to save', () => {
     const p = goalProgress({ ...base, targetMinor: 80000 }, '2026-10-24');
     expect(p).toMatchObject({ reached: true, remainingMinor: 0, ratio: 1, monthlyNeededMinor: null, projectedDate: null });

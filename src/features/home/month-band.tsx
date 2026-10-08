@@ -15,6 +15,8 @@ import type { HomeSummary } from './summary';
 const BAND = 32;
 const RING = 16;
 const LABEL_ROW = 20;
+/** Space before a segment name. */
+const LABEL_INSET = spacing.xs + 2;
 
 /**
  * The signature move: the month as one metro band. Segments are categories in their line colour,
@@ -87,6 +89,11 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
               {segments.map((segment) => {
                 const line = lineColor(segment.color);
                 const segmentWidth = segment.ratio * width;
+                const segmentLeft = segment.left * width;
+                const textWidth = segment.name.length * 7;
+                // The today stem crosses the band: a name it would cut starts after it, or is left out.
+                const stemInside = budget !== null && ringX >= segmentLeft && ringX <= segmentLeft + LABEL_INSET + textWidth + spacing.xs;
+                const inset = stemInside ? ringX - segmentLeft + 1 + LABEL_INSET : LABEL_INSET;
                 return (
                   <Animated.View
                     key={segment.key}
@@ -98,12 +105,12 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
                       width: segmentWidth,
                       backgroundColor: line.fill,
                       justifyContent: 'center',
-                      paddingLeft: spacing.xs + 2,
+                      paddingLeft: inset,
                       overflow: 'hidden',
                       ...transition,
                     }}
                   >
-                    {segmentWidth > segment.name.length * 7 + 14 ? (
+                    {segmentWidth > inset + textWidth + 8 ? (
                       <AppText variant="caption" numberOfLines={1} style={{ color: line.on }}>
                         {segment.name}
                       </AppText>

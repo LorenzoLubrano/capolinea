@@ -1,12 +1,14 @@
 import type { Bucket, PeriodUnit } from '@/domain/analysis';
 import { it } from '@/i18n/it';
 import { monthName, periodLabel, shortMonth } from '@/services/format/dates';
-import { formatShare } from '@/services/format/numbers';
+import { formatMultiple, formatShare } from '@/services/format/numbers';
 
 import type { Comparison } from './analysis';
 
 /** Below this change the period reads as "in line with the usual". */
 const IN_LINE = 0.05;
+/** From double the usual upwards a percentage stops meaning much: the words say how many times. */
+const TIMES_FROM = 1;
 
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -24,6 +26,7 @@ export function comparisonWords(
   const { change, usualMinor } = comparison;
   const usual = current ? it.analytics.usual.usualSoFar(it.analytics.pointOf[unit], money(usualMinor)) : it.analytics.usual.usualWas(money(usualMinor));
   if (Math.abs(change) < IN_LINE) return { text: it.analytics.usual.inLine, usual, direction: 'flat' };
+  if (change >= TIMES_FROM) return { text: capitalize(it.analytics.usual.times(formatMultiple(1 + change))), usual, direction: 'up' };
   const share = formatShare(Math.abs(change));
   return change > 0
     ? { text: capitalize(it.analytics.usual.more(share)), usual, direction: 'up' }

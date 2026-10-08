@@ -6,10 +6,10 @@ import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
-import { formatPercent } from '@/services/format/numbers';
 import { spacing, useTheme } from '@/theme';
 
 import type { HomeSummary } from './summary';
+import { comparisonLine } from './words';
 
 /** "Speso a ottobre": the first thing the eye lands on, then the comparison in words. */
 export function SpentHero({ summary }: { summary: HomeSummary }) {
@@ -22,14 +22,7 @@ export function SpentHero({ summary }: { summary: HomeSummary }) {
 
   const { change } = summary.comparison;
   const month = summary.previousMonthName;
-  const comparison =
-    change === null
-      ? it.home.comparison.none
-      : Math.abs(change) < 0.005
-        ? it.home.comparison.same(month)
-        : change < 0
-          ? it.home.comparison.less(formatPercent(change), month)
-          : it.home.comparison.more(formatPercent(change), month);
+  const comparison = comparisonLine(change, month);
 
   return (
     <View style={{ gap: spacing.xs }}>

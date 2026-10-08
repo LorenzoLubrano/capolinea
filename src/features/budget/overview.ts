@@ -22,7 +22,10 @@ export interface CategoryBudgetRow {
   name: string;
   color: string;
   budgetMinor: number;
+  /** Never below zero: a month that gave back more than it took has spent nothing. */
   spentMinor: number;
+  /** Refunds beyond the month's spending in the category, 0 otherwise. */
+  refundedMinor: number;
   ratio: number;
   status: BudgetStatus;
 }
@@ -86,7 +89,8 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
   for (const category of categories) {
     const budget = category.kind === 'expense' ? activeBudget(budgets, month, 'category', category.id) : undefined;
     if (!budget) continue;
-    const spent = spendingBetween(transactions, from, today, { ...options, categoryId: category.id });
+    const net = spendingBetween(transactions, from, today, { ...options, categoryId: category.id });
+    const spent = Math.max(net, 0);
     categoryRows.push({
       categoryId: category.id,
       budgetId: budget.id,
@@ -94,6 +98,7 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
       color: category.color,
       budgetMinor: budget.amountMinor,
       spentMinor: spent,
+      refundedMinor: Math.max(-net, 0),
       ratio: spent / budget.amountMinor,
       status: budgetStatus({ spentMinor: spent, budgetMinor: budget.amountMinor, pace }),
     });
@@ -122,7 +127,9 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
 export interface CategoryDetail {
   budgetId: Id | null;
   budgetMinor: number | null;
+  /** Never below zero, as in the overview. */
   spentMinor: number;
+  refundedMinor: number;
   forecastMinor: number;
   perDayMinor: number | null;
   status: BudgetStatus | null;
@@ -137,12 +144,14 @@ export function buildCategoryDetail(snapshot: Snapshot, categoryId: Id): Categor
   const from = monthStart(today);
   const pace = monthPace(today);
   const budget = activeBudget(budgets, today.slice(0, 7), 'category', categoryId);
-  const spentMinor = spendingBetween(transactions, from, today, options);
+  const net = spendingBetween(transactions, from, today, options);
+  const spentMinor = Math.max(net, 0);
 
   return {
     budgetId: budget?.id ?? null,
     budgetMinor: budget?.amountMinor ?? null,
     spentMinor,
+    refundedMinor: Math.max(-net, 0),
     forecastMinor: forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor: upcomingRecurring(snapshot, categoryId) }),
     perDayMinor: budget ? dailyAllowance(budget.amountMinor - spentMinor, today) : null,
     status: budget ? budgetStatus({ spentMinor, budgetMinor: budget.amountMinor, pace }) : null,

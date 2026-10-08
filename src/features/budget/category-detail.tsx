@@ -65,7 +65,13 @@ export function CategoryBudgetDetail() {
           {detail.budgetMinor !== null && detail.status ? (
             <>
               <ProgressLine ratio={detail.spentMinor / detail.budgetMinor} color={fill} pace={detail.pace} height={8} />
-              <StatusLine status={detail.status} />
+              {detail.refundedMinor > 0 ? (
+                <AppText variant="footnote" tone="secondary">
+                  {it.budget.refundedBeyond(money(detail.refundedMinor))}
+                </AppText>
+              ) : (
+                <StatusLine status={detail.status} />
+              )}
               <AppText variant="subhead" tone="secondary">
                 {detail.budgetMinor - detail.spentMinor >= 0
                   ? `${it.budget.remaining} ${money(detail.budgetMinor - detail.spentMinor)} · ${it.budget.perDay(money(detail.perDayMinor ?? 0))}`

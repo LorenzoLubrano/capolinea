@@ -1,4 +1,4 @@
-import { formatPercent, formatShare } from './numbers';
+import { formatMultiple, formatPercent, formatShare } from './numbers';
 
 const plain = (text: string) => text.replace(/ | /g, ' ');
 
@@ -18,5 +18,17 @@ describe('formatShare', () => {
   it('never shows a real share as zero', () => {
     expect(formatShare(0.003)).toBe("meno dell'1%");
     expect(formatShare(0)).toBe('0%');
+  });
+});
+
+describe('formatMultiple', () => {
+  it('writes how many times, with at most one decimal', () => {
+    expect(formatMultiple(2.345)).toBe('2,3');
+    expect(formatMultiple(2)).toBe('2');
+  });
+
+  it('stops counting at ten', () => {
+    expect(formatMultiple(10)).toBe('oltre 10');
+    expect(formatMultiple(36.6)).toBe('oltre 10');
   });
 });

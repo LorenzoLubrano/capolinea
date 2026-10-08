@@ -22,7 +22,7 @@ import { buildBudgetOverview } from './overview';
 export function StatusLine({ status }: { status: BudgetStatus }) {
   const { colors } = useTheme();
   const alert = status === 'over';
-  const warn = status === 'near' || status === 'ahead';
+  const warn = status === 'near' || status === 'full' || status === 'ahead';
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
       <Icon name={alert || warn ? 'Warning' : 'Check'} size={14} weight="bold" color={alert ? colors.alert : warn ? colors.warning : colors.inkSecondary} />
@@ -129,7 +129,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
           <PressableScale
             key={row.categoryId}
             accessibilityRole="button"
-            accessibilityLabel={`${row.name}, ${it.budget.spentOf(money(row.spentMinor), money(row.budgetMinor))}, ${it.budget.statusWords[row.status]}`}
+            accessibilityLabel={`${row.name}, ${it.budget.spentOf(money(row.spentMinor), money(row.budgetMinor))}, ${row.refundedMinor > 0 ? it.budget.refundedBeyond(money(row.refundedMinor)) : it.budget.statusWords[row.status]}`}
             feedback="dim"
             onPress={() => router.push({ pathname: '/category/[id]', params: { id: row.categoryId } })}
             style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, paddingVertical: spacing.smd, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
@@ -143,7 +143,13 @@ export function MonthSection({ data }: { data: Snapshot }) {
                 <SpentOf spent={row.spentMinor} budget={row.budgetMinor} currency={currency} variant="subhead" />
               </View>
               <ProgressLine ratio={row.ratio} color={lineColor(row.color).fill} pace={overview.pace} />
-              <StatusLine status={row.status} />
+              {row.refundedMinor > 0 ? (
+                <AppText variant="footnote" tone="secondary">
+                  {it.budget.refundedBeyond(money(row.refundedMinor))}
+                </AppText>
+              ) : (
+                <StatusLine status={row.status} />
+              )}
             </View>
           </PressableScale>
         ))}
