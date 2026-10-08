@@ -5,11 +5,11 @@ import Animated, {
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useReduceMotion } from '@/services/a11y';
 import { backdrop as backdropTokens, layout, spacing, useTheme } from '@/theme';
 
 /**
@@ -27,7 +27,7 @@ export function Screen({
 }: { children: ReactNode; backdrop?: ReactNode; variant?: 'tab' | 'stack' } & ScrollViewProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((event) => {
     scrollY.set(event.contentOffset.y);

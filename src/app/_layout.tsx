@@ -12,11 +12,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
 
 import { ToastHost } from '@/components/toast-host';
 import { DataProvider } from '@/data/provider';
 import { LockGate } from '@/features/security/lock-screen';
 import { it } from '@/i18n/it';
+import { useReduceMotion } from '@/services/a11y';
 import { useAppSwitcherCover } from '@/services/security';
 import { clearExports } from '@/services/share-file';
 import { prototypeFaults } from '@/state/prototype';
@@ -29,6 +31,7 @@ function AppStack() {
   const { colors, scheme } = useTheme();
   useAppSwitcherCover(useSettings((s) => s.coverInSwitcher));
   const onboarded = useSettings((s) => s.onboarded);
+  const reduceMotion = useReduceMotion();
   // Exports left from the last session are deleted: the app keeps no copy of the data.
   useEffect(() => clearExports(), []);
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
@@ -51,11 +54,14 @@ function AppStack() {
     headerTitleStyle: { fontFamily: fonts.bold, fontSize: 17, color: colors.ink },
     headerBackButtonDisplayMode: 'minimal',
     contentStyle: { backgroundColor: colors.background },
+    animation: reduceMotion ? 'fade' : 'default',
   } as const;
 
   return (
     <ThemeProvider value={navigationTheme}>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      {/* Animations without their own setting follow Reduce Motion as it is now, not as it was at launch. */}
+      <ReducedMotionConfig mode={reduceMotion ? ReduceMotion.Always : ReduceMotion.Never} />
       <Stack screenOptions={{ headerShown: false }}>
         {/* The app itself only after the onboarding; wiping the data turns the guard off again. */}
         <Stack.Protected guard={onboarded}>

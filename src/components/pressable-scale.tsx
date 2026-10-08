@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Platform, Pressable, StyleSheet, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, { useReducedMotion } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
+import { useReduceMotion } from '@/services/a11y';
 import { speakable } from '@/services/format/money';
 import { motion } from '@/theme';
 
@@ -34,7 +35,7 @@ function splitStyle(style: StyleProp<ViewStyle>) {
 /** Press feedback on press-in, 120 ms, transform and opacity only. */
 export function PressableScale({ children, style, feedback = 'scale', disabled, ...props }: PressableScaleProps) {
   const [pressed, setPressed] = useState(false);
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
   const active = pressed && !disabled;
   const { placement, visual } = splitStyle(style);
 

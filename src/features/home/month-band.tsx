@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import Animated, { useReducedMotion } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
 import { StatusLine } from '@/components/status-line';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
+import { useReduceMotion } from '@/services/a11y';
 import { formatMoney, speakable } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { motion, radius, spacing, useTheme } from '@/theme';
@@ -26,7 +27,7 @@ const LABEL_INSET = spacing.xs + 2;
  */
 export function MonthBand({ summary, compact = false }: { summary: HomeSummary; compact?: boolean }) {
   const { colors, lineColor } = useTheme();
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
   const masked = useSettings((s) => s.privacy);
   const [width, setWidth] = useState(0);
   const { band, budget, currency, spentMinor } = summary;

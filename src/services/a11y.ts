@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AccessibilityInfo, Platform, useWindowDimensions } from 'react-native';
+import { useReducedMotion } from 'react-native-reanimated';
 
 /**
  * Speaks a message with VoiceOver. Android needs nothing: TalkBack reads the live regions
@@ -44,4 +45,36 @@ export function useScreenReader(): boolean {
     };
   }, []);
   return on;
+}
+
+/** Reduce Motion as the system says now; `null` until the first answer arrives. */
+let liveReduceMotion: boolean | null = null;
+const reduceMotionListeners = new Set<() => void>();
+let reduceMotionWatched = false;
+
+function watchReduceMotion(listener: () => void) {
+  reduceMotionListeners.add(listener);
+  // One subscription for the whole app: pressable elements alone mount by the hundred.
+  if (!reduceMotionWatched) {
+    reduceMotionWatched = true;
+    const update = (value: boolean) => {
+      if (value === liveReduceMotion) return;
+      liveReduceMotion = value;
+      reduceMotionListeners.forEach((notify) => notify());
+    };
+    AccessibilityInfo.isReduceMotionEnabled().then(update);
+    AccessibilityInfo.addEventListener('reduceMotionChanged', update);
+  }
+  return () => {
+    reduceMotionListeners.delete(listener);
+  };
+}
+
+/**
+ * Whether Reduce Motion is on, kept current while the app runs. Reanimated's own hook keeps the
+ * value the app started with; it still answers the first frame, before the system replies.
+ */
+export function useReduceMotion(): boolean {
+  const atLaunch = useReducedMotion();
+  return useSyncExternalStore(watchReduceMotion, () => liveReduceMotion ?? atLaunch);
 }

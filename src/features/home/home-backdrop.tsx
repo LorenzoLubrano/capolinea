@@ -2,8 +2,8 @@ import { useIsFocused } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import Animated, {
+  ReduceMotion,
   useAnimatedProps,
-  useReducedMotion,
   useSharedValue,
   withDelay,
   withSequence,
@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import type { Id, Transaction } from '@/domain/types';
+import { useReduceMotion } from '@/services/a11y';
 import { useSettings } from '@/state/settings';
 import { backdrop, layout, mix, motion, useTheme } from '@/theme';
 
@@ -70,13 +71,16 @@ function MapLine({
     const previous = seen.current;
     if (previous === null || latest.createdAt > previous) seen.current = latest.createdAt;
     if (previous === null || latest.createdAt <= previous || latest.categoryId !== categoryId) return;
+    // Opacity only, so it plays under Reduce Motion too: Reanimated would otherwise skip to the end.
     pulse.set(
       withDelay(
         backdrop.pulseDelay,
         withSequence(
-          withTiming(backdrop.pulseStrength, { duration: backdrop.pulseIn, easing: motion.easeOutTiming }),
-          withTiming(0, { duration: backdrop.pulseOut, easing: motion.easeOutTiming }),
+          ReduceMotion.Never,
+          withTiming(backdrop.pulseStrength, { duration: backdrop.pulseIn, easing: motion.easeOutTiming, reduceMotion: ReduceMotion.Never }),
+          withTiming(0, { duration: backdrop.pulseOut, easing: motion.easeOutTiming, reduceMotion: ReduceMotion.Never }),
         ),
+        ReduceMotion.Never,
       ),
     );
   }, [latest, categoryId, pulse]);
@@ -98,7 +102,7 @@ function MapLine({
 function MapBackdrop({ lines, latest }: { lines: Lines; latest: Transaction | null }) {
   const frame = useFrame();
   const { scheme, colors, lineColor } = useTheme();
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
   const [animate] = useState(() => !reduced && !drawnThisLaunch);
   const interchange = useSharedValue(animate ? 0 : 1);
 
@@ -159,7 +163,7 @@ function GlowBackdrop({ lines }: { lines: Lines }) {
   const frame = useFrame();
   const { scheme, lineColor } = useTheme();
   const focused = useIsFocused();
-  const reduced = useReducedMotion();
+  const reduced = useReduceMotion();
   const strength = backdrop.glowStrength[scheme];
 
   return glowSpots(frame).map((spot, i) => {
