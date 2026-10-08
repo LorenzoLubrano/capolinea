@@ -64,3 +64,63 @@ describe('memory repositories: subscriptions and people', () => {
     expect((await repos.snapshot()).people.map((p) => p.name)).toContain('Sara');
   });
 });
+
+describe('memory repositories: budgets, subscriptions, goals', () => {
+  it('creates, updates and deletes a budget', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const created = await repos.saveBudget({ scope: 'category', categoryId: 'cat-tech', amountMinor: 5000, currency: 'EUR', fromMonth: '2026-10' });
+    await repos.saveBudget({ ...created, amountMinor: 6000 });
+    expect((await repos.snapshot()).budgets.find((b) => b.id === created.id)?.amountMinor).toBe(6000);
+    await repos.deleteBudget(created.id);
+    expect((await repos.snapshot()).budgets.some((b) => b.id === created.id)).toBe(false);
+    await repos.restoreBudget(created.id);
+    expect((await repos.snapshot()).budgets.some((b) => b.id === created.id)).toBe(true);
+  });
+
+  it('moves the next charge of a subscription and can pause it', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const { subscription } = await repos.updateSubscription('sub-netflix', { amountMinor: 1599, anchorDate: '2026-12-01' });
+    expect(subscription).toMatchObject({ amountMinor: 1599, anchorDate: '2026-12-01', nextBillingDate: '2026-12-01' });
+    const paused = await repos.updateSubscription('sub-netflix', { active: false });
+    expect(paused.subscription.active).toBe(false);
+  });
+
+  it('resumes a paused subscription from today, without charges for the pause', async () => {
+    const dataset = createDataset();
+    // Paused since August: no Netflix charge in September and October.
+    const paused = dataset.subscriptions.map((s) => (s.id === 'sub-netflix' ? { ...s, active: false, nextBillingDate: '2026-09-05' } : s));
+    const transactions = dataset.transactions.filter((t) => !(t.subscriptionId === 'sub-netflix' && t.date >= '2026-09-01'));
+    const repos = createMemoryRepositories({ ...dataset, subscriptions: paused, transactions }, 0);
+    const before = (await repos.snapshot()).transactions.filter((t) => t.subscriptionId === 'sub-netflix').length;
+    const { subscription, generated } = await repos.updateSubscription('sub-netflix', { active: true });
+    expect(generated).toBe(0);
+    expect(subscription.nextBillingDate).toBe('2026-11-05');
+    expect((await repos.snapshot()).transactions.filter((t) => t.subscriptionId === 'sub-netflix')).toHaveLength(before);
+  });
+
+  it('deletes a subscription but keeps its past charges', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    await repos.deleteSubscription('sub-spotify');
+    const snapshot = await repos.snapshot();
+    expect(snapshot.subscriptions.some((s) => s.id === 'sub-spotify')).toBe(false);
+    expect(snapshot.transactions.filter((t) => t.subscriptionId === 'sub-spotify')).toHaveLength(3);
+    await repos.restoreSubscription('sub-spotify');
+    expect((await repos.snapshot()).subscriptions.some((s) => s.id === 'sub-spotify')).toBe(true);
+  });
+
+  it('saves a goal and records contributions', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const goal = await repos.saveGoal({ name: 'Bici', icon: 'Bicycle', color: 'green', targetMinor: 60000, currency: 'EUR' });
+    expect(goal.contributions).toEqual([]);
+    const after = await repos.addContribution(goal.id, { date: '2026-10-24', amountMinor: 5000 });
+    expect(after.contributions.map((c) => c.amountMinor)).toEqual([5000]);
+    const renamed = await repos.saveGoal({ ...after, name: 'Bici da corsa' });
+    expect(renamed.contributions).toHaveLength(1);
+    const removed = await repos.removeContribution(goal.id, after.contributions[0].id);
+    expect(removed.contributions).toEqual([]);
+    await repos.deleteGoal(goal.id);
+    expect((await repos.snapshot()).goals.some((g) => g.id === goal.id)).toBe(false);
+    await repos.restoreGoal(goal.id);
+    expect((await repos.snapshot()).goals.some((g) => g.id === goal.id)).toBe(true);
+  });
+});

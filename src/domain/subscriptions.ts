@@ -96,3 +96,16 @@ export function generateDueCharges(
 
   return { charges, subscriptions: updated };
 }
+
+export interface UpcomingCharge {
+  date: LocalDate;
+  subscription: Subscription;
+}
+
+/** Every charge of the active subscriptions inside `[from, to]`, by date. */
+export function upcomingCharges(subscriptions: Subscription[], from: LocalDate, to: LocalDate): UpcomingCharge[] {
+  return subscriptions
+    .filter((s) => !s.deletedAt)
+    .flatMap((subscription) => chargesBetween(subscription, from, to).map((date) => ({ date, subscription })))
+    .sort((a, b) => a.date.localeCompare(b.date) || a.subscription.name.localeCompare(b.subscription.name));
+}

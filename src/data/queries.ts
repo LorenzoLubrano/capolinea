@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useRepositories } from './provider';
-import type { NewSubscription, NewTransaction, TransactionChanges } from './repositories';
+import type { BudgetDraft, GoalDraft, NewSubscription, NewTransaction, Repositories, SubscriptionChanges, TransactionChanges } from './repositories';
 
 const SNAPSHOT_KEY = ['snapshot'] as const;
 
@@ -63,3 +63,30 @@ export function useAddPerson() {
     onSuccess: () => client.invalidateQueries({ queryKey: SNAPSHOT_KEY }),
   });
 }
+
+/** A write that refreshes the snapshot when it succeeds. */
+function useSnapshotMutation<TVars, TResult>(write: (repos: Repositories, vars: TVars) => Promise<TResult>) {
+  const repos = useRepositories();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: TVars) => write(repos, vars),
+    onSuccess: () => client.invalidateQueries({ queryKey: SNAPSHOT_KEY }),
+  });
+}
+
+export const useUpdateSubscription = () =>
+  useSnapshotMutation((r, { id, changes }: { id: string; changes: SubscriptionChanges }) => r.updateSubscription(id, changes));
+export const useDeleteSubscription = () => useSnapshotMutation((r, id: string) => r.deleteSubscription(id));
+export const useRestoreSubscription = () => useSnapshotMutation((r, id: string) => r.restoreSubscription(id));
+export const useSaveBudget = () => useSnapshotMutation((r, draft: BudgetDraft) => r.saveBudget(draft));
+export const useDeleteBudget = () => useSnapshotMutation((r, id: string) => r.deleteBudget(id));
+export const useRestoreBudget = () => useSnapshotMutation((r, id: string) => r.restoreBudget(id));
+export const useSaveGoal = () => useSnapshotMutation((r, draft: GoalDraft) => r.saveGoal(draft));
+export const useDeleteGoal = () => useSnapshotMutation((r, id: string) => r.deleteGoal(id));
+export const useRestoreGoal = () => useSnapshotMutation((r, id: string) => r.restoreGoal(id));
+export const useAddContribution = () =>
+  useSnapshotMutation((r, { goalId, date, amountMinor }: { goalId: string; date: string; amountMinor: number }) =>
+    r.addContribution(goalId, { date, amountMinor }),
+  );
+export const useRemoveContribution = () =>
+  useSnapshotMutation((r, { goalId, contributionId }: { goalId: string; contributionId: string }) => r.removeContribution(goalId, contributionId));

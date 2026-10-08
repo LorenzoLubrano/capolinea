@@ -1,7 +1,7 @@
 import type { Snapshot } from '@/data/repositories';
 import { totalBalance } from '@/domain/accounts';
 import { incomeBetween, monthlyEquivalent, spendingByCategory } from '@/domain/breakdown';
-import { budgetStatus, forecastMonthEnd, monthPace, type BudgetStatus } from '@/domain/budget';
+import { activeBudget, budgetStatus, forecastMonthEnd, monthPace, type BudgetStatus } from '@/domain/budget';
 import { addDays, addMonthsClamped, monthEnd, monthStart } from '@/domain/dates';
 import { compareWithPreviousMonth, spendingBetween } from '@/domain/spending';
 import { chargesBetween } from '@/domain/subscriptions';
@@ -67,7 +67,8 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
     .reduce((sum, s) => sum + chargesBetween(s, addDays(today, 1), to).length * s.amountMinor, 0);
   const forecastMinor = forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor });
 
-  const globalBudget = budgets.find((b) => b.scope === 'global' && b.currency === currency && !b.deletedAt);
+  const month = today.slice(0, 7);
+  const globalBudget = activeBudget(budgets, month, 'global');
   const pace = monthPace(today);
   const budget = globalBudget
     ? {
@@ -102,7 +103,7 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
   const incomeMinor = incomeBetween(transactions, from, today, currency);
   const lines = head.slice(0, TOP_LINES).map(({ categoryId, amountMinor }) => {
     const category = categoryById.get(categoryId!);
-    const categoryBudget = budgets.find((b) => b.scope === 'category' && b.categoryId === categoryId && !b.deletedAt);
+    const categoryBudget = activeBudget(budgets, month, 'category', categoryId!);
     return {
       categoryId: categoryId!,
       name: category?.name ?? strings.categories.uncategorized,

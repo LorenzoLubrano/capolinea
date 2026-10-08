@@ -1,5 +1,17 @@
 import { subscription, tx } from './testing/builders';
-import { incomeBetween, monthlyEquivalent, spendingByCategory, yearlyEquivalent } from './breakdown';
+import { incomeBetween, monthlyEquivalent, spendingByCategory, subscriptionTotals, yearlyEquivalent } from './breakdown';
+
+describe('subscriptionTotals', () => {
+  it('adds the active subscriptions of a currency, per month and per year', () => {
+    const subs = [
+      subscription({ amountMinor: 1000 }),
+      subscription({ amountMinor: 12000, frequency: { unit: 'year', interval: 1 } }),
+      subscription({ amountMinor: 5000, active: false }),
+      subscription({ amountMinor: 5000, currency: 'USD' }),
+    ];
+    expect(subscriptionTotals(subs, 'EUR')).toEqual({ monthlyMinor: 2000, yearlyMinor: 24000, activeCount: 2 });
+  });
+});
 
 const ME = 'person-me';
 

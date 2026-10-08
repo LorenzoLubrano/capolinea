@@ -67,3 +67,13 @@ export function yearlyEquivalent(subscription: Subscription): number {
       return Math.round(perUnit);
   }
 }
+
+/** Active subscriptions of one currency, as a monthly and a yearly cost. */
+export function subscriptionTotals(subscriptions: Subscription[], currency: CurrencyCode) {
+  const active = subscriptions.filter((s) => s.active && !s.deletedAt && s.currency === currency);
+  return {
+    monthlyMinor: active.reduce((sum, s) => sum + monthlyEquivalent(s), 0),
+    yearlyMinor: active.reduce((sum, s) => sum + yearlyEquivalent(s), 0),
+    activeCount: active.length,
+  };
+}

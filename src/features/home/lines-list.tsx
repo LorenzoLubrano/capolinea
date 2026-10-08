@@ -1,7 +1,9 @@
+import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { LineBadge } from '@/components/line-badge';
+import { PressableScale } from '@/components/pressable-scale';
 import { Money } from '@/components/money';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
@@ -24,8 +26,11 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
         const over = ratio !== null && ratio > 1;
         const near = ratio !== null && !over && ratio >= 0.9;
         return (
-          <View
+          <PressableScale
             key={line.categoryId}
+            accessibilityRole="button"
+            feedback="dim"
+            onPress={() => router.push({ pathname: '/category/[id]', params: { id: line.categoryId } })}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -80,7 +85,7 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
                 </AppText>
               )}
             </View>
-          </View>
+          </PressableScale>
         );
       })}
     </View>

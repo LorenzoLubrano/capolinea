@@ -69,6 +69,12 @@ function AppStack() {
         <Stack.Screen name="add-refund" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="add-subscription" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="split" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="budget-edit" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="category/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="subscription/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="goal/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="goal-edit" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="goal-contribution" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="transaction/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="transaction-filters" options={{ ...sheet, sheetAllowedDetents: [0.75, 1] }} />
         <Stack.Screen name="profile" options={{ ...pushed, title: it.profile.title }} />

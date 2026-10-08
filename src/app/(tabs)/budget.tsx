@@ -1,6 +1,3 @@
-import { ComingSoon } from '@/components/coming-soon';
-import { it } from '@/i18n/it';
+import { BudgetScreen } from '@/features/budget/budget-screen';
 
-export default function Screen() {
-  return <ComingSoon title={it.tabs.budget} body={it.placeholder.budget} />;
-}
+export default BudgetScreen;

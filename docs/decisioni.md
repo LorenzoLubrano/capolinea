@@ -53,3 +53,11 @@ Registro delle decisioni di prodotto e tecniche. Il piano completo della fase 1 
 - Divisione: parti uguali, importi o percentuali, con chi ha pagato; la quota di chi ha pagato è saldata per definizione. Si può aggiungere una persona al volo.
 - Le date si scelgono da un calendario disegnato (stesso aspetto su iOS e Android, provabile sul web).
 - Avvisi: sui telefoni i fogli sono finestre native sopra l'app, quindi ogni foglio ha il suo punto per gli avvisi; un avviso resta sul foglio che l'ha mostrato e, se quel foglio si chiude, passa a quello sotto.
+
+## 08/10/2026: blocco Budget (passo 5)
+
+- La scheda Budget ha tre viste alla pari, Mese, Abbonamenti e Obiettivi, cambiate sul posto senza scorrimento laterale.
+- Budget valido in un mese: il più recente con «dal mese» non successivo. La proposta per un budget nuovo è la media dei mesi pieni precedenti, contando solo i mesi da quando ci sono movimenti.
+- Ogni barra di budget ha la tacca del ritmo del mese; diventa rossa solo oltre il budget. Accanto: quanto resta e quanto si può spendere al giorno fino a fine mese.
+- Abbonamenti: totale al mese e all'anno, calendario con i giorni di addebito, elenco. Sospendere ferma gli addebiti; riattivare riparte dal primo addebito da oggi, senza recuperare il periodo in pausa. Eliminare un abbonamento lascia i suoi addebiti tra i movimenti.
+- Obiettivi: quota mensile per arrivare alla data scelta e arrivo previsto al ritmo dei versamenti degli ultimi tre mesi.

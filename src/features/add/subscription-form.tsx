@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
@@ -11,7 +11,7 @@ import { PressableScale } from '@/components/pressable-scale';
 import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
 import { ToastHost } from '@/components/toast-host';
-import { useAddSubscription, useSnapshot } from '@/data/queries';
+import { useAddSubscription, useSnapshot, useUpdateSubscription } from '@/data/queries';
 import type { Snapshot } from '@/data/repositories';
 import { monthlyEquivalent, yearlyEquivalent } from '@/domain/breakdown';
 import { addDays, addMonthsClamped } from '@/domain/dates';
@@ -54,9 +54,12 @@ function nextCharge(today: LocalDate, { unit, interval }: Frequency): LocalDate 
 
 /** Nuovo abbonamento: a template (or custom), then price, frequency, next charge. */
 export function SubscriptionForm() {
+  const { id } = useLocalSearchParams<{ id?: string }>();
   const { data } = useSnapshot();
   const [template, setTemplate] = useState<SubscriptionTemplate | 'custom' | null>(null);
   if (!data) return <View style={{ flex: 1 }} />;
+  const editing = id ? data.subscriptions.find((s) => s.id === id) : undefined;
+  if (editing) return <SubscriptionDetails data={data} editing={editing} onBack={() => router.back()} />;
   if (!template) return <TemplatePicker data={data} onPick={setTemplate} />;
   return <SubscriptionDetails data={data} template={template === 'custom' ? undefined : template} onBack={() => setTemplate(null)} />;
 }
@@ -128,20 +131,36 @@ function TemplatePicker({ data, onPick }: { data: Snapshot; onPick: (t: Subscrip
   );
 }
 
-function SubscriptionDetails({ data, template, onBack }: { data: Snapshot; template?: SubscriptionTemplate; onBack: () => void }) {
+function SubscriptionDetails({
+  data,
+  template,
+  editing,
+  onBack,
+}: {
+  data: Snapshot;
+  template?: SubscriptionTemplate;
+  editing?: Subscription;
+  onBack: () => void;
+}) {
   const { colors } = useTheme();
   const addSubscription = useAddSubscription();
+  const updateSubscription = useUpdateSubscription();
   const showToast = useToast((s) => s.show);
   const masked = useSettings((s) => s.privacy);
 
-  const [name, setName] = useState(template?.name ?? '');
-  const [input, setInput] = useState(template ? minorToInput(template.amountMinor) : '');
-  const [frequency, setFrequency] = useState<Frequency>(template?.frequency ?? PRESETS.monthly);
+  const [name, setName] = useState(editing?.name ?? template?.name ?? '');
+  const [input, setInput] = useState(() => {
+    const minor = editing?.amountMinor ?? template?.amountMinor;
+    return minor ? minorToInput(minor) : '';
+  });
+  const [frequency, setFrequency] = useState<Frequency>(editing?.frequency ?? template?.frequency ?? PRESETS.monthly);
   const [custom, setCustom] = useState(false);
-  const [anchorDate, setAnchorDate] = useState<LocalDate>(nextCharge(data.today, template?.frequency ?? PRESETS.monthly));
-  const [dateTouched, setDateTouched] = useState(false);
-  const [categoryId, setCategoryId] = useState<Id | undefined>(template?.categoryId);
-  const [accountId, setAccountId] = useState<Id>(defaultAccountId(data));
+  const [anchorDate, setAnchorDate] = useState<LocalDate>(
+    editing?.nextBillingDate ?? nextCharge(data.today, template?.frequency ?? PRESETS.monthly),
+  );
+  const [dateTouched, setDateTouched] = useState(!!editing);
+  const [categoryId, setCategoryId] = useState<Id | undefined>(editing?.categoryId ?? template?.categoryId);
+  const [accountId, setAccountId] = useState<Id>(editing?.accountId ?? defaultAccountId(data));
   const [picker, setPicker] = useState<'account' | 'date' | null>(null);
   const [allCategories, setAllCategories] = useState(false);
 
@@ -174,7 +193,24 @@ function SubscriptionDetails({ data, template, onBack }: { data: Snapshot; templ
   const missing = !name.trim() ? it.subscriptionForm.typeName : !amountMinor ? it.add.typeAmount : !categoryId ? it.add.chooseCategory : null;
 
   const save = () => {
-    if (missing || addSubscription.isPending || !categoryId) return;
+    if (missing || addSubscription.isPending || updateSubscription.isPending || !categoryId) return;
+    if (editing) {
+      const moved = anchorDate !== editing.nextBillingDate;
+      updateSubscription.mutate(
+        {
+          id: editing.id,
+          changes: { name: name.trim(), amountMinor, frequency, categoryId, accountId, ...(moved ? { anchorDate } : {}) },
+        },
+        {
+          onSuccess: ({ generated }) => {
+            haptics.success();
+            router.back();
+            showToast({ text: generated ? it.subscriptions.detail.updatedWithCharges(generated) : it.subscriptions.detail.updated });
+          },
+        },
+      );
+      return;
+    }
     addSubscription.mutate(
       { name: name.trim(), amountMinor, currency: data.currency, frequency, anchorDate, categoryId, accountId, active: true },
       {
@@ -189,7 +225,10 @@ function SubscriptionDetails({ data, template, onBack }: { data: Snapshot; templ
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
-      <SheetHeader title={template?.name ?? it.subscriptionForm.title} left={{ label: it.subscriptionForm.back, onPress: onBack }} />
+      <SheetHeader
+        title={editing ? it.subscriptions.detail.editTitle : (template?.name ?? it.subscriptionForm.title)}
+        left={{ label: editing ? it.add.cancel : it.subscriptionForm.back, onPress: onBack }}
+      />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.sm, paddingTop: spacing.xs }}>
           <Chip
@@ -250,7 +289,7 @@ function SubscriptionDetails({ data, template, onBack }: { data: Snapshot; templ
           }
         />
 
-        {!template ? <TextField label={it.subscriptionForm.name} value={name} onChangeText={setName} placeholder={it.subscriptionForm.namePlaceholder} /> : null}
+        {!template || editing ? <TextField label={it.subscriptionForm.name} value={name} onChangeText={setName} placeholder={it.subscriptionForm.namePlaceholder} /> : null}
 
         <ChoiceRow label={it.subscriptionForm.frequency}>
           {(Object.keys(PRESETS) as (keyof typeof PRESETS)[]).map((key) => (
@@ -318,9 +357,9 @@ function SubscriptionDetails({ data, template, onBack }: { data: Snapshot; templ
       <SaveBar
         onKey={(key) => setInput((current) => appendKeypadKey(current, key))}
         onClear={() => setInput('')}
-        label={missing ?? `${it.add.save} ${money(amountMinor)}`}
+        label={missing ?? (editing ? it.add.saveChanges : `${it.add.save} ${money(amountMinor)}`)}
         ready={!missing}
-        busy={addSubscription.isPending}
+        busy={addSubscription.isPending || updateSubscription.isPending}
         onSave={save}
       />
       <ToastHost top={60} />

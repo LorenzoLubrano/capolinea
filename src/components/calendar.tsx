@@ -14,8 +14,24 @@ import { AppText } from './text';
 
 const CELL = 44;
 
-/** A month grid, Monday first. Today has a ring, the chosen day is ink. Same look on every platform. */
-export function Calendar({ value, today, onChange }: { value: LocalDate; today: LocalDate; onChange: (date: LocalDate) => void }) {
+/**
+ * A month grid, Monday first. Today has a ring, the chosen day is ink. Same look on every platform.
+ * `markers` puts up to three coloured dots under a day (subscription charges, for example).
+ */
+export function Calendar({
+  value,
+  today,
+  onChange,
+  markers,
+  markersLabel,
+}: {
+  value: LocalDate;
+  today: LocalDate;
+  onChange: (date: LocalDate) => void;
+  markers?: Record<LocalDate, string[]>;
+  /** Spoken after the date when a day has markers, e.g. "2 addebiti". */
+  markersLabel?: (count: number) => string;
+}) {
   const { colors } = useTheme();
   const [month, setMonth] = useState(monthStart(value));
 
@@ -52,11 +68,12 @@ export function Calendar({ value, today, onChange }: { value: LocalDate; today: 
             if (!day) return <View key={d} style={{ flex: 1, height: CELL }} />;
             const selected = day === value;
             const isToday = day === today;
+            const dots = markers?.[day] ?? [];
             return (
               <PressableScale
                 key={day}
                 accessibilityRole="button"
-                accessibilityLabel={fullDate(day)}
+                accessibilityLabel={dots.length && markersLabel ? `${fullDate(day)}, ${markersLabel(dots.length)}` : fullDate(day)}
                 accessibilityState={{ selected }}
                 feedback="dim"
                 onPress={() => {
@@ -81,6 +98,13 @@ export function Calendar({ value, today, onChange }: { value: LocalDate; today: 
                     {Number(day.slice(8))}
                   </AppText>
                 </View>
+                {dots.length ? (
+                  <View style={{ position: 'absolute', bottom: 1, flexDirection: 'row', gap: 2 }}>
+                    {dots.slice(0, 3).map((color, i) => (
+                      <View key={i} style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
+                    ))}
+                  </View>
+                ) : null}
               </PressableScale>
             );
           })}

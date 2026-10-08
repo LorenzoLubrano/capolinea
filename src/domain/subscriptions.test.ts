@@ -1,5 +1,15 @@
 import { subscription, tx } from './testing/builders';
-import { chargesBetween, generateDueCharges, occurrenceAfter } from './subscriptions';
+import { chargesBetween, generateDueCharges, occurrenceAfter, upcomingCharges } from './subscriptions';
+
+describe('upcomingCharges', () => {
+  it('lists the charges of active subscriptions in a window, by date', () => {
+    const netflix = subscription({ name: 'Netflix', anchorDate: '2026-01-05', startDate: '2026-01-05' });
+    const gym = subscription({ name: 'Palestra', anchorDate: '2026-01-28', startDate: '2026-01-28' });
+    const paused = subscription({ name: 'Vecchio', anchorDate: '2026-01-26', startDate: '2026-01-26', active: false });
+    const charges = upcomingCharges([gym, netflix, paused], '2026-10-25', '2026-11-24');
+    expect(charges.map((c) => `${c.date} ${c.subscription.name}`)).toEqual(['2026-10-28 Palestra', '2026-11-05 Netflix']);
+  });
+});
 
 describe('occurrenceAfter', () => {
   it('keeps day 31 in long months after a short one', () => {
