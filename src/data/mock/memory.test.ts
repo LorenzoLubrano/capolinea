@@ -202,7 +202,8 @@ describe('memory repositories: replacing all the data', () => {
     expect(snapshot.transactions).toEqual([]);
     expect(snapshot.subscriptions).toEqual([]);
     expect(snapshot.goals).toEqual([]);
-    expect(snapshot.accounts.map((a) => a.name)).toEqual(['Contanti']);
+    // No account: the onboarding creates the first one (Contanti when skipped).
+    expect(snapshot.accounts).toEqual([]);
     expect(snapshot.categories.length).toBeGreaterThan(10);
     expect(snapshot.people.filter((p) => p.isMe)).toHaveLength(1);
   });

@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
@@ -118,6 +119,9 @@ export function ExportScreen() {
           </AppText>
         </View>
         <Button label={it.exportScreen.action} icon="Export" busy={busy} disabled={kind === 'csv' && count === 0} onPress={onExport} />
+        <SettingsGroup>
+          <SettingsRow icon="ArrowCounterClockwise" title={it.restore.entry} hint={it.restore.entryHint} onPress={() => router.push('/restore')} />
+        </SettingsGroup>
       </View>
     </Screen>
   );

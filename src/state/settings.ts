@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 
+import type { AutoLock } from '@/domain/lock';
+
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 /** Home backdrop: a piece of the metro map (default) or soft glows. */
 export type HomeBackdrop = 'map' | 'glow';
 
-/** How long the app may stay in the background before it asks to be unlocked again. */
-export type AutoLock = 'immediate' | '1m' | '5m' | '15m';
+export type { AutoLock };
 
 /** A PIN is never kept in clear: only a salted SHA-256 and its length (to draw the dots). */
 export interface PinRecord {
@@ -60,6 +61,8 @@ interface SettingsState {
   /** The app switcher shows a cover instead of the screen (Android: also no screenshots). */
   coverInSwitcher: boolean;
   notifications: NotificationRules;
+  /** False on a first launch or after wiping the data: the app shows the onboarding. */
+  onboarded: boolean;
   togglePrivacy: () => void;
   setPrivacy: (privacy: boolean) => void;
   setThemeMode: (mode: ThemeMode) => void;
@@ -73,6 +76,7 @@ interface SettingsState {
   setNotifications: (changes: Partial<NotificationRules>) => void;
   /** Wiping the local data also forgets the lock. Appearance stays. */
   resetSecurity: () => void;
+  setOnboarded: (onboarded: boolean) => void;
 }
 
 /**
@@ -89,6 +93,8 @@ export const useSettings = create<SettingsState>((set) => ({
   startHidden: false,
   coverInSwitcher: true,
   notifications: DEFAULT_NOTIFICATIONS,
+  // The prototype opens on the example data, as if the onboarding were done.
+  onboarded: true,
   togglePrivacy: () => set((state) => ({ privacy: !state.privacy })),
   setPrivacy: (privacy) => set({ privacy }),
   setThemeMode: (themeMode) => set({ themeMode }),
@@ -100,4 +106,5 @@ export const useSettings = create<SettingsState>((set) => ({
   setCoverInSwitcher: (coverInSwitcher) => set({ coverInSwitcher }),
   setNotifications: (changes) => set((state) => ({ notifications: { ...state.notifications, ...changes } })),
   resetSecurity: () => set({ pin: null, biometrics: false, autoLock: '1m', startHidden: false }),
+  setOnboarded: (onboarded) => set({ onboarded }),
 }));

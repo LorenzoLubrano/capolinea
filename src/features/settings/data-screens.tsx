@@ -29,6 +29,7 @@ export function DeleteDataScreen() {
   const { data } = useSnapshot();
   const replaceAll = useReplaceAll();
   const resetSecurity = useSettings((s) => s.resetSecurity);
+  const setOnboarded = useSettings((s) => s.setOnboarded);
   const signOut = useSync((s) => s.signOut);
   const showToast = useToast((s) => s.show);
   const [typed, setTyped] = useState('');
@@ -43,8 +44,8 @@ export function DeleteDataScreen() {
         resetSecurity();
         signOut();
         useTransactionFilters.getState().resetAll();
-        if (router.canDismiss()) router.dismissAll();
-        router.navigate('/');
+        // The guard in the root layout takes the app back to the onboarding.
+        setOnboarded(false);
         showToast({ text: it.deleteData.done });
       },
     });
@@ -109,6 +110,19 @@ const SYNC_STATES: SyncStatus[] = ['off', 'on', 'syncing', 'offline', 'error', '
 export function PrototypePanel() {
   const status = useSync((s) => s.status);
   const setStatus = useSync((s) => s.setStatus);
+  const { data } = useSnapshot();
+  const replaceAll = useReplaceAll();
+  const firstLaunch = () => {
+    if (!data) return;
+    replaceAll.mutate(createEmptyDataset(data.today, data.currency), {
+      onSuccess: () => {
+        useSettings.getState().resetSecurity();
+        useSync.getState().signOut();
+        useTransactionFilters.getState().resetAll();
+        useSettings.getState().setOnboarded(false);
+      },
+    });
+  };
   return (
     <Screen variant="stack">
       <View style={{ gap: spacing.xl }}>
@@ -126,6 +140,9 @@ export function PrototypePanel() {
             />
           ))}
           <SettingsRow icon="CloudCheck" title={it.prototype.openSync} onPress={() => router.push('/settings/sync')} />
+        </SettingsGroup>
+        <SettingsGroup>
+          <SettingsRow icon="ArrowCounterClockwise" title={it.prototype.firstLaunch} hint={it.prototype.firstLaunchHint} onPress={firstLaunch} />
         </SettingsGroup>
       </View>
     </Screen>

@@ -3,8 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { Icon } from '@/components/icon';
-import { PressableScale } from '@/components/pressable-scale';
+import { PinDots, PinPad } from '@/components/pin-pad';
 import { Screen } from '@/components/screen';
 import { SettingsGroup, SettingsRow, SettingsSwitchRow } from '@/components/settings-group';
 import { SheetHeader } from '@/components/sheet-header';
@@ -14,9 +13,10 @@ import { pinProblem } from '@/domain/pin';
 import { it } from '@/i18n/it';
 import { haptics } from '@/services/haptics';
 import { biometricSupport, checkPin, confirmWithBiometrics, hashPin } from '@/services/security';
+import { useLock } from '@/state/lock';
 import { useSettings, type AutoLock } from '@/state/settings';
 import { useToast } from '@/state/toast';
-import { layout, radius, spacing, useTheme } from '@/theme';
+import { layout, spacing } from '@/theme';
 
 const AUTO_LOCK: AutoLock[] = ['immediate', '1m', '5m', '15m'];
 
@@ -61,6 +61,7 @@ export function SecurityScreen() {
             />
           ) : null}
           {pin ? <SettingsRow icon="PencilSimple" title={it.security.changePin} onPress={() => router.push({ pathname: '/settings/pin', params: { mode: 'change' } })} /> : null}
+          {pin ? <SettingsRow icon="LockSimple" title={it.lock.now} hint={it.lock.nowHint} onPress={() => useLock.getState().lock()} /> : null}
         </SettingsGroup>
 
         {pin ? (
@@ -88,35 +89,8 @@ type Mode = 'set' | 'change' | 'disable';
 type Step = 'current' | 'new' | 'confirm';
 const MAX_DIGITS = 6;
 const MIN_DIGITS = 4;
-const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'back'];
-
-/** Digits only, large keys, no comma: the PIN pad. */
-function PinPad({ onDigit, onBack }: { onDigit: (digit: string) => void; onBack: () => void }) {
-  const { colors } = useTheme();
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', rowGap: spacing.smd, columnGap: spacing.lg, maxWidth: 3 * 76 + 2 * spacing.lg, alignSelf: 'center' }}>
-      {KEYS.map((key, i) =>
-        key === '' ? (
-          <View key={i} style={{ width: 76, height: 76 }} />
-        ) : (
-          <PressableScale
-            key={i}
-            accessibilityRole="button"
-            accessibilityLabel={key === 'back' ? it.pin.delete : key}
-            onPress={() => (key === 'back' ? onBack() : onDigit(key))}
-            style={{ width: 76, height: 76, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center', backgroundColor: key === 'back' ? 'transparent' : colors.surfaceMuted }}
-          >
-            {key === 'back' ? <Icon name="Backspace" size={26} color={colors.ink} /> : <AppText variant="key">{key}</AppText>}
-          </PressableScale>
-        ),
-      )}
-    </View>
-  );
-}
-
 /** Set, change or remove the PIN. The PIN is hashed with a salt as soon as it is confirmed. */
 export function PinSheet() {
-  const { colors } = useTheme();
   const { mode: rawMode } = useLocalSearchParams<{ mode?: Mode }>();
   const mode: Mode = rawMode === 'change' || rawMode === 'disable' ? rawMode : 'set';
   const saved = useSettings((s) => s.pin);
@@ -194,11 +168,7 @@ export function PinSheet() {
           <AppText variant="subhead" tone="secondary" style={{ textAlign: 'center' }}>
             {it.pin.hints[step]}
           </AppText>
-          <View accessible accessibilityLabel={it.pin.typed(digits.length)} style={{ flexDirection: 'row', gap: spacing.md, paddingVertical: spacing.lg }}>
-            {Array.from({ length: slots }, (_, i) => (
-              <View key={i} style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: colors.ink, backgroundColor: i < digits.length ? colors.ink : 'transparent' }} />
-            ))}
-          </View>
+          <PinDots slots={slots} filled={digits.length} />
           <AppText variant="footnote" tone="alert" accessibilityLiveRegion="polite" style={{ textAlign: 'center', minHeight: 36 }}>
             {error ?? ''}
           </AppText>

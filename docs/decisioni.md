@@ -92,3 +92,11 @@ Registro delle decisioni di prodotto e tecniche. Il piano completo della fase 1 
 - Notifiche: regole locali con soglie e un'anteprima di come arrivano; con la privacy attiva nessuna cifra, nemmeno le percentuali. Nel prototipo non partono.
 - Sincronizzazione: concept con i sei stati simulati (accesso finto, nessun server); offline, errore e conflitto si vedono dal pannello prototipo, che per ora ha solo questa parte.
 - Elimina dati locali: conferma scritta «ELIMINA» al posto dell'Annulla, perché non si torna indietro. Si riparte dalle categorie predefinite e da Contanti a zero; si perdono anche PIN e accesso alla sincronizzazione, l'aspetto resta. Le categorie predefinite ora stanno in `src/data/defaults.ts`, non nei dati di esempio.
+
+## 08/10/2026: blocco Onboarding e blocco (passo 5)
+
+- Onboarding in 5 schermate: Benvenuto (con «Ripristina da un backup»), Valuta, Primo conto, Budget del mese, Privacy; i passi sono una linea con le fermate. Saltando il conto si crea «Contanti» a zero; il budget si può saltare. Alla fine la Home vuota indica il +.
+- L'app e l'onboarding sono separati da rotte protette (`Stack.Protected` con `onboarded`): eliminare i dati o «Rivedi il primo avvio» nel pannello riportano all'onboarding da soli. I dati vuoti non hanno più un conto: lo crea l'onboarding.
+- Blocco: dopo il tempo scelto in secondo piano la schermata di blocco si apre sopra tutto, fogli compresi, e allo sblocco si torna dov'eri. Niente importi sulla schermata; il volto o l'impronta partono subito se attivi, il PIN resta sempre. Il tasto indietro di Android non la chiude. «Blocca adesso» in Sicurezza.
+- Tentativi: dopo 4 PIN sbagliati si aspetta 30 secondi, poi 1, 2, 5, 10 e infine 15 minuti: con 10.000 combinazioni indovinare diventa impraticabile. Il PIN in memoria si perde chiudendo l'app, quindi nella fase 1 il blocco si vede solo tornando dal secondo piano.
+- Ripristino: il file non è mai creduto sulla parola. Prima la dimensione (20 MB al massimo, controllata prima di leggerlo), poi JSON, formato e versione, poi ogni record contro il suo schema e ogni riferimento contro i record; si tengono solo i campi noti, così niente di estraneo entra nei dati. Anteprima con conteggi e date; se il telefono ha già dati serve scrivere «SOSTITUISCI», da vuoto no.

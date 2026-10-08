@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { TextInput, View } from 'react-native';
+import { TextInput, View, type TextInputProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -79,12 +79,14 @@ export function TextField({
   onChangeText,
   placeholder,
   autoFocus,
+  keyboardType,
 }: {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
   autoFocus?: boolean;
+  keyboardType?: TextInputProps['keyboardType'];
 }) {
   const { colors } = useTheme();
   return (
@@ -100,6 +102,7 @@ export function TextField({
         placeholderTextColor={colors.inkTertiary}
         selectionColor={colors.ink}
         autoFocus={autoFocus}
+        keyboardType={keyboardType}
         style={[type.body, { color: colors.ink, minHeight: 48, paddingHorizontal: spacing.smd, borderRadius: radius.key, backgroundColor: colors.surfaceMuted }]}
       />
     </View>

@@ -3,7 +3,8 @@ import type { Account, Category, Id, LocalDate, Person } from '@/domain/types';
 import type { Snapshot } from './repositories';
 
 /**
- * What a new or wiped app starts from: the default categories, the user, a cash account at zero.
+ * What a new or wiped app starts from: the default categories and the user; `CASH` is the account
+ * the onboarding creates when the first account is skipped.
  * Product data, not example data: phase 2 seeds the database with the same records.
  */
 
@@ -44,14 +45,14 @@ export const CASH: Account = {
   id: 'acc-cash', ...meta, name: 'Contanti', type: 'cash', currency: 'EUR', openingBalanceMinor: 0, color: 'green', includeInTotal: true, archived: false, sortOrder: 0,
 };
 
-/** A fresh start: default categories, a cash account at zero, the user, nothing else. */
+/** A fresh start: default categories and the user. The onboarding adds the first account. */
 export function createEmptyDataset(today: LocalDate, currency = 'EUR'): Snapshot {
   return {
     today,
     currency,
     meId: ME.id,
     people: [ME],
-    accounts: [{ ...CASH, currency }],
+    accounts: [],
     categories: DEFAULT_CATEGORIES,
     subscriptions: [],
     budgets: [],
