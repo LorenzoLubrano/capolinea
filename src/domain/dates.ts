@@ -21,6 +21,11 @@ function format({ year, month, day }: DateParts): LocalDate {
   return `${pad(year, 4)}-${pad(month, 2)}-${pad(day, 2)}`;
 }
 
+/** The calendar day of a moment, on the phone's clock. */
+export function toLocalDate(moment: Date): LocalDate {
+  return format({ year: moment.getFullYear(), month: moment.getMonth() + 1, day: moment.getDate() });
+}
+
 export function daysInMonth(year: number, month: number): number {
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
 }

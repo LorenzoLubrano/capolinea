@@ -65,8 +65,13 @@ export function TransactionsScreen() {
       sections = results.length ? [{ date: '', totalMinor: 0, data: results }] : [];
     }
   }
-  const categories = new Map(data?.categories.map((c) => [c.id, c]));
-  const accounts = new Map(data?.accounts.map((a) => [a.id, a.name]));
+  // Ternaries, never `data?.categories.map` or `data!` in a callback: the React Compiler memoizes
+  // on `data.categories` and the like, which crashes while the data is loading.
+  const categories = new Map(data ? data.categories.map((c) => [c.id, c]) : []);
+  const accounts = new Map(data ? data.accounts.map((a) => [a.id, a.name]) : []);
+  const currency = data ? data.currency : '';
+  const meId = data ? data.meId : '';
+  const today = data ? data.today : '';
   const spent = data ? results.reduce((sum, tx) => sum + spendingImpact(tx, data.meId), 0) : 0;
   const sheetFilters = activeFilterCount(filters);
   const searching = filters.query.trim().length > 0;
@@ -142,8 +147,8 @@ export function TransactionsScreen() {
         tx={item}
         category={category}
         subtitle={byDate ? subtitle : `${shortDate(item.date)} · ${subtitle}`}
-        currency={data!.currency}
-        meId={data!.meId}
+        currency={currency}
+        meId={meId}
         first={index === 0}
         last={index === section.data.length - 1}
         onPress={() => router.push({ pathname: '/transaction/[id]', params: { id: item.id } })}
@@ -171,9 +176,9 @@ export function TransactionsScreen() {
                 backgroundColor: colors.background,
               }}
             >
-              <AppText variant="subheadStrong">{dayLabel(section.date, data!.today)}</AppText>
+              <AppText variant="subheadStrong">{dayLabel(section.date, today)}</AppText>
               {section.totalMinor > 0 ? (
-                <Money minor={section.totalMinor} currency={data!.currency} sign="expense" variant="subhead" tone="secondary" />
+                <Money minor={section.totalMinor} currency={currency} sign="expense" variant="subhead" tone="secondary" />
               ) : null}
             </View>
           ) : null

@@ -48,7 +48,10 @@ export function AddMenu() {
   const { colors } = useTheme();
   const { data } = useSnapshot();
   const templates = data ? recentTemplates(data, 3) : [];
-  const categoryById = new Map(data?.categories.map((c) => [c.id, c]) ?? []);
+  // Ternaries, not `data?.categories.map` or `data!`: the React Compiler would memoize on
+  // `data.categories`, which crashes while the data is loading.
+  const categoryById = new Map(data ? data.categories.map((c) => [c.id, c]) : []);
+  const currency = data ? data.currency : '';
 
   return (
     <View style={{ flex: 1, paddingHorizontal: spacing.gutter, paddingTop: spacing.lg, gap: spacing.md }}>
@@ -125,7 +128,7 @@ export function AddMenu() {
                 >
                   <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? t.merchant} size={28} />
                   <AppText variant="subheadStrong">{t.merchant}</AppText>
-                  <Money minor={t.amountMinor} currency={data!.currency} variant="subhead" tone="secondary" />
+                  <Money minor={t.amountMinor} currency={currency} variant="subhead" tone="secondary" />
                 </PressableScale>
               );
             })}

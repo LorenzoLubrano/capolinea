@@ -21,6 +21,7 @@ import { LockGate } from '@/features/security/lock-screen';
 import { it } from '@/i18n/it';
 import { useAppSwitcherCover } from '@/services/security';
 import { clearExports } from '@/services/share-file';
+import { prototypeFaults } from '@/state/prototype';
 import { useSettings } from '@/state/settings';
 import { fonts, useTheme } from '@/theme';
 
@@ -99,7 +100,6 @@ function AppStack() {
           <Stack.Screen name="settings/sync" options={{ ...pushed, title: it.sync.title }} />
           <Stack.Screen name="settings/delete" options={{ ...pushed, title: it.deleteData.title }} />
           <Stack.Screen name="settings/info" options={{ ...pushed, title: it.info.title }} />
-          <Stack.Screen name="prototype" options={{ ...pushed, title: it.prototype.title }} />
           <Stack.Screen name="settings/sync-signin" options={{ ...sheet, sheetAllowedDetents: [0.6, 1] }} />
           <Stack.Screen name="accounts" options={{ ...pushed, title: it.accounts.title }} />
           <Stack.Screen name="account/[id]" options={{ ...pushed, title: '' }} />
@@ -110,6 +110,10 @@ function AppStack() {
           <Stack.Screen name="category-edit" options={{ ...sheet, sheetAllowedDetents: [1] }} />
           <Stack.Screen name="person-edit" options={{ ...sheet, sheetAllowedDetents: [0.5, 1] }} />
           <Stack.Screen name="settle" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        </Stack.Protected>
+        {/* Development only: a release build has no prototype panel, not even through a link. */}
+        <Stack.Protected guard={onboarded && __DEV__}>
+          <Stack.Screen name="prototype" options={{ ...pushed, title: it.prototype.title }} />
         </Stack.Protected>
         <Stack.Protected guard={!onboarded}>
           <Stack.Screen name="onboarding" />
@@ -144,7 +148,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <DataProvider>
+      <DataProvider faults={__DEV__ ? prototypeFaults : undefined}>
         <AppStack />
       </DataProvider>
     </GestureHandlerRootView>

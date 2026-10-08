@@ -15,6 +15,12 @@ describe('example dataset', () => {
     expect(data.transactions.every((t) => t.date <= PINNED_TODAY)).toBe(true);
   });
 
+  it('puts nothing in the future on an earlier today, goal contributions included', () => {
+    const early = createDataset('2026-10-01');
+    expect(early.transactions.every((t) => t.date <= '2026-10-01')).toBe(true);
+    expect(early.goals.every((g) => g.contributions.every((c) => c.date <= '2026-10-01'))).toBe(true);
+  });
+
   it('gives October a plausible month: under budget, a bit under September at the same day', () => {
     const { currentMinor, change } = compareWithPreviousMonth(data.transactions, PINNED_TODAY, opts);
     expect(currentMinor).toBeGreaterThan(100000);

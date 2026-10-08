@@ -9,6 +9,7 @@ import {
   monthGrid,
   monthStart,
   samePeriodPreviousMonth,
+  toLocalDate,
   weekdayMondayFirst,
 } from './dates';
 
@@ -114,5 +115,12 @@ describe('weekdayMondayFirst', () => {
     expect(weekdayMondayFirst('2026-10-19')).toBe(0);
     expect(weekdayMondayFirst('2026-10-24')).toBe(5);
     expect(weekdayMondayFirst('2026-10-25')).toBe(6);
+  });
+});
+
+describe('toLocalDate', () => {
+  it('reads the calendar day of the phone, not of UTC', () => {
+    expect(toLocalDate(new Date(2026, 9, 8, 23, 59))).toBe('2026-10-08');
+    expect(toLocalDate(new Date(2027, 0, 1, 0, 0))).toBe('2027-01-01');
   });
 });

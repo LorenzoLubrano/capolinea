@@ -211,7 +211,7 @@ export function createDataset(today: LocalDate = PINNED_TODAY): Dataset {
     categories: CATEGORIES,
     subscriptions: generated.subscriptions,
     budgets: BUDGETS,
-    goals: GOALS,
+    goals: GOALS.map((g) => ({ ...g, contributions: g.contributions.filter((c) => c.date <= today) })),
     transactions: [...transactions, ...generated.charges].sort((a, b) => (a.date === b.date ? a.id.localeCompare(b.id) : a.date.localeCompare(b.date))),
   };
 }

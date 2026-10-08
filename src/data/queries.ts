@@ -22,6 +22,12 @@ export function useSnapshot() {
   return useQuery({ queryKey: SNAPSHOT_KEY, queryFn: () => repos.snapshot() });
 }
 
+/** Forgets the data already read, so every screen loads it again (prototype panel). */
+export function useReloadSnapshot() {
+  const client = useQueryClient();
+  return () => client.resetQueries({ queryKey: SNAPSHOT_KEY });
+}
+
 export function useAddTransaction() {
   const repos = useRepositories();
   const client = useQueryClient();

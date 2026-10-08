@@ -15,7 +15,8 @@ import { TextField } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
 import { haptics } from '@/services/haptics';
 import { useSettings } from '@/state/settings';
-import { useSync, type SyncStatus } from '@/state/sync';
+import { fullDate } from '@/services/format/dates';
+import { useSync } from '@/state/sync';
 import { useToast } from '@/state/toast';
 import { useTransactionFilters } from '@/state/transaction-filters';
 import { spacing, useTheme } from '@/theme';
@@ -80,6 +81,7 @@ export function DeleteDataScreen() {
 
 /** Info: name, version, phase, licences; the prototype panel in development. */
 export function InfoScreen() {
+  const { data } = useSnapshot();
   return (
     <Screen variant="stack">
       <View style={{ gap: spacing.xl }}>
@@ -88,6 +90,7 @@ export function InfoScreen() {
           <SettingsInfoRow title={it.info.version} value={Constants.expoConfig?.version ?? '–'} />
           <SettingsInfoRow title={it.info.phase} value={it.info.phaseValue} />
           <SettingsInfoRow title={it.info.data} value={it.info.dataValue} />
+          <SettingsInfoRow title={it.info.today} value={data ? fullDate(data.today).replace(/^\S+ /, '') : '–'} />
         </SettingsGroup>
         <SettingsGroup title={it.info.licenses}>
           {it.info.licenseList.map(([name, license]) => (
@@ -99,51 +102,6 @@ export function InfoScreen() {
             <SettingsRow icon="Flask" title={it.info.prototype} hint={it.info.prototypeHint} onPress={() => router.push('/prototype')} />
           </SettingsGroup>
         ) : null}
-      </View>
-    </Screen>
-  );
-}
-
-const SYNC_STATES: SyncStatus[] = ['off', 'on', 'syncing', 'offline', 'error', 'conflict'];
-
-/** Pannello prototipo (development only). For now: force a sync state to see how it looks. */
-export function PrototypePanel() {
-  const status = useSync((s) => s.status);
-  const setStatus = useSync((s) => s.setStatus);
-  const { data } = useSnapshot();
-  const replaceAll = useReplaceAll();
-  const firstLaunch = () => {
-    if (!data) return;
-    replaceAll.mutate(createEmptyDataset(data.today, data.currency), {
-      onSuccess: () => {
-        useSettings.getState().resetSecurity();
-        useSync.getState().signOut();
-        useTransactionFilters.getState().resetAll();
-        useSettings.getState().setOnboarded(false);
-      },
-    });
-  };
-  return (
-    <Screen variant="stack">
-      <View style={{ gap: spacing.xl }}>
-        <SettingsGroup title={it.prototype.sync}>
-          {SYNC_STATES.map((s) => (
-            <SettingsRow
-              key={s}
-              role="radio"
-              checked={status === s}
-              title={it.prototype.syncStates[s]}
-              onPress={() => {
-                haptics.selection();
-                setStatus(s);
-              }}
-            />
-          ))}
-          <SettingsRow icon="CloudCheck" title={it.prototype.openSync} onPress={() => router.push('/settings/sync')} />
-        </SettingsGroup>
-        <SettingsGroup>
-          <SettingsRow icon="ArrowCounterClockwise" title={it.prototype.firstLaunch} hint={it.prototype.firstLaunchHint} onPress={firstLaunch} />
-        </SettingsGroup>
       </View>
     </Screen>
   );
