@@ -78,7 +78,7 @@ function GoalFormBody({ data, editing }: { data: Snapshot; editing?: Goal }) {
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title={editing ? it.goals.form.editTitle : it.goals.form.newTitle} left={{ label: it.add.cancel, onPress: () => router.back() }} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
         <AmountDisplay
           input={input}
           label={name || it.goals.form.newTitle}

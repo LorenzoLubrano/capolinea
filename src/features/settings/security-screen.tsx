@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { PinDots, PinPad } from '@/components/pin-pad';
 import { Screen } from '@/components/screen';
@@ -163,7 +163,7 @@ export function PinSheet() {
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title="" left={{ label: it.common.cancel, onPress: () => router.back() }} right={step === 'new' && digits.length >= MIN_DIGITS ? { label: it.pin.next, onPress: next } : undefined} />
-      <View style={{ flex: 1, justifyContent: 'space-between', paddingHorizontal: spacing.gutter, paddingTop: spacing.lg, paddingBottom: spacing.xl }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between', gap: spacing.lg, paddingHorizontal: spacing.gutter, paddingTop: spacing.lg, paddingBottom: spacing.xl }}>
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
           <AppText variant="title2" accessibilityRole="header">
             {it.pin.titles[step]}
@@ -177,7 +177,7 @@ export function PinSheet() {
           </AppText>
         </View>
         <PinPad onDigit={onDigit} onBack={() => setDigits((d) => d.slice(0, -1))} />
-      </View>
+      </ScrollView>
       <ToastHost top={60} />
     </View>
   );

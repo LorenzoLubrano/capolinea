@@ -107,7 +107,7 @@ export function LineTabBar({ state, navigation }: TabBarProps) {
               style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3, minHeight: 48 }}
             >
               <Icon name={tab.icon} size={24} color={focused ? colors.ink : colors.inkSecondary} weight={focused ? 'fill' : 'regular'} />
-              <AppText variant="tab" tone={focused ? 'primary' : 'secondary'} numberOfLines={1}>
+              <AppText variant="tab" tone={focused ? 'primary' : 'secondary'} numberOfLines={1} maxFontSizeMultiplier={1.3}>
                 {tab.label}
               </AppText>
             </PressableScale>

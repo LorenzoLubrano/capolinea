@@ -50,7 +50,7 @@ export function Money({
           <RNText style={type[centsVariant!]}>{`${split[2] ?? ''}${split[3]}`}</RNText>
         </AppText>
       ) : (
-        <AppText variant={variant} tone={tone} numberOfLines={1}>
+        <AppText variant={variant} tone={tone} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
           {text}
         </AppText>
       )}

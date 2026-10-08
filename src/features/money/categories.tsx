@@ -180,7 +180,7 @@ function CategoryFormBody({ data, editing, kind }: { data: Snapshot; editing?: C
         left={{ label: it.common.cancel, onPress: () => router.back() }}
         right={{ label: it.categoryList.form.save, onPress: onSave }}
       />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.lg }} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.lg }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd }} accessibilityLabel={it.categoryList.form.preview}>
           <LineBadge color={color} name={name || '?'} size={40} />
           <AppText variant="title2" numberOfLines={1} style={{ flexShrink: 1 }}>

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { AppState, BackHandler, View } from 'react-native';
+import { AppState, BackHandler, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
@@ -134,7 +134,10 @@ export function LockScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.xl }}>
-      <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center', paddingHorizontal: spacing.gutter, justifyContent: 'space-between' }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center', paddingHorizontal: spacing.gutter, justifyContent: 'space-between', gap: spacing.lg }}
+      >
         <View style={{ alignItems: 'center', gap: spacing.sm }}>
           <View style={{ width: 56, height: 56, borderRadius: radius.sign, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="LockSimple" size={28} color={colors.onInk} weight="bold" />
@@ -159,7 +162,7 @@ export function LockScreen() {
             <Button label={it.lock.useBiometrics[kind]} icon={kind === 'face' ? 'ScanSmiley' : 'Fingerprint'} variant="secondary" onPress={askBiometrics} />
           ) : null}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }

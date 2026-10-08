@@ -74,7 +74,7 @@ function TemplatePicker({ data, onPick }: { data: Snapshot; onPick: (t: Subscrip
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title={it.subscriptionForm.title} left={{ label: it.add.cancel, onPress: () => router.back() }} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingVertical: spacing.md, gap: spacing.md }}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingVertical: spacing.md, gap: spacing.md }}>
         <View style={{ gap: spacing.xs }}>
           <AppText variant="subheadStrong" tone="secondary" accessibilityRole="header">
             {it.subscriptionForm.pick}
@@ -236,7 +236,7 @@ function SubscriptionDetails({
         title={editing ? it.subscriptions.detail.editTitle : (template?.name ?? it.subscriptionForm.title)}
         left={{ label: editing ? it.add.cancel : it.subscriptionForm.back, onPress: onBack }}
       />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.sm, paddingTop: spacing.xs }}>
           <Chip
             label={accounts.find((a) => a.id === accountId)?.name ?? ''}

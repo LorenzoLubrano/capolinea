@@ -8,14 +8,15 @@ import { PressableScale } from '@/components/pressable-scale';
 import { AppText } from '@/components/text';
 import { daysInMonth } from '@/domain/dates';
 import { it } from '@/i18n/it';
+import { useLargeText } from '@/services/a11y';
 import { spacing, useTheme } from '@/theme';
 
 import type { HomeSummary } from './summary';
 
-function Metric({ label, children }: { label: string; children: React.ReactNode }) {
+function Metric({ label, children, large }: { label: string; children: React.ReactNode; large: boolean }) {
   return (
-    <View style={{ flex: 1, gap: spacing.xxs }}>
-      <AppText variant="footnote" tone="secondary" numberOfLines={1}>
+    <View style={large ? { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm } : { flex: 1, gap: spacing.xxs }}>
+      <AppText variant="footnote" tone="secondary" numberOfLines={large ? undefined : 1} style={large ? { flexShrink: 1 } : undefined}>
         {label}
       </AppText>
       {children}
@@ -29,6 +30,7 @@ export function BalanceSection({ summary, today }: { summary: HomeSummary; today
   const { balance, income, currency } = summary;
   const [year, month, day] = today.split('-').map(Number);
   const daysLeft = daysInMonth(year, month) - day;
+  const large = useLargeText();
 
   return (
     <View>
@@ -59,28 +61,28 @@ export function BalanceSection({ summary, today }: { summary: HomeSummary; today
           <Icon name="CaretRight" size={16} color={colors.inkTertiary} />
         </View>
       </PressableScale>
-      <View style={{ flexDirection: 'row', gap: spacing.md, paddingTop: spacing.smd }}>
+      <View style={{ flexDirection: large ? 'column' : 'row', gap: large ? spacing.sm : spacing.md, paddingTop: spacing.smd }}>
         {income ? (
           <>
-            <Metric label={it.home.metrics.income}>
+            <Metric label={it.home.metrics.income} large={large}>
               <Money minor={income.incomeMinor} currency={currency} sign="income" variant="subheadStrong" wholeUnits />
             </Metric>
-            <Metric label={it.home.metrics.subscriptions}>
+            <Metric label={it.home.metrics.subscriptions} large={large}>
               <Money minor={summary.subscriptionsMonthlyMinor} currency={currency} variant="subheadStrong" wholeUnits />
             </Metric>
-            <Metric label={it.home.metrics.net}>
+            <Metric label={it.home.metrics.net} large={large}>
               <Money minor={income.netMinor} currency={currency} sign={income.netMinor >= 0 ? 'income' : 'none'} variant="subheadStrong" wholeUnits />
             </Metric>
           </>
         ) : (
           <>
-            <Metric label={it.home.metrics.dailyAverage}>
+            <Metric label={it.home.metrics.dailyAverage} large={large}>
               <Money minor={Math.round(summary.spentMinor / day)} currency={currency} variant="subheadStrong" />
             </Metric>
-            <Metric label={it.home.metrics.subscriptions}>
+            <Metric label={it.home.metrics.subscriptions} large={large}>
               <Money minor={summary.subscriptionsMonthlyMinor} currency={currency} variant="subheadStrong" wholeUnits />
             </Metric>
-            <Metric label={it.home.metrics.daysLeft}>
+            <Metric label={it.home.metrics.daysLeft} large={large}>
               <AppText variant="subheadStrong">{String(daysLeft)}</AppText>
             </Metric>
           </>

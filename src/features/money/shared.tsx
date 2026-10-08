@@ -358,7 +358,7 @@ function SettleBody({ data, person }: { data: Snapshot; person: Person }) {
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title={it.shared.settle.title} left={{ label: it.common.cancel, onPress: () => router.back() }} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.lg, gap: spacing.lg }}>
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.lg, gap: spacing.lg }}>
         <View style={{ gap: spacing.xs }}>
           <AppText variant="title2">{sentence}</AppText>
           <AppText variant="subhead" tone="secondary">

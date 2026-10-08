@@ -31,7 +31,7 @@ export function Keypad({ onKey, onClear }: { onKey: (key: KeypadKey) => void; on
               onLongPress={key === 'backspace' ? onClear : undefined}
               style={{
                 flex: 1,
-                height: 52,
+                minHeight: 52,
                 borderRadius: radius.key,
                 borderCurve: 'continuous',
                 backgroundColor: key === 'backspace' || key === ',' ? 'transparent' : colors.surfaceMuted,

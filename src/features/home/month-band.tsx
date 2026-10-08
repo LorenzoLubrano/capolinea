@@ -112,7 +112,7 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
                     }}
                   >
                     {segmentWidth > inset + textWidth + 8 ? (
-                      <AppText variant="caption" numberOfLines={1} style={{ color: line.on }}>
+                      <AppText variant="caption" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ color: line.on }}>
                         {segment.name}
                       </AppText>
                     ) : null}
@@ -181,6 +181,7 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
                 />
                 <AppText
                   variant="caption"
+                  maxFontSizeMultiplier={1.2}
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -197,7 +198,7 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
 
       {budget ? (
         <View style={{ gap: spacing.xs }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', columnGap: spacing.sm, rowGap: spacing.xs }}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
               {budget.remainingMinor < 0 ? <Icon name="Warning" size={14} weight="bold" color={colors.alert} /> : null}
               <AppText variant="subhead" tone={budget.remainingMinor < 0 ? 'alert' : 'secondary'}>

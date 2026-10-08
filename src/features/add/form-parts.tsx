@@ -63,7 +63,7 @@ export function SaveBar({
         accessibilityState={{ disabled: !ready, busy }}
         disabled={!ready}
         onPress={onSave}
-        style={{ height: 56, borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}
+        style={{ minHeight: 56, paddingVertical: spacing.sm, borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}
       >
         <AppText variant="bodyStrong" tone="onInk">
           {label}

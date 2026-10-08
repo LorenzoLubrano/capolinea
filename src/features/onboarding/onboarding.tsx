@@ -73,7 +73,7 @@ function StepFrame({ step, title, body, children, footer, onSkip }: { step: Step
             </PressableScale>
           ) : null}
         </View>
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.sm, paddingBottom: spacing.lg, gap: spacing.lg }} keyboardShouldPersistTaps="handled">
+        <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.sm, paddingBottom: spacing.lg, gap: spacing.lg }} keyboardShouldPersistTaps="handled">
           <StepLine step={step} />
           <View style={{ gap: spacing.sm }}>
             <AppText variant="title1" accessibilityRole="header">
@@ -109,7 +109,10 @@ export function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.md }}>
-      <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center', paddingHorizontal: spacing.gutter, justifyContent: 'space-between' }}>
+      <ScrollView automaticallyAdjustKeyboardInsets
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center', paddingHorizontal: spacing.gutter, justifyContent: 'space-between', gap: spacing.xl }}
+      >
         <View style={{ gap: spacing.xl }}>
           <View style={{ gap: 5 }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
             {WELCOME_LINES.map((key, i) => (
@@ -139,7 +142,7 @@ export function WelcomeScreen() {
           <Button label={it.onboarding.welcome.start} onPress={() => router.push('/onboarding/currency')} />
           <Button label={it.onboarding.welcome.restore} icon="ArrowCounterClockwise" variant="secondary" onPress={() => router.push('/restore')} />
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }

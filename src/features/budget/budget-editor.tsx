@@ -111,7 +111,7 @@ function EditorBody({ data, existing, params }: { data: Snapshot; existing?: Bud
         left={{ label: it.add.cancel, onPress: () => router.back() }}
         right={existing ? { label: it.budget.editor.delete, onPress: onDelete } : undefined}
       />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }}>
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }}>
         {scope === 'category' && existing ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingTop: spacing.sm }}>
             <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? ''} size={28} />

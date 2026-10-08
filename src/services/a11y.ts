@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Platform } from 'react-native';
+import { AccessibilityInfo, Platform, useWindowDimensions } from 'react-native';
 
 /**
  * Speaks a message with VoiceOver. Android needs nothing: TalkBack reads the live regions
@@ -19,6 +19,14 @@ export function useAnnounce(message: string | null | undefined, { skipInitial = 
     }
     if (message) announce(message);
   }, [message]);
+}
+
+/** From this text size, rows of side-by-side figures stack instead of squeezing. */
+const LARGE_TEXT = 1.35;
+
+/** Whether the user reads with large text (Dynamic Type, Android font size): layouts reflow. */
+export function useLargeText(): boolean {
+  return useWindowDimensions().fontScale >= LARGE_TEXT;
 }
 
 /** Whether VoiceOver or TalkBack is on, kept current while the app runs. */

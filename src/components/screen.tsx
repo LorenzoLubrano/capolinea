@@ -33,6 +33,9 @@ export function Screen({
     scrollY.set(event.contentOffset.y);
   });
   const factor = reduced ? 1 : backdropTokens.parallax;
+  const statusBarStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.get(), [0, spacing.md], [0, 1], Extrapolation.CLAMP),
+  }));
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.get(), [0, backdropTokens.fadeOut], [1, 0], Extrapolation.CLAMP),
     transform: [{ translateY: -scrollY.get() * factor }],
@@ -50,8 +53,10 @@ export function Screen({
         </Animated.View>
       ) : null}
       <Animated.ScrollView
+        automaticallyAdjustKeyboardInsets
+        keyboardShouldPersistTaps="handled"
         {...props}
-        onScroll={backdrop ? onScroll : undefined}
+        onScroll={backdrop || variant === 'tab' ? onScroll : undefined}
         scrollEventThrottle={16}
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{
@@ -65,6 +70,12 @@ export function Screen({
       >
         {children}
       </Animated.ScrollView>
+      {variant === 'tab' ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, backgroundColor: colors.background }, statusBarStyle]}
+        />
+      ) : null}
     </View>
   );
 }

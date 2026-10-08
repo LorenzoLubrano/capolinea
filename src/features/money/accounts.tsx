@@ -323,7 +323,7 @@ function AccountFormBody({ data, editing }: { data: Snapshot; editing?: Account 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title={editing ? it.accounts.form.editTitle : it.accounts.form.newTitle} left={{ label: it.common.cancel, onPress: () => router.back() }} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }} keyboardShouldPersistTaps="handled">
         <AmountDisplay input={input} label={name || it.accounts.form.balance} caption={it.accounts.form.balance} />
         <ChoiceRow label={it.accounts.form.balance}>
           {([false, true] as const).map((value) => (

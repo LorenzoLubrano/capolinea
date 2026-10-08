@@ -22,7 +22,7 @@ export function LineBadge({ color, name, size = 26 }: { color: string; name: str
         justifyContent: 'center',
       }}
     >
-      <AppText variant="badge" style={{ color: line.on, fontSize: Math.round(size * 0.5) }}>
+      <AppText variant="badge" maxFontSizeMultiplier={1.2} style={{ color: line.on, fontSize: Math.round(size * 0.5) }}>
         {name.charAt(0).toUpperCase()}
       </AppText>
     </View>

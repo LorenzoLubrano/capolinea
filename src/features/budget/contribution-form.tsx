@@ -69,7 +69,7 @@ export function ContributionForm() {
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title={it.goals.contribution.title} left={{ label: it.add.cancel, onPress: () => router.back() }} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }}>
+      <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }}>
         <View style={{ flexDirection: 'row', justifyContent: 'center', paddingTop: spacing.xs }}>
           <Chip
             label={dayLabel(day, data.today)}
