@@ -23,7 +23,7 @@ import { useAppSwitcherCover } from '@/services/security';
 import { clearExports } from '@/services/share-file';
 import { prototypeFaults } from '@/state/prototype';
 import { useSettings } from '@/state/settings';
-import { fonts, useTheme } from '@/theme';
+import { fonts, radius, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,7 +42,7 @@ function AppStack() {
   const sheet = {
     presentation: 'formSheet',
     sheetGrabberVisible: true,
-    sheetCornerRadius: 28,
+    sheetCornerRadius: radius.sheet,
     contentStyle: { backgroundColor: colors.background },
   } as const;
   // Pushed screens (profile, settings): native header and back gesture, same look on both platforms.

@@ -21,6 +21,9 @@ export function LineBadge({ color, icon, size = 26 }: { color: string; icon?: st
         borderRadius: radius.badge,
         borderCurve: 'continuous',
         backgroundColor: line.fill,
+        // The light yellow would melt into the enamel ground: it keeps its darker rim.
+        borderWidth: line.edge ? 1 : 0,
+        borderColor: line.edge,
         alignItems: 'center',
         justifyContent: 'center',
       }}

@@ -1,0 +1,1000 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T14:06:25+00:00",
+  "title": "Design System: app-spese",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Bianco smalto",
+        "canonical": "#FAFAF8",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#262625",
+          "#454543",
+          "#666664",
+          "#898987",
+          "#aeaeac",
+          "#d1d1cf",
+          "#eeeeec"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Superficie",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#aeaeae",
+          "#d1d1d1",
+          "#eeeeee"
+        ]
+      },
+      "surface-muted": {
+        "role": "neutral",
+        "displayName": "Superficie tenue",
+        "canonical": "#F0EFEB",
+        "tonalRamp": [
+          "#0c0b09",
+          "#272623",
+          "#464542",
+          "#676663",
+          "#8a8985",
+          "#afaeaa",
+          "#d2d1cd",
+          "#efeeea"
+        ]
+      },
+      "selection": {
+        "role": "neutral",
+        "displayName": "Selezione",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#aeaeae",
+          "#d1d1d1",
+          "#eeeeee"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Inchiostro stazione",
+        "canonical": "#111111",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#aeaeae",
+          "#d1d1d1",
+          "#eeeeee"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Inchiostro secondario",
+        "canonical": "#5F5F5B",
+        "tonalRamp": [
+          "#0b0b08",
+          "#272723",
+          "#454541",
+          "#666662",
+          "#898985",
+          "#aeaeaa",
+          "#d1d1cd",
+          "#efefea"
+        ]
+      },
+      "ink-tertiary": {
+        "role": "neutral",
+        "displayName": "Inchiostro terziario",
+        "canonical": "#6B6B66",
+        "tonalRamp": [
+          "#0b0b08",
+          "#272722",
+          "#454541",
+          "#666661",
+          "#898984",
+          "#aeaea9",
+          "#d1d1cc",
+          "#efefe9"
+        ]
+      },
+      "on-ink": {
+        "role": "neutral",
+        "displayName": "Su inchiostro",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#aeaeae",
+          "#d1d1d1",
+          "#eeeeee"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Filetto",
+        "canonical": "rgba(17, 17, 17, 0.10)"
+      },
+      "track": {
+        "role": "neutral",
+        "displayName": "Binario",
+        "canonical": "#E8E7E2",
+        "tonalRamp": [
+          "#0c0b08",
+          "#272623",
+          "#464541",
+          "#676662",
+          "#8a8985",
+          "#afaea9",
+          "#d2d1cc",
+          "#f0eee9"
+        ]
+      },
+      "alert": {
+        "role": "tertiary",
+        "displayName": "Rosso avviso",
+        "canonical": "#C8141B",
+        "tonalRamp": [
+          "#1e0101",
+          "#500003",
+          "#830b0f",
+          "#c10113",
+          "#ec433c",
+          "#f88a7e",
+          "#fdc0b7",
+          "#fee9e6"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Ocra attenzione",
+        "canonical": "#8F5A00",
+        "tonalRamp": [
+          "#130800",
+          "#372104",
+          "#603c05",
+          "#8a5b17",
+          "#b47c34",
+          "#dba15b",
+          "#fbc687",
+          "#feebd6"
+        ]
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Vetro",
+        "canonical": "rgba(250, 250, 248, 0.78)"
+      },
+      "glass-border": {
+        "role": "neutral",
+        "displayName": "Bordo del vetro",
+        "canonical": "rgba(17, 17, 17, 0.08)"
+      },
+      "scrim": {
+        "role": "neutral",
+        "displayName": "Velo",
+        "canonical": "rgba(17, 17, 17, 0.24)"
+      },
+      "background-dark": {
+        "role": "neutral",
+        "displayName": "Nero stazione",
+        "canonical": "#0D0D0E",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#262627",
+          "#454546",
+          "#666667",
+          "#89898a",
+          "#aeaeaf",
+          "#d1d1d2",
+          "#eeeef0"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Superficie (scuro)",
+        "canonical": "#17171A",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#262629",
+          "#454548",
+          "#666669",
+          "#89898d",
+          "#adadb2",
+          "#d0d0d5",
+          "#eeeef2"
+        ]
+      },
+      "surface-muted-dark": {
+        "role": "neutral",
+        "displayName": "Superficie tenue (scuro)",
+        "canonical": "#202024",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#26262a",
+          "#444449",
+          "#65656a",
+          "#88888e",
+          "#adadb3",
+          "#d0d0d6",
+          "#eeeef3"
+        ]
+      },
+      "selection-dark": {
+        "role": "neutral",
+        "displayName": "Selezione (scuro)",
+        "canonical": "#3A3A40",
+        "tonalRamp": [
+          "#0b0b0f",
+          "#26262b",
+          "#44444a",
+          "#65656c",
+          "#88888f",
+          "#adadb4",
+          "#d0d0d8",
+          "#eeeef5"
+        ]
+      },
+      "ink-dark": {
+        "role": "primary",
+        "displayName": "Inchiostro chiaro",
+        "canonical": "#F4F4F1",
+        "tonalRamp": [
+          "#0b0b09",
+          "#272724",
+          "#454543",
+          "#666664",
+          "#898987",
+          "#aeaeab",
+          "#d1d1ce",
+          "#efefec"
+        ]
+      },
+      "ink-secondary-dark": {
+        "role": "neutral",
+        "displayName": "Inchiostro secondario (scuro)",
+        "canonical": "#A3A39E",
+        "tonalRamp": [
+          "#0b0b08",
+          "#272723",
+          "#454541",
+          "#666662",
+          "#898985",
+          "#aeaea9",
+          "#d1d1cc",
+          "#efefe9"
+        ]
+      },
+      "ink-tertiary-dark": {
+        "role": "neutral",
+        "displayName": "Inchiostro terziario (scuro)",
+        "canonical": "#8A8A83",
+        "tonalRamp": [
+          "#0c0b07",
+          "#272721",
+          "#45453f",
+          "#676760",
+          "#8a8a83",
+          "#aeaea7",
+          "#d1d1ca",
+          "#efefe7"
+        ]
+      },
+      "on-ink-dark": {
+        "role": "neutral",
+        "displayName": "Su inchiostro (scuro)",
+        "canonical": "#0D0D0E",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#262627",
+          "#454546",
+          "#666667",
+          "#89898a",
+          "#aeaeaf",
+          "#d1d1d2",
+          "#eeeef0"
+        ]
+      },
+      "hairline-dark": {
+        "role": "neutral",
+        "displayName": "Filetto (scuro)",
+        "canonical": "rgba(255, 255, 255, 0.10)"
+      },
+      "track-dark": {
+        "role": "neutral",
+        "displayName": "Binario (scuro)",
+        "canonical": "#26262A",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#26262a",
+          "#444449",
+          "#65656a",
+          "#88898d",
+          "#adadb2",
+          "#d0d0d6",
+          "#eeeef3"
+        ]
+      },
+      "alert-dark": {
+        "role": "tertiary",
+        "displayName": "Rosso avviso (scuro)",
+        "canonical": "#FF5A52",
+        "tonalRamp": [
+          "#1e0101",
+          "#4f0205",
+          "#821013",
+          "#bf0e1a",
+          "#ea4641",
+          "#fd867b",
+          "#fcc0b9",
+          "#ffe9e6"
+        ]
+      },
+      "warning-dark": {
+        "role": "tertiary",
+        "displayName": "Ocra attenzione (scuro)",
+        "canonical": "#F2B54A",
+        "tonalRamp": [
+          "#120900",
+          "#352302",
+          "#5a3f0c",
+          "#865e0c",
+          "#b27e15",
+          "#dea232",
+          "#fec76b",
+          "#fdecd2"
+        ]
+      },
+      "glass-dark": {
+        "role": "neutral",
+        "displayName": "Vetro (scuro)",
+        "canonical": "rgba(23, 23, 26, 0.72)"
+      },
+      "glass-border-dark": {
+        "role": "neutral",
+        "displayName": "Bordo del vetro (scuro)",
+        "canonical": "rgba(255, 255, 255, 0.10)"
+      },
+      "scrim-dark": {
+        "role": "neutral",
+        "displayName": "Velo (scuro)",
+        "canonical": "rgba(0, 0, 0, 0.50)"
+      },
+      "line-green": {
+        "role": "secondary",
+        "displayName": "Linea verde",
+        "canonical": "#0B9C55",
+        "tonalRamp": [
+          "#001004",
+          "#032f16",
+          "#10522d",
+          "#127a43",
+          "#1ca35b",
+          "#50c97f",
+          "#77eea1",
+          "#cafed8"
+        ]
+      },
+      "line-yellow": {
+        "role": "secondary",
+        "displayName": "Linea gialla",
+        "canonical": "#F2B315",
+        "tonalRamp": [
+          "#110a00",
+          "#332404",
+          "#594005",
+          "#816017",
+          "#ac8122",
+          "#dba423",
+          "#fbc864",
+          "#feeccc"
+        ]
+      },
+      "line-yellow-edge": {
+        "role": "secondary",
+        "displayName": "Linea gialla (bordo)",
+        "canonical": "#B98500",
+        "tonalRamp": [
+          "#120900",
+          "#332303",
+          "#5b4002",
+          "#835f13",
+          "#ae801d",
+          "#d9a439",
+          "#fec761",
+          "#ffeccc"
+        ]
+      },
+      "line-blue": {
+        "role": "secondary",
+        "displayName": "Linea blu",
+        "canonical": "#1C5DAE",
+        "tonalRamp": [
+          "#000a20",
+          "#04254f",
+          "#054388",
+          "#2565b7",
+          "#4a8adf",
+          "#7cb0f7",
+          "#b4d3ff",
+          "#e5effd"
+        ]
+      },
+      "line-lilac": {
+        "role": "secondary",
+        "displayName": "Linea lilla",
+        "canonical": "#8E5BB5",
+        "tonalRamp": [
+          "#140023",
+          "#380654",
+          "#5b277e",
+          "#7e4ba3",
+          "#a26fca",
+          "#c893f2",
+          "#e1c3fc",
+          "#f4eafe"
+        ]
+      },
+      "line-sky": {
+        "role": "secondary",
+        "displayName": "Linea azzurra",
+        "canonical": "#2A93C9",
+        "tonalRamp": [
+          "#000d16",
+          "#002a3f",
+          "#094b6a",
+          "#026e9c",
+          "#2a93c9",
+          "#57b9f1",
+          "#a4d9fb",
+          "#dff2fe"
+        ]
+      },
+      "line-magenta": {
+        "role": "secondary",
+        "displayName": "Linea magenta",
+        "canonical": "#C2337A",
+        "tonalRamp": [
+          "#1c000c",
+          "#480729",
+          "#7d0949",
+          "#b11f6c",
+          "#db4c8f",
+          "#fe7bb4",
+          "#fdbbd4",
+          "#fee8ef"
+        ]
+      },
+      "line-orange": {
+        "role": "secondary",
+        "displayName": "Linea arancione",
+        "canonical": "#E07010",
+        "tonalRamp": [
+          "#170600",
+          "#3e1c03",
+          "#6c3303",
+          "#9b4e14",
+          "#cd6a1e",
+          "#fe8b3a",
+          "#fcc3a1",
+          "#ffeade"
+        ]
+      },
+      "line-teal": {
+        "role": "secondary",
+        "displayName": "Linea verde acqua",
+        "canonical": "#0E8A8A",
+        "tonalRamp": [
+          "#010e0e",
+          "#002d2d",
+          "#0a4f4f",
+          "#047575",
+          "#2d9b9b",
+          "#5ac1c0",
+          "#7fe5e4",
+          "#b7fefd"
+        ]
+      },
+      "line-indigo": {
+        "role": "secondary",
+        "displayName": "Linea indaco",
+        "canonical": "#3F4AB0",
+        "tonalRamp": [
+          "#050032",
+          "#180872",
+          "#2e3499",
+          "#4b59c0",
+          "#6c7ee9",
+          "#96a8f8",
+          "#c3cffb",
+          "#e9eefe"
+        ]
+      },
+      "line-olive": {
+        "role": "secondary",
+        "displayName": "Linea oliva",
+        "canonical": "#6E8B1F",
+        "tonalRamp": [
+          "#080e00",
+          "#202b02",
+          "#3b4c0d",
+          "#58710e",
+          "#78962d",
+          "#9cbc56",
+          "#bfe07a",
+          "#dcfe97"
+        ]
+      },
+      "line-brown": {
+        "role": "secondary",
+        "displayName": "Linea marrone",
+        "canonical": "#8A5A2B",
+        "tonalRamp": [
+          "#150700",
+          "#3a1f03",
+          "#663800",
+          "#8a5a2b",
+          "#af7d4e",
+          "#d6a272",
+          "#fbc594",
+          "#feebda"
+        ]
+      },
+      "line-slate": {
+        "role": "secondary",
+        "displayName": "Linea ardesia",
+        "canonical": "#4A6378",
+        "tonalRamp": [
+          "#000c19",
+          "#11293b",
+          "#30485c",
+          "#50697f",
+          "#728da3",
+          "#96b2c9",
+          "#b9d5ed",
+          "#e2f1fe"
+        ]
+      },
+      "line-pink": {
+        "role": "secondary",
+        "displayName": "Linea rosa",
+        "canonical": "#D9679A",
+        "tonalRamp": [
+          "#1c000d",
+          "#4b002a",
+          "#7d0a4b",
+          "#a4376c",
+          "#cd5c8f",
+          "#f782b5",
+          "#fdbbd5",
+          "#fde8f0"
+        ]
+      },
+      "line-plum": {
+        "role": "secondary",
+        "displayName": "Linea prugna",
+        "canonical": "#7A2E5E",
+        "tonalRamp": [
+          "#1c0011",
+          "#470433",
+          "#6f2354",
+          "#954676",
+          "#bc699a",
+          "#e48ec0",
+          "#fcbadf",
+          "#ffe7f3"
+        ]
+      },
+      "line-grey": {
+        "role": "secondary",
+        "displayName": "Linea grigia",
+        "canonical": "#8C8C88",
+        "tonalRamp": [
+          "#0b0b09",
+          "#272723",
+          "#454542",
+          "#666662",
+          "#898985",
+          "#aeaeaa",
+          "#d1d1cd",
+          "#efefea"
+        ]
+      },
+      "line-blue-dark": {
+        "role": "secondary",
+        "displayName": "Linea blu (scuro)",
+        "canonical": "#4A86DA",
+        "tonalRamp": [
+          "#000a22",
+          "#012453",
+          "#0b4288",
+          "#2965b6",
+          "#4d89de",
+          "#78b0fe",
+          "#b5d3fe",
+          "#e5efff"
+        ]
+      },
+      "line-indigo-dark": {
+        "role": "secondary",
+        "displayName": "Linea indaco (scuro)",
+        "canonical": "#7380DC",
+        "tonalRamp": [
+          "#060130",
+          "#1a1368",
+          "#34388d",
+          "#525bb4",
+          "#7380dc",
+          "#98a7fc",
+          "#c4cefd",
+          "#eaeeff"
+        ]
+      },
+      "line-magenta-dark": {
+        "role": "secondary",
+        "displayName": "Linea magenta (scuro)",
+        "canonical": "#D9508F",
+        "tonalRamp": [
+          "#1c010c",
+          "#4a0229",
+          "#7b1049",
+          "#af266b",
+          "#d84f8e",
+          "#fc7eb3",
+          "#fbbcd3",
+          "#ffe7ef"
+        ]
+      },
+      "line-brown-dark": {
+        "role": "secondary",
+        "displayName": "Linea marrone (scuro)",
+        "canonical": "#B07A45",
+        "tonalRamp": [
+          "#150800",
+          "#391f03",
+          "#653902",
+          "#8c5922",
+          "#b27c47",
+          "#d9a16b",
+          "#fec48d",
+          "#feebda"
+        ]
+      },
+      "line-slate-dark": {
+        "role": "secondary",
+        "displayName": "Linea ardesia (scuro)",
+        "canonical": "#6E8AA2",
+        "tonalRamp": [
+          "#010c19",
+          "#0f293c",
+          "#2e485d",
+          "#4e6980",
+          "#718da5",
+          "#95b2cb",
+          "#b7d5ef",
+          "#e2f1fd"
+        ]
+      },
+      "line-plum-dark": {
+        "role": "secondary",
+        "displayName": "Linea prugna (scuro)",
+        "canonical": "#C0609A",
+        "tonalRamp": [
+          "#1b0111",
+          "#490133",
+          "#751956",
+          "#9b3f79",
+          "#c3639d",
+          "#ec88c3",
+          "#feb9df",
+          "#fee7f3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Il totale «Speso a ottobre» in Home; centesimi in display-cents."
+      },
+      "display-cents": {
+        "displayName": "Centesimi del display",
+        "purpose": "Centesimi e valuta accanto al totale grande."
+      },
+      "amount-input": {
+        "displayName": "Importo in inserimento",
+        "purpose": "L'importo mentre lo si scrive."
+      },
+      "figure": {
+        "displayName": "Cifra",
+        "purpose": "Importi in evidenza nelle sezioni, come il saldo totale."
+      },
+      "title1": {
+        "displayName": "Titolo 1",
+        "purpose": "Titoli di schermata."
+      },
+      "title2": {
+        "displayName": "Titolo 2",
+        "purpose": "Titoli di foglio e di blocco."
+      },
+      "title3": {
+        "displayName": "Titolo 3",
+        "purpose": "Titoli di sezione e dei fogli."
+      },
+      "body": {
+        "displayName": "Testo",
+        "purpose": "Righe e testo corrente."
+      },
+      "body-strong": {
+        "displayName": "Testo forte",
+        "purpose": "Titoli di riga e importi di riga, cifre tabellari."
+      },
+      "callout": {
+        "displayName": "Richiamo",
+        "purpose": "Azioni testuali dei fogli, testo del toast."
+      },
+      "subhead": {
+        "displayName": "Sottotitolo",
+        "purpose": "Righe secondarie."
+      },
+      "subhead-strong": {
+        "displayName": "Sottotitolo forte",
+        "purpose": "Chip, segmenti, importi piccoli."
+      },
+      "footnote": {
+        "displayName": "Nota",
+        "purpose": "Stato, sottotitoli di riga, note."
+      },
+      "caption": {
+        "displayName": "Didascalia",
+        "purpose": "Nomi nella fascia, «oggi», assi."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Testo dentro i cartelli."
+      },
+      "tab": {
+        "displayName": "Scheda",
+        "purpose": "Etichette della barra delle schede."
+      },
+      "key": {
+        "displayName": "Tasto",
+        "purpose": "Tasti del PIN e del tastierino."
+      }
+    },
+    "shadows": [
+      {
+        "name": "floating",
+        "value": "0 8px 24px rgba(0, 0, 0, 0.10)",
+        "purpose": "Toast, segmento selezionato, anteprima della notifica: solo ciò che galleggia."
+      }
+    ],
+    "motion": [
+      {
+        "name": "press",
+        "value": "120ms",
+        "purpose": "Riscontro alla pressione (scala 0,97 o opacità 0,6)."
+      },
+      {
+        "name": "fast",
+        "value": "150ms",
+        "purpose": "Dissolvenze in entrata, anche con Riduci animazioni."
+      },
+      {
+        "name": "base",
+        "value": "250ms",
+        "purpose": "Toast che sale, totale che entra dopo un salvataggio."
+      },
+      {
+        "name": "slow",
+        "value": "400ms",
+        "purpose": "Segmenti della fascia del mese che si spostano."
+      },
+      {
+        "name": "afterSheet",
+        "value": "300ms",
+        "purpose": "Attesa dello schermo sotto un foglio prima di muoversi; ritardo dell'accensione della linea."
+      },
+      {
+        "name": "easeOut",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Curva predefinita di ogni transizione."
+      },
+      {
+        "name": "easeInOut",
+        "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "purpose": "Disponibile; non usata nel prototipo."
+      },
+      {
+        "name": "backdrop.draw",
+        "value": "900ms, stagger 90ms",
+        "purpose": "Disegno della mappa di sfondo, una volta per avvio."
+      },
+      {
+        "name": "backdrop.interchange",
+        "value": "delay 650ms, fade 300ms",
+        "purpose": "Comparsa della stazione di interscambio."
+      },
+      {
+        "name": "backdrop.pulse",
+        "value": "in 225ms, out 675ms, strength 0.7, delay 300ms",
+        "purpose": "La linea della categoria salvata si accende."
+      },
+      {
+        "name": "backdrop.drift",
+        "value": "19000ms, 23000ms, 27000ms",
+        "purpose": "Deriva degli aloni di Luce, fuori fase."
+      },
+      {
+        "name": "backdrop.parallax",
+        "value": "0.4, fadeOut 240",
+        "purpose": "Lo sfondo scorre al 40% e svanisce nei primi 240 punti."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "maxContentWidth",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Pulsante principale",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Inchiostro pieno: l'unica azione principale della schermata.",
+      "html": "<button class=\"ds-btn-primary\">Salva</button>",
+      "css": ".ds-btn-primary { font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 16px; line-height: 22px; font-variant-numeric: tabular-nums; min-height: 56px; padding: 0 16px; border: none; border-radius: 14px; background: #111111; color: #FFFFFF; transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), opacity 120ms cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; }"
+    },
+    {
+      "name": "Pulsante secondario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Azione quieta accanto ad altre.",
+      "html": "<button class=\"ds-btn-secondary\">Duplica</button>",
+      "css": ".ds-btn-secondary { font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 16px; line-height: 22px; min-height: 52px; padding: 0 16px; border: none; border-radius: 14px; background: #F0EFEB; color: #111111; transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: 2px solid #111111; outline-offset: 2px; }"
+    },
+    {
+      "name": "Pulsante distruttivo",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Elimina; il toast con Annulla sostituisce la conferma.",
+      "html": "<button class=\"ds-btn-destructive\">Elimina</button>",
+      "css": ".ds-btn-destructive { font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 16px; line-height: 22px; min-height: 52px; padding: 0 16px; border: none; border-radius: 14px; background: #F0EFEB; color: #C8141B; transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; } .ds-btn-destructive:active { transform: scale(0.97); } .ds-btn-destructive:focus-visible { outline: 2px solid #111111; outline-offset: 2px; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Scelta a pillola: filtri, categorie, conti. Selezionata diventa inchiostro.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">Tutti</button><button class=\"ds-chip\">Spese</button><button class=\"ds-chip\">Entrate</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; } .ds-chip { font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 14px; line-height: 19px; min-height: 44px; min-width: 56px; padding: 0 12px; border-radius: 9999px; border: 1px solid rgba(17, 17, 17, 0.10); background: #FFFFFF; color: #111111; transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; } .ds-chip:active { transform: scale(0.97); } .ds-chip:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-chip-on { background: #111111; border-color: #111111; color: #FFFFFF; }"
+    },
+    {
+      "name": "Controllo segmentato",
+      "kind": "nav",
+      "refersTo": "segmented",
+      "description": "Viste alla pari della stessa schermata; il contenuto cambia sul posto.",
+      "html": "<div class=\"ds-seg\" role=\"tablist\"><button class=\"ds-seg-item ds-seg-on\" role=\"tab\">Mese</button><button class=\"ds-seg-item\" role=\"tab\">Abbonamenti</button><button class=\"ds-seg-item\" role=\"tab\">Obiettivi</button></div>",
+      "css": ".ds-seg { display: flex; padding: 3px; border-radius: 14px; background: #F0EFEB; } .ds-seg-item { flex: 1; font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 14px; min-height: 44px; padding: 0 8px; border-radius: 11px; border: 1px solid transparent; background: transparent; color: #5F5F5B; cursor: pointer; transition: opacity 120ms; } .ds-seg-item:active { opacity: 0.6; } .ds-seg-item:focus-visible { outline: 2px solid #111111; outline-offset: 1px; } .ds-seg-on { background: #FFFFFF; border-color: rgba(17, 17, 17, 0.08); color: #111111; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10); }"
+    },
+    {
+      "name": "Barra delle schede",
+      "kind": "nav",
+      "refersTo": "tab-bar-add",
+      "description": "Vetro agganciato in basso: quattro schede e il + in inchiostro al centro.",
+      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tab ds-tab-on\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M3 11 12 4l9 7v9h-6v-6H9v6H3z\" fill=\"currentColor\"/></svg><span>Home</span></a><a class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M8 6h12M8 12h12M8 18h12\"/><circle cx=\"4\" cy=\"6\" r=\"1\"/><circle cx=\"4\" cy=\"12\" r=\"1\"/><circle cx=\"4\" cy=\"18\" r=\"1\"/></svg><span>Movimenti</span></a><button class=\"ds-tab-add\" aria-label=\"Aggiungi\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg></button><a class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"12\" r=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"1\"/></svg><span>Budget</span></a><a class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M4 20V10M10 20V4M16 20v-7M21 20H3\"/></svg><span>Analisi</span></a></nav>",
+      "css": ".ds-tabbar { display: flex; align-items: center; height: 64px; padding: 0 8px; background: rgba(250, 250, 248, 0.78); backdrop-filter: blur(20px); border-top: 1px solid rgba(17, 17, 17, 0.08); } .ds-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 48px; justify-content: center; color: #5F5F5B; font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 11px; line-height: 13px; text-decoration: none; cursor: pointer; } .ds-tab:hover { opacity: 0.8; } .ds-tab:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-tab-on { color: #111111; } .ds-tab-add { flex: none; margin: 0 auto; width: 56px; height: 48px; border: none; border-radius: 14px; background: #111111; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1); } .ds-tab-add:active { transform: scale(0.97); } .ds-tab-add:focus-visible { outline: 2px solid #111111; outline-offset: 2px; }"
+    },
+    {
+      "name": "Fascia del mese",
+      "kind": "custom",
+      "refersTo": "month-band",
+      "description": "La firma: segmenti di categoria, tratteggio di previsione, anello «oggi», barra di capolinea.",
+      "html": "<div class=\"ds-band\"><span class=\"ds-band-today\">oggi</span><div class=\"ds-band-track\"><div class=\"ds-band-seg\" style=\"width:30%;background:#1C5DAE;color:#FFFFFF\">Casa</div><div class=\"ds-band-seg\" style=\"width:18%;background:#0B9C55;color:#111111\">Spesa</div><div class=\"ds-band-seg\" style=\"width:12%;background:#E07010;color:#111111\">Bar</div></div><div class=\"ds-band-forecast\"></div><div class=\"ds-band-stem\"></div><div class=\"ds-band-ring\"></div></div>",
+      "css": ".ds-band { position: relative; height: 52px; font-family: Archivo, system-ui, sans-serif; } .ds-band-today { position: absolute; top: 0; left: calc(65% + 12px); font-weight: 600; font-size: 12px; line-height: 16px; color: #111111; } .ds-band-track { position: absolute; top: 20px; left: 0; right: 0; height: 32px; display: flex; border-radius: 7px; background: #E8E7E2; overflow: hidden; } .ds-band-seg { display: flex; align-items: center; padding-left: 6px; font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; transition: width 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms; } .ds-band-forecast { position: absolute; top: 20px; left: 60%; width: 24%; height: 32px; box-sizing: border-box; border: 2px dashed #5F5F5B; border-left: 0; border-radius: 0 7px 7px 0; } .ds-band-stem { position: absolute; top: 12px; left: calc(65% - 1px); width: 2px; height: 40px; background: #111111; } .ds-band-ring { position: absolute; top: 4px; left: calc(65% - 8px); width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%; border: 3px solid #111111; background: #FAFAF8; }"
+    },
+    {
+      "name": "Linea di budget",
+      "kind": "custom",
+      "refersTo": "progress-line",
+      "description": "Budget come linea verso il capolinea: colore della categoria fino al capolinea, solo l'eccesso rosso.",
+      "html": "<div class=\"ds-pl\"><div class=\"ds-pl-track\"><div class=\"ds-pl-fill\" style=\"width:80%\"></div><div class=\"ds-pl-over\" style=\"width:20%\"></div></div><div class=\"ds-pl-terminus\" style=\"left:80%\"></div></div>",
+      "css": ".ds-pl { position: relative; height: 14px; display: flex; align-items: center; } .ds-pl-track { width: 100%; height: 6px; display: flex; border-radius: 9999px; background: #E8E7E2; overflow: hidden; } .ds-pl-fill { background: #8E5BB5; border-radius: 9999px 0 0 9999px; } .ds-pl-over { background: #C8141B; } .ds-pl-terminus { position: absolute; top: 0; width: 3px; height: 14px; margin-left: -1.5px; border-radius: 2px; background: #111111; }"
+    },
+    {
+      "name": "Badge di linea e gettone del conto",
+      "kind": "custom",
+      "refersTo": "line-badge",
+      "description": "Quadrato smaltato solo per le categorie; il conto è un gettone neutro con l'anello.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-line-badge\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#111111\" stroke-width=\"2.5\" stroke-linecap=\"round\"><path d=\"M4 7h16l-2 12H6z\"/><path d=\"M9 7a3 3 0 0 1 6 0\"/></svg></span><span class=\"ds-account\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#111111\" stroke-width=\"2.5\"><rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M3 10h18\"/></svg></span></div>",
+      "css": ".ds-badges { display: flex; gap: 12px; align-items: center; } .ds-line-badge { width: 26px; height: 26px; border-radius: 6px; background: #0B9C55; display: inline-flex; align-items: center; justify-content: center; } .ds-account { width: 32px; height: 32px; box-sizing: border-box; border-radius: 50%; border: 2.5px solid #1C5DAE; background: #F0EFEB; display: inline-flex; align-items: center; justify-content: center; }"
+    },
+    {
+      "name": "Toast",
+      "kind": "card",
+      "refersTo": "toast",
+      "description": "Vetro galleggiante con l'azione Annulla, sopra la barra.",
+      "html": "<div class=\"ds-toast\"><span>Spesa eliminata</span><button class=\"ds-toast-action\">Annulla</button></div>",
+      "css": ".ds-toast { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 4px 0 16px; border-radius: 14px; border: 1px solid rgba(17, 17, 17, 0.08); background: rgba(250, 250, 248, 0.78); backdrop-filter: blur(20px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10); font-family: Archivo, system-ui, sans-serif; font-weight: 500; font-size: 15px; line-height: 20px; color: #111111; } .ds-toast-action { min-height: 44px; padding: 0 16px; border: none; background: transparent; font-family: Archivo, system-ui, sans-serif; font-weight: 600; font-size: 14px; color: #111111; cursor: pointer; } .ds-toast-action:active { transform: scale(0.97); } .ds-toast-action:focus-visible { outline: 2px solid #111111; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La linea che percorri",
+    "overview": "Il mese è una linea della metropolitana. Il mondo è la segnaletica di Bob Noorda per la Metropolitana di Milano (1964): bianco smalto e nero stazione, un solo grottesco, le categorie come linee di colore saturo, il budget come capolinea. Una fascia continua divisa per categoria dice quanta strada ha fatto la spesa, dove dovrebbe essere oggi (l'anello) e dove arriverà a fine mese (il tratteggio). Il resto dell'app ripete gli stessi segni: barre di budget come linee verso il capolinea, obiettivi come linee con le fermate, movimenti come fermate lungo una linea.\n\nLa densità è quella di un'app iOS moderna: una colonna larga come un telefono (al massimo 480), righe separate da filetti, pochi blocchi pieni. Il colore saturo appartiene solo alle categorie; tutto il resto è inchiostro su smalto, così una categoria si impara una volta e si riconosce ovunque. Il vetro sta solo dove le cose galleggiano (barra delle schede, toast); i contenuti stanno su superfici piene. Il movimento è breve, in uscita morbida, e si ferma: niente animazioni in ciclo sui contenuti.\n\nRifiuti confermati dal proprietario (PRODUCT.md): estetica cyberpunk e neon, gradienti eccessivi, superfici di testo troppo trasparenti, cruscotti stile crypto, card generiche stile Bootstrap, aspetto da pannello di amministrazione. Il tema scuro è curato a parte, non è un'inversione del chiaro.",
+    "keyCharacteristics": [
+      "Fascia del mese a segmenti di categoria, tratteggio di previsione, anello «oggi», barra di capolinea in inchiostro.",
+      "Un solo inchiostro (`ink`) per azioni, selezioni e segni di riferimento; colori saturi solo per le categorie.",
+      "Rosso (`alert`) solo oltre il capolinea e per le azioni distruttive.",
+      "Archivo per il testo, Archivo Narrow con cifre tabellari per gli importi.",
+      "Lo stato si legge sempre da forma e parole, oltre che dal colore."
+    ],
+    "rules": [
+      {
+        "name": "The Red Terminus Rule",
+        "body": "Il rosso compare solo oltre il capolinea e nelle azioni distruttive. Nessuna categoria usa il rosso; spendere più del solito non è un errore e non diventa rosso; una barra resta nel colore della sua linea fino al capolinea e solo l'eccesso è rosso.",
+        "section": "colors"
+      },
+      {
+        "name": "The Enamel Square Rule",
+        "body": "Il quadrato smaltato pieno appartiene solo alle categorie. I conti sono gettoni rotondi neutri (`surface-muted`) con l'anello del loro colore; gli obiettivi sono un'icona su fondo rotondo neutro. Un conto non deve mai sembrare una linea.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ink Rule",
+        "body": "Selezione e azione principale sono sempre inchiostro pieno con testo `on-ink`, mai un colore di linea.",
+        "section": "colors"
+      },
+      {
+        "name": "The Opaque Mix Rule",
+        "body": "I disegni tenui (la mappa di sfondo) usano `mix()` di `colors.ts`, un colore opaco precalcolato, invece della trasparenza, così le forme che si toccano non si scuriscono a vicenda.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Money Rule",
+        "body": "Ogni importo esce da `Money`, in una variante tabellare. Nessun importo si scrive a mano in un testo: è `Money` che applica la privacy e legge l'importo per esteso ai lettori di schermo.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two Faces Rule",
+        "body": "Archivo Narrow solo per le cifre; le parole sono sempre Archivo. Gerarchia per corpo e peso, non per famiglie diverse.",
+        "section": "typography"
+      },
+      {
+        "name": "The Float-Only Glass Rule",
+        "body": "Vetro e ombra solo per ciò che galleggia (barra, toast, segmento scelto). Righe, importi e grafici stanno sempre su superfici piene; sul vetro vanno solo etichette brevi come quelle delle schede e del toast.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** passare ogni colore da `useTheme()` e ogni categoria da `lineColor(key)`, così la versione scura delle linee arriva da sola.",
+      "**Do** disegnare ogni stato con forma e parole oltre al colore: pieno per lo speso, tratteggio per la previsione, anello per oggi, barra inchiostro per il capolinea, `StatusLine` per le parole.",
+      "**Do** usare il tratteggio in `ink-secondary` per ogni previsione, nella fascia, nelle barre e nei grafici.",
+      "**Do** far passare ogni importo da `Money` e ogni testo da `AppText` con una variante di `type`.",
+      "**Do** tenere i bersagli ad almeno 44 pt (48 dp su Android) e il contrasto a 4,5:1 per il testo e 3:1 per i segni.",
+      "**Do** far aspettare `motion.afterSheet` (300) a ciò che cambia sotto un foglio, così il movimento si vede a foglio chiuso."
+    ],
+    "donts": [
+      "**Don't** usare il rosso per una categoria, per «più del solito» o per la parte di una barra che sta prima del capolinea.",
+      "**Don't** dare il quadrato smaltato a conti o obiettivi: i conti sono gettoni neutri con l'anello, gli obiettivi icone su fondo neutro.",
+      "**Don't** mettere vetro o trasparenza sotto righe, importi e grafici; il vetro è solo per barra, toast e ciò che galleggia.",
+      "**Don't** usare gradienti su superfici, pulsanti o card (l'unico gradiente è l'alone tenue dello sfondo Luce), né neon, estetica cyberpunk o da cruscotto crypto, card generiche stile Bootstrap o un aspetto da pannello di amministrazione.",
+      "**Don't** mostrare importi nella decorazione di sfondo o sulla schermata di blocco.",
+      "**Don't** far partire più di una vibrazione per azione, né animazioni in ciclo sui contenuti (la sola deriva continua è quella degli aloni di Luce, ferma fuori dalla Home e con «Riduci animazioni»)."
+    ]
+  }
+}

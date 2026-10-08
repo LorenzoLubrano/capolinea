@@ -28,7 +28,7 @@ const TABS: Record<string, { label: string; icon: IconName }> = {
 
 /**
  * A docked glass tab bar, the same on iOS and Android (documented platform-neutral treatment):
- * four sections and the + in the middle, the only action. Long-press + opens a new expense directly.
+ * four sections and the + in the middle, the only action: it opens a new expense.
  */
 export function LineTabBar({ state, navigation }: TabBarProps) {
   const { colors } = useTheme();
