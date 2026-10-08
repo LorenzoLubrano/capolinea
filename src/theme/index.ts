@@ -2,7 +2,7 @@ import { useColorScheme } from 'react-native';
 
 import { useSettings } from '@/state/settings';
 
-import { lineColor, lines, palettes, type ColorScheme, type Palette } from './colors';
+import { lineColor, lines, palettes, type ColorScheme, type LineColor, type Palette } from './colors';
 
 export * from './colors';
 export * from './tokens';
@@ -11,7 +11,8 @@ export interface Theme {
   scheme: ColorScheme;
   colors: Palette;
   lines: typeof lines;
-  lineColor: typeof lineColor;
+  /** A category line in the current theme. */
+  lineColor: (key: string) => LineColor;
 }
 
 /** The single entry point for colours: system appearance unless the user picked one in Aspetto. */
@@ -19,5 +20,5 @@ export function useTheme(): Theme {
   const system = useColorScheme();
   const mode = useSettings((state) => state.themeMode);
   const scheme: ColorScheme = mode === 'system' ? (system === 'dark' ? 'dark' : 'light') : mode;
-  return { scheme, colors: palettes[scheme], lines, lineColor };
+  return { scheme, colors: palettes[scheme], lines, lineColor: (key: string) => lineColor(key, scheme) };
 }

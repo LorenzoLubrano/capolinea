@@ -21,7 +21,7 @@ import { formatMoney } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
 
-function SubscriptionRow({ subscription, color, currency, today }: { subscription: Subscription; color: string; currency: string; today: LocalDate }) {
+function SubscriptionRow({ subscription, color, icon, currency, today }: { subscription: Subscription; color: string; icon?: string; currency: string; today: LocalDate }) {
   const { colors } = useTheme();
   const masked = useSettings((s) => s.privacy);
   const when = subscription.active
@@ -36,7 +36,7 @@ function SubscriptionRow({ subscription, color, currency, today }: { subscriptio
       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, paddingVertical: spacing.smd, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
     >
       <View style={{ opacity: subscription.active ? 1 : 0.45 }}>
-        <LineBadge color={color} name={subscription.name} size={32} />
+        <LineBadge color={color} icon={icon} size={32} />
       </View>
       <View style={{ flex: 1, gap: spacing.xxs }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
         <AppText variant="bodyStrong" numberOfLines={1}>
@@ -147,7 +147,7 @@ export function SubscriptionsSection({ data }: { data: Snapshot }) {
           </PressableScale>
         </View>
         {ordered.map((s) => (
-          <SubscriptionRow key={s.id} subscription={s} color={colorOf(s)} currency={data.currency} today={data.today} />
+          <SubscriptionRow key={s.id} subscription={s} color={colorOf(s)} icon={categories.get(s.categoryId)?.icon} currency={data.currency} today={data.today} />
         ))}
       </View>
     </View>

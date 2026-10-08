@@ -21,6 +21,7 @@ export interface CategoryBudgetRow {
   budgetId: Id;
   name: string;
   color: string;
+  icon: string;
   budgetMinor: number;
   /** Never below zero: a month that gave back more than it took has spent nothing. */
   spentMinor: number;
@@ -46,7 +47,7 @@ export interface BudgetOverview {
   /** Average of the last three full months: the proposal for a missing global budget. */
   proposalMinor: number;
   categories: CategoryBudgetRow[];
-  withoutBudget: { categoryId: Id; name: string; color: string; spentMinor: number }[];
+  withoutBudget: { categoryId: Id; name: string; color: string; icon?: string; spentMinor: number }[];
 }
 
 const SUGGESTIONS = 4;
@@ -102,6 +103,7 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
       budgetId: budget.id,
       name: category.name,
       color: category.color,
+      icon: category.icon,
       budgetMinor: budget.amountMinor,
       spentMinor: spent,
       refundedMinor: Math.max(-net, 0),
@@ -117,7 +119,7 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
     .slice(0, SUGGESTIONS)
     .map(({ categoryId, amountMinor }) => {
       const category = categoryById.get(categoryId!);
-      return { categoryId: categoryId!, name: category?.name ?? '', color: category?.color ?? 'grey', spentMinor: amountMinor };
+      return { categoryId: categoryId!, name: category?.name ?? '', color: category?.color ?? 'grey', icon: category?.icon, spentMinor: amountMinor };
     });
 
   return {

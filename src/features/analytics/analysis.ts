@@ -54,6 +54,7 @@ export interface CategoryShare {
   categoryId: Id | null;
   name: string;
   color: string;
+  icon?: string;
   spentMinor: number;
   share: number;
 }
@@ -188,6 +189,7 @@ export function buildAnalysis(snapshot: Snapshot, unit: PeriodUnit, offset: numb
         categoryId,
         name: category?.name ?? it.analytics.uncategorized,
         color: category?.color ?? 'grey',
+        icon: category?.icon,
         spentMinor: amountMinor,
         share: totalMinor > 0 ? amountMinor / totalMinor : 0,
       };

@@ -114,7 +114,7 @@ function EditorBody({ data, existing, params }: { data: Snapshot; existing?: Bud
       <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, gap: spacing.md, paddingBottom: spacing.md }}>
         {scope === 'category' && existing ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingTop: spacing.sm }}>
-            <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? ''} size={28} />
+            <LineBadge color={category?.color ?? 'grey'} icon={category?.icon} size={28} />
             <AppText variant="bodyStrong">{category?.name}</AppText>
           </View>
         ) : null}
@@ -150,7 +150,7 @@ function EditorBody({ data, existing, params }: { data: Snapshot; existing?: Bud
                   haptics.selection();
                   setCategoryId(c.id);
                 }}
-                leading={<LineBadge color={c.color} name={c.name} size={28} />}
+                leading={<LineBadge color={c.color} icon={c.icon} size={28} />}
               />
             ))}
           </ChoiceRow>

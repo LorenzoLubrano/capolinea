@@ -41,7 +41,7 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
               borderBottomColor: colors.hairline,
             }}
           >
-            <LineBadge color={line.color} name={line.name} />
+            <LineBadge color={line.color} icon={line.icon} />
             <View style={{ flex: 1, gap: spacing.xs }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
                 <AppText variant="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }}>

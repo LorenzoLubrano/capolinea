@@ -44,7 +44,7 @@ function CategoryListRow({ row }: { row: CategoryRow }) {
       onPress={() => router.push({ pathname: '/category-edit', params: { id: category.id } })}
       style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, minHeight: 56, paddingHorizontal: spacing.md, paddingVertical: spacing.sm }}
     >
-      <LineBadge color={category.color} name={category.name} />
+      <LineBadge color={category.color} icon={category.icon} />
       <View style={{ flex: 1, gap: spacing.xxs }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
         <AppText variant="body" numberOfLines={1}>
           {category.name}
@@ -182,7 +182,7 @@ function CategoryFormBody({ data, editing, kind }: { data: Snapshot; editing?: C
       />
       <ScrollView automaticallyAdjustKeyboardInsets style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.lg }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd }} accessibilityLabel={it.categoryList.form.preview}>
-          <LineBadge color={color} name={name || '?'} size={40} />
+          <LineBadge color={color} icon={icon} size={40} />
           <AppText variant="title2" numberOfLines={1} style={{ flexShrink: 1 }}>
             {name || it.categoryList.form.namePlaceholder}
           </AppText>

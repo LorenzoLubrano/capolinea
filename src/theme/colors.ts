@@ -48,20 +48,21 @@ export type ColorScheme = keyof typeof palettes;
 export type Palette = { [K in keyof (typeof palettes)['light']]: string };
 
 /**
- * Category line colours, identical in both themes like enamel signs.
- * `on` is the text colour for initials on the badge (contrast checked against `fill`).
+ * Category line colours, like enamel signs. `on` draws icons and names on the fill: at least 4.5:1,
+ * so the names on the month band read as text. `edge` outlines a fill that would melt into the
+ * light track (yellow).
  */
 export const lines = {
-  green: { fill: '#0B9C55', on: '#FFFFFF' },
-  yellow: { fill: '#F2B315', on: '#111111' },
+  green: { fill: '#0B9C55', on: '#111111' },
+  yellow: { fill: '#F2B315', on: '#111111', edge: '#B98500' },
   blue: { fill: '#1C5DAE', on: '#FFFFFF' },
   lilac: { fill: '#8E5BB5', on: '#FFFFFF' },
   sky: { fill: '#2A93C9', on: '#111111' },
   magenta: { fill: '#C2337A', on: '#FFFFFF' },
   orange: { fill: '#E07010', on: '#111111' },
-  teal: { fill: '#0E8A8A', on: '#FFFFFF' },
+  teal: { fill: '#0E8A8A', on: '#111111' },
   indigo: { fill: '#3F4AB0', on: '#FFFFFF' },
-  olive: { fill: '#6E8B1F', on: '#FFFFFF' },
+  olive: { fill: '#6E8B1F', on: '#111111' },
   brown: { fill: '#8A5A2B', on: '#FFFFFF' },
   slate: { fill: '#4A6378', on: '#FFFFFF' },
   pink: { fill: '#D9679A', on: '#111111' },
@@ -70,9 +71,28 @@ export const lines = {
 } as const;
 
 export type LineKey = keyof typeof lines;
+export type LineColor = { fill: string; on: string; edge?: string };
 
-export function lineColor(key: string): { fill: string; on: string } {
-  return key in lines ? lines[key as LineKey] : lines.grey;
+/**
+ * The dark lines sink into the station black: in the dark theme they are lifted until they reach
+ * 3:1 on the background and on the track, and carry dark icons and names.
+ */
+const darkLines: Partial<Record<LineKey, LineColor>> = {
+  blue: { fill: '#4A86DA', on: '#111111' },
+  indigo: { fill: '#7380DC', on: '#111111' },
+  magenta: { fill: '#D9508F', on: '#111111' },
+  brown: { fill: '#B07A45', on: '#111111' },
+  slate: { fill: '#6E8AA2', on: '#111111' },
+  plum: { fill: '#C0609A', on: '#111111' },
+};
+
+export function lineColor(key: string, scheme: ColorScheme = 'light'): LineColor {
+  const line = key in lines ? (key as LineKey) : 'grey';
+  if (scheme === 'dark') {
+    const { edge: _edge, ...base } = lines[line] as LineColor;
+    return darkLines[line] ?? base;
+  }
+  return lines[line];
 }
 
 /**

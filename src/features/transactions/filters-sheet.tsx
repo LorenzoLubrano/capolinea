@@ -72,7 +72,7 @@ export function FiltersSheet() {
               label={c.name}
               selected={filters.categoryIds.includes(c.id)}
               onPress={pick(() => toggleCategory(c.id))}
-              leading={<LineBadge color={c.color} name={c.name} size={28} />}
+              leading={<LineBadge color={c.color} icon={c.icon} size={28} />}
             />
           ))}
         </Group>

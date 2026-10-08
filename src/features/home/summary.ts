@@ -45,7 +45,7 @@ export interface HomeSummary {
   income: { incomeMinor: number; netMinor: number } | null;
   subscriptionsMonthlyMinor: number;
   /** Status only for lines with a budget, from the line's own forecast. */
-  lines: { categoryId: Id; name: string; color: string; spentMinor: number; budgetMinor?: number; status?: BudgetStatus }[];
+  lines: { categoryId: Id; name: string; color: string; icon?: string; spentMinor: number; budgetMinor?: number; status?: BudgetStatus }[];
   latest: Transaction[];
 }
 
@@ -109,6 +109,7 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
       categoryId: categoryId!,
       name: category?.name ?? strings.categories.uncategorized,
       color: category?.color ?? 'grey',
+      icon: category?.icon,
       spentMinor: amountMinor,
       ...(categoryBudget
         ? {

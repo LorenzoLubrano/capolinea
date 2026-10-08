@@ -363,7 +363,7 @@ function MovementFormBody({
                   key={t.merchant}
                   label={`${t.merchant} · ${money(t.amountMinor)}`}
                   accessibilityLabel={it.add.repeat(t.merchant, money(t.amountMinor))}
-                  leading={category ? <LineBadge color={category.color} name={category.name} size={28} /> : undefined}
+                  leading={category ? <LineBadge color={category.color} icon={category.icon} size={28} /> : undefined}
                   onPress={() => {
                     haptics.selection();
                     setInput(minorToInput(t.amountMinor));
@@ -417,7 +417,7 @@ function MovementFormBody({
                   }}
                   leading={
                     kind === 'expense' ? (
-                      <LineBadge color={c.color} name={c.name} size={28} />
+                      <LineBadge color={c.color} icon={c.icon} size={28} />
                     ) : (
                       <Icon name={c.icon} size={18} color={c.id === categoryId ? colors.onInk : colors.ink} />
                     )

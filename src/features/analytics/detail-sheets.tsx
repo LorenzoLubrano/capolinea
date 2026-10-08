@@ -98,7 +98,7 @@ export function CategoryAnalysisSheet() {
     >
       <View style={{ gap: spacing.sm }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-          <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? ''} size={28} />
+          <LineBadge color={category?.color ?? 'grey'} icon={category?.icon} size={28} />
           <AppText variant="callout" tone="secondary">
             {periodLabel(analysis.period)}
           </AppText>

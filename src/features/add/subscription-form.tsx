@@ -97,7 +97,7 @@ function TemplatePicker({ data, onPick }: { data: Snapshot; onPick: (t: Subscrip
                 }}
                 style={{ ...tile, flexBasis: '47%', flexGrow: 1, gap: spacing.sm, padding: spacing.smd }}
               >
-                <LineBadge color={category?.color ?? 'grey'} name={t.name} size={32} />
+                <LineBadge color={category?.color ?? 'grey'} icon={category?.icon} size={32} />
                 <View style={{ gap: spacing.xxs }}>
                   <AppText variant="bodyStrong" numberOfLines={1}>
                     {t.name}
@@ -355,7 +355,7 @@ function SubscriptionDetails({
                 haptics.selection();
                 setCategoryId(c.id);
               }}
-              leading={<LineBadge color={c.color} name={c.name} size={28} />}
+              leading={<LineBadge color={c.color} icon={c.icon} size={28} />}
             />
           ))}
           <Chip label={allCategories ? it.add.lessCategories : it.add.allCategories} onPress={() => setAllCategories(!allCategories)} />

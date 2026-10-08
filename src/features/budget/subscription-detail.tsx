@@ -89,7 +89,7 @@ export function SubscriptionDetail() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.lg }}>
         <View style={{ gap: spacing.sm }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <LineBadge color={category?.color ?? 'grey'} name={subscription.name} size={28} />
+            <LineBadge color={category?.color ?? 'grey'} icon={category?.icon} size={28} />
             <AppText variant="callout" tone="secondary">
               {category?.name}
             </AppText>

@@ -2,10 +2,13 @@ import { View } from 'react-native';
 
 import { radius, useTheme } from '@/theme';
 
-import { AppText } from './text';
+import { Icon } from './icon';
 
-/** A category's line badge: a rounded enamel square with the initial, like a metro line sign. */
-export function LineBadge({ color, name, size = 26 }: { color: string; name: string; size?: number }) {
+/**
+ * A category's line badge: a rounded enamel square in the line colour with the category's icon,
+ * like a metro line sign. Categories only: accounts and goals wear other shapes.
+ */
+export function LineBadge({ color, icon, size = 26 }: { color: string; icon?: string; size?: number }) {
   const { lineColor } = useTheme();
   const line = lineColor(color);
   return (
@@ -22,9 +25,7 @@ export function LineBadge({ color, name, size = 26 }: { color: string; name: str
         justifyContent: 'center',
       }}
     >
-      <AppText variant="badge" maxFontSizeMultiplier={1.2} style={{ color: line.on, fontSize: Math.round(size * 0.5) }}>
-        {name.charAt(0).toUpperCase()}
-      </AppText>
+      <Icon name={icon ?? 'Tag'} size={Math.round(size * 0.6)} color={line.on} weight="bold" />
     </View>
   );
 }

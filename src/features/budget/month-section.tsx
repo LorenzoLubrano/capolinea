@@ -119,7 +119,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
             onPress={() => router.push({ pathname: '/category/[id]', params: { id: row.categoryId } })}
             style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, paddingVertical: spacing.smd, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
           >
-            <LineBadge color={row.color} name={row.name} />
+            <LineBadge color={row.color} icon={row.icon} />
             <View style={{ flex: 1, gap: spacing.xxs }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
                 <AppText variant="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }}>
@@ -154,7 +154,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
               onPress={() => router.push({ pathname: '/category/[id]', params: { id: c.categoryId } })}
               style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, minHeight: 52 }}
             >
-              <LineBadge color={c.color} name={c.name} />
+              <LineBadge color={c.color} icon={c.icon} />
               <AppText variant="body" style={{ flex: 1 }} numberOfLines={1}>
                 {c.name}
               </AppText>

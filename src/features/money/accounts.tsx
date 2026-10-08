@@ -45,17 +45,28 @@ const TYPE_ICONS: Record<AccountType, IconName> = {
 };
 const COLORS = ['blue', 'sky', 'indigo', 'teal', 'green', 'olive', 'yellow', 'orange', 'magenta', 'plum', 'slate', 'grey'];
 
-/** An account as a small enamel sign in its colour, with the icon of its type. */
+/**
+ * An account as a coin: a round, neutral token with the icon of its type and its colour as a ring.
+ * The filled enamel square belongs to categories only, so an account never reads as a line.
+ */
 export function AccountBadge({ account, size = 32 }: { account: Pick<Account, 'type' | 'color'>; size?: number }) {
-  const { lineColor } = useTheme();
-  const line = lineColor(account.color);
+  const { colors, lineColor } = useTheme();
   return (
     <View
       importantForAccessibility="no"
       accessibilityElementsHidden
-      style={{ width: size, height: size, borderRadius: radius.badge, borderCurve: 'continuous', backgroundColor: line.fill, alignItems: 'center', justifyContent: 'center' }}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: radius.full,
+        borderWidth: 2.5,
+        borderColor: lineColor(account.color).fill,
+        backgroundColor: colors.surfaceMuted,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
     >
-      <Icon name={TYPE_ICONS[account.type]} size={Math.round(size * 0.56)} color={line.on} weight="bold" />
+      <Icon name={TYPE_ICONS[account.type]} size={Math.round(size * 0.5)} color={colors.ink} weight="bold" />
     </View>
   );
 }

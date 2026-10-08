@@ -105,7 +105,7 @@ function CategoriesSection({ analysis, data }: { analysis: Analysis; data: Snaps
             onPress={() => c.categoryId && router.push({ pathname: '/analysis/category/[id]', params: { id: c.categoryId } })}
             style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, paddingVertical: spacing.sm }}
           >
-            <LineBadge color={c.color} name={c.name} />
+            <LineBadge color={c.color} icon={c.icon} />
             <View style={{ flex: 1, gap: spacing.xxs }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
                 <AppText variant="bodyStrong" numberOfLines={1} style={{ flex: 1 }}>

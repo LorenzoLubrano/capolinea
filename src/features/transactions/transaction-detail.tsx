@@ -206,7 +206,7 @@ export function TransactionDetail() {
                 <Icon name={tx.settlementWith ? 'HandCoins' : 'ArrowsLeftRight'} size={16} color={colors.ink} />
               </View>
             ) : (
-              <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? '?'} size={28} />
+              <LineBadge color={category?.color ?? 'grey'} icon={category?.icon} size={28} />
             )}
             <AppText variant="callout" tone="secondary">
               {tx.type === 'transfer' ? it.detail.types.transfer : tx.settlementWith ? it.shared.title : (category?.name ?? '')}

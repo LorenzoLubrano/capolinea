@@ -46,7 +46,7 @@ export function CategoryBudgetDetail() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.xl }}>
         <View style={{ gap: spacing.sm }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? ''} size={28} />
+            <LineBadge color={category?.color ?? 'grey'} icon={category?.icon} size={28} />
             <AppText variant="callout" tone="secondary">
               {monthName(data.today)}
             </AppText>
