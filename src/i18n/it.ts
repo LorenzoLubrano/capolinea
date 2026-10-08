@@ -108,7 +108,7 @@ export const it = {
     budget: 'Budget',
     noBudget: 'Nessun budget',
     latest: 'Ultime fermate',
-    seeAll: 'Vedi tutti',
+    seeAll: 'Vedi tutte',
     privacyHide: 'Nascondi gli importi',
     profile: 'Profilo e impostazioni',
     openAccounts: 'Apre i conti',
@@ -397,7 +397,7 @@ export const it = {
       over: 'Oltre il capolinea',
     },
     refundedBeyond: (amount: string) => `Rimborsi oltre la spesa: ${amount}`,
-    paceHint: 'La tacca indica dove dovresti essere oggi.',
+    paceHint: "L'anello «oggi» indica dove saresti con una spesa costante.",
     editor: {
       global: 'Budget del mese',
       category: 'Budget per categoria',

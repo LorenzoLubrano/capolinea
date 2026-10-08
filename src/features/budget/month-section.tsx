@@ -10,6 +10,8 @@ import { ProgressLine } from '@/components/progress-line';
 import { StatusLine } from '@/components/status-line';
 import { AppText } from '@/components/text';
 import type { Snapshot } from '@/data/repositories';
+import { MonthBand } from '@/features/home/month-band';
+import { buildHomeSummary } from '@/features/home/summary';
 import { it } from '@/i18n/it';
 import { monthName } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
@@ -35,6 +37,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
   const { colors, lineColor } = useTheme();
   const masked = useSettings((s) => s.privacy);
   const overview = buildBudgetOverview(data);
+  const summary = buildHomeSummary(data);
   const { global, currency } = { ...overview, currency: data.currency };
   const money = (minor: number) => formatMoney(minor, currency, { masked, wholeUnits: true });
 
@@ -56,7 +59,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
             </PressableScale>
           </View>
           <SpentOf spent={global.spentMinor} budget={global.amountMinor} currency={currency} variant="figure" />
-          <ProgressLine ratio={global.ratio} color={colors.ink} pace={overview.pace} height={8} />
+          <MonthBand summary={summary} compact />
           <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs, flexWrap: 'wrap' }}>
             <AppText variant="subhead" tone="secondary">
               {global.remainingMinor >= 0 ? it.budget.remaining : it.budget.over}
@@ -127,7 +130,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
                 </AppText>
                 <SpentOf spent={row.spentMinor} budget={row.budgetMinor} currency={currency} variant="subhead" />
               </View>
-              <ProgressLine ratio={row.ratio} color={lineColor(row.color).fill} pace={overview.pace} />
+              <ProgressLine ratio={row.ratio} color={lineColor(row.color).fill} edge={lineColor(row.color).edge} pace={overview.pace} />
               {row.refundedMinor > 0 ? (
                 <AppText variant="footnote" tone="secondary">
                   {it.budget.refundedBeyond(money(row.refundedMinor))}

@@ -24,7 +24,7 @@ const LABEL_INSET = spacing.xs + 2;
  * the dashed extension is the forecast, the ring is where today says the spending should be,
  * the black bar is the budget terminus.
  */
-export function MonthBand({ summary }: { summary: HomeSummary }) {
+export function MonthBand({ summary, compact = false }: { summary: HomeSummary; compact?: boolean }) {
   const { colors, lineColor } = useTheme();
   const reduced = useReducedMotion();
   const masked = useSettings((s) => s.privacy);
@@ -51,19 +51,21 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
 
   return (
     <View style={{ gap: spacing.sm }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
-        <AppText variant="title3" accessibilityRole="header">
-          {it.home.band.title}
-        </AppText>
-        {budget ? (
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
-            <AppText variant="footnote" tone="secondary">
-              {it.home.band.terminus}
-            </AppText>
-            <Money minor={budget.amountMinor} currency={currency} variant="subheadStrong" wholeUnits />
-          </View>
-        ) : null}
-      </View>
+      {compact ? null : (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
+          <AppText variant="title3" accessibilityRole="header">
+            {it.home.band.title}
+          </AppText>
+          {budget ? (
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
+              <AppText variant="footnote" tone="secondary">
+                {it.home.band.terminus}
+              </AppText>
+              <Money minor={budget.amountMinor} currency={currency} variant="subheadStrong" wholeUnits />
+            </View>
+          ) : null}
+        </View>
+      )}
 
       <View
         accessible
@@ -196,7 +198,7 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
         ) : null}
       </View>
 
-      {budget ? (
+      {compact ? null : budget ? (
         <View style={{ gap: spacing.xs }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', columnGap: spacing.sm, rowGap: spacing.xs }}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>

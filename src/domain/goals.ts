@@ -40,3 +40,17 @@ export function goalProgress(goal: Goal, today: LocalDate): GoalProgress {
 
   return { savedMinor, remainingMinor, ratio, reached, overdue, monthlyNeededMinor, projectedDate };
 }
+
+/** Where each contribution up to today left the goal, as shares of the target: the stops on its line. */
+export function goalStops(goal: Goal, today: LocalDate): number[] {
+  const stops: number[] = [];
+  if (goal.targetMinor <= 0) return stops;
+  let saved = 0;
+  const contributions = goal.contributions.filter((c) => c.date <= today).sort((a, b) => a.date.localeCompare(b.date));
+  for (const contribution of contributions) {
+    saved += contribution.amountMinor;
+    stops.push(Math.min(saved / goal.targetMinor, 1));
+    if (saved >= goal.targetMinor) break;
+  }
+  return stops;
+}

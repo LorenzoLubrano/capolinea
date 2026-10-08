@@ -56,8 +56,8 @@ export function ProfileScreen() {
         </View>
 
         <SettingsGroup title={it.profile.money}>
-          <SettingsRow icon="Wallet" title={it.profile.accounts} hint={it.profile.accountsHint(accounts)} onPress={() => router.push('/accounts')} />
-          <SettingsRow icon="Tag" title={it.profile.categories} hint={it.profile.categoriesHint(expenseCategories, incomeCategories)} onPress={() => router.push('/categories')} />
+          <SettingsRow icon="Wallet" title={it.profile.accounts} hint={data ? it.profile.accountsHint(accounts) : undefined} onPress={() => router.push('/accounts')} />
+          <SettingsRow icon="Tag" title={it.profile.categories} hint={data ? it.profile.categoriesHint(expenseCategories, incomeCategories) : undefined} onPress={() => router.push('/categories')} />
           <SettingsRow icon="Users" title={it.profile.shared} hint={sharedHint} onPress={() => router.push('/shared')} />
         </SettingsGroup>
 

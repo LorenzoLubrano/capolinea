@@ -1,4 +1,4 @@
-import { goalProgress } from './goals';
+import { goalProgress, goalStops } from './goals';
 import type { Goal } from './types';
 
 const base: Goal = {
@@ -54,5 +54,16 @@ describe('goalProgress', () => {
   it('is reached at the target, with nothing left to save', () => {
     const p = goalProgress({ ...base, targetMinor: 80000 }, '2026-10-24');
     expect(p).toMatchObject({ reached: true, remainingMinor: 0, ratio: 1, monthlyNeededMinor: null, projectedDate: null });
+  });
+});
+
+describe('goalStops', () => {
+  it('places each contribution where it left the goal, as a share of the target', () => {
+    expect(goalStops(base, '2026-10-24')).toEqual([0.15, 0.25, 0.325, 0.375, 0.425]);
+  });
+
+  it('ignores contributions after today and stops at the target', () => {
+    expect(goalStops(base, '2026-08-31')).toEqual([0.15, 0.25, 0.325]);
+    expect(goalStops({ ...base, targetMinor: 60000 }, '2026-10-24')).toEqual([0.5, 5 / 6, 1]);
   });
 });

@@ -4,7 +4,7 @@ import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
-import { GoalRing } from '@/components/goal-ring';
+import { GoalBadge, GoalLine } from '@/components/goal-line';
 import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
 import { PressableScale } from '@/components/pressable-scale';
@@ -12,7 +12,7 @@ import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
 import { ToastHost } from '@/components/toast-host';
 import { useAddContribution, useDeleteGoal, useRemoveContribution, useRestoreGoal, useSnapshot } from '@/data/queries';
-import { goalProgress } from '@/domain/goals';
+import { goalProgress, goalStops } from '@/domain/goals';
 import { it } from '@/i18n/it';
 import { fullDate, monthYear } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
@@ -100,21 +100,22 @@ export function GoalDetail() {
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader title={goal.name} left={{ label: it.detail.close, onPress: () => router.back() }} />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.lg }}>
-        <View style={{ alignItems: 'center', gap: spacing.md }}>
-          <GoalRing ratio={progress.ratio} color={lineColor(goal.color).fill} size={148} stroke={12}>
-            <View style={{ alignItems: 'center', gap: spacing.xxs }}>
-              <Icon name={progress.reached ? 'Check' : goal.icon} size={26} color={colors.ink} weight={progress.reached ? 'bold' : 'regular'} />
+        <View style={{ gap: spacing.md }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+            <GoalBadge icon={goal.icon} reached={progress.reached} size={56} />
+            <View style={{ flex: 1, gap: spacing.xxs }}>
               <AppText variant="figure">{formatPercent(progress.ratio).replace(',0%', '%')}</AppText>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs, flexWrap: 'wrap' }}>
+                <Money minor={progress.savedMinor} currency={goal.currency} variant="subheadStrong" wholeUnits label={goal.name} />
+                <AppText variant="subhead" tone="secondary">
+                  {it.budget.of}
+                </AppText>
+                <Money minor={goal.targetMinor} currency={goal.currency} variant="subhead" tone="secondary" wholeUnits />
+              </View>
             </View>
-          </GoalRing>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
-            <Money minor={progress.savedMinor} currency={goal.currency} variant="figure" wholeUnits label={goal.name} />
-            <AppText variant="callout" tone="secondary">
-              {it.budget.of}
-            </AppText>
-            <Money minor={goal.targetMinor} currency={goal.currency} variant="callout" tone="secondary" wholeUnits />
           </View>
-          <AppText variant="subhead" tone="secondary" style={{ textAlign: 'center' }}>
+          <GoalLine ratio={progress.ratio} stops={goalStops(goal, data.today)} color={lineColor(goal.color).fill} height={10} />
+          <AppText variant="subhead" tone="secondary">
             {goalOutlook(goal, progress, money)}
           </AppText>
         </View>

@@ -2,13 +2,13 @@ import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Button } from '@/components/button';
-import { GoalRing } from '@/components/goal-ring';
+import { GoalBadge, GoalLine } from '@/components/goal-line';
 import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
 import { PressableScale } from '@/components/pressable-scale';
 import { AppText } from '@/components/text';
 import type { Snapshot } from '@/data/repositories';
-import { goalProgress, type GoalProgress } from '@/domain/goals';
+import { goalProgress, goalStops, type GoalProgress } from '@/domain/goals';
 import type { Goal } from '@/domain/types';
 import { it } from '@/i18n/it';
 import { monthYear } from '@/services/format/dates';
@@ -61,27 +61,30 @@ export function GoalsSection({ data }: { data: Snapshot }) {
               accessibilityLabel={`${goal.name}, ${it.goals.percent(formatPercent(progress.ratio))}, ${outlook}`}
               feedback="dim"
               onPress={() => router.push({ pathname: '/goal/[id]', params: { id: goal.id } })}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
+              style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
             >
-              <GoalRing ratio={progress.ratio} color={color} size={56}>
-                <Icon name={progress.reached ? 'Check' : goal.icon} size={22} color={colors.ink} weight={progress.reached ? 'bold' : 'regular'} />
-              </GoalRing>
-              <View style={{ flex: 1, gap: spacing.xxs }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
-                <AppText variant="bodyStrong" numberOfLines={1}>
-                  {goal.name}
-                </AppText>
-                <View style={{ flexDirection: 'row', gap: spacing.xs, alignItems: 'baseline' }}>
-                  <Money minor={progress.savedMinor} currency={goal.currency} variant="subheadStrong" wholeUnits />
-                  <AppText variant="subhead" tone="secondary">
-                    {it.budget.of}
+              <GoalBadge icon={goal.icon} reached={progress.reached} />
+              <View style={{ flex: 1, gap: spacing.xs }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
+                  <AppText variant="bodyStrong" numberOfLines={1} style={{ flexShrink: 1 }}>
+                    {goal.name}
                   </AppText>
-                  <Money minor={goal.targetMinor} currency={goal.currency} variant="subhead" tone="secondary" wholeUnits />
+                  <View style={{ flexDirection: 'row', gap: spacing.xs, alignItems: 'baseline' }}>
+                    <Money minor={progress.savedMinor} currency={goal.currency} variant="subheadStrong" wholeUnits />
+                    <AppText variant="subhead" tone="secondary">
+                      {it.budget.of}
+                    </AppText>
+                    <Money minor={goal.targetMinor} currency={goal.currency} variant="subhead" tone="secondary" wholeUnits />
+                  </View>
                 </View>
+                <GoalLine ratio={progress.ratio} stops={goalStops(goal, data.today)} color={color} />
                 <AppText variant="footnote" tone="secondary" numberOfLines={2}>
                   {outlook}
                 </AppText>
               </View>
-              <Icon name="CaretRight" size={16} color={colors.inkTertiary} />
+              <View style={{ alignSelf: 'center' }}>
+                <Icon name="CaretRight" size={16} color={colors.inkTertiary} />
+              </View>
             </PressableScale>
           );
         })}

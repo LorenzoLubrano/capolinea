@@ -50,7 +50,7 @@ export function applyFilters(transactions: Transaction[], filters: Filters, toda
 }
 
 const newestFirst = (a: Transaction, b: Transaction) =>
-  b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt);
+  b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id);
 
 export function sortTransactions(transactions: Transaction[], sort: SortOrder): Transaction[] {
   const sorted = [...transactions];

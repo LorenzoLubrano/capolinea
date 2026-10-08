@@ -4,10 +4,11 @@ import { View } from 'react-native';
 import { Icon } from '@/components/icon';
 import { LineBadge } from '@/components/line-badge';
 import { PressableScale } from '@/components/pressable-scale';
+import { ProgressLine } from '@/components/progress-line';
 import { Money } from '@/components/money';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
-import { radius, spacing, useTheme } from '@/theme';
+import { spacing, useTheme } from '@/theme';
 
 import type { HomeSummary } from './summary';
 
@@ -51,16 +52,7 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
               </View>
               {line.budgetMinor ? (
                 <>
-                  <View style={{ height: 4, borderRadius: radius.full, backgroundColor: colors.track, overflow: 'hidden' }}>
-                    <View
-                      style={{
-                        width: `${Math.min(ratio! * 100, 100)}%`,
-                        height: '100%',
-                        borderRadius: radius.full,
-                        backgroundColor: lineColor(line.color).fill,
-                      }}
-                    />
-                  </View>
+                  <ProgressLine ratio={ratio!} color={lineColor(line.color).fill} edge={lineColor(line.color).edge} height={4} />
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
                     {over || warn ? <Icon name="Warning" size={12} weight="bold" color={over ? colors.alert : colors.warning} /> : null}
                     {over ? (
