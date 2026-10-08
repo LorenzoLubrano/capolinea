@@ -1,5 +1,6 @@
 import {
   AirplaneTiltIcon,
+  ArchiveIcon,
   ArrowCounterClockwiseIcon,
   ArrowDownIcon,
   ArrowUUpLeftIcon,
@@ -20,6 +21,7 @@ import {
   CheckIcon,
   CircleHalfIcon,
   CopyIcon,
+  CreditCardIcon,
   DeviceMobileIcon,
   DotsThreeIcon,
   EyeIcon,
@@ -39,6 +41,7 @@ import {
   ListBulletsIcon,
   MagnifyingGlassIcon,
   MinusIcon,
+  MoneyIcon,
   MoonIcon,
   MusicNotesIcon,
   PaletteIcon,
@@ -70,6 +73,7 @@ import {
 /** One icon family (Phosphor, MIT) for the whole app, iOS and Android alike. */
 const icons = {
   AirplaneTilt: AirplaneTiltIcon,
+  Archive: ArchiveIcon,
   ArrowCounterClockwise: ArrowCounterClockwiseIcon,
   ArrowDown: ArrowDownIcon,
   ArrowUUpLeft: ArrowUUpLeftIcon,
@@ -90,6 +94,7 @@ const icons = {
   Check: CheckIcon,
   CircleHalf: CircleHalfIcon,
   Copy: CopyIcon,
+  CreditCard: CreditCardIcon,
   DeviceMobile: DeviceMobileIcon,
   DotsThree: DotsThreeIcon,
   Eye: EyeIcon,
@@ -109,6 +114,7 @@ const icons = {
   ListBullets: ListBulletsIcon,
   MagnifyingGlass: MagnifyingGlassIcon,
   Minus: MinusIcon,
+  Money: MoneyIcon,
   Moon: MoonIcon,
   MusicNotes: MusicNotesIcon,
   Palette: PaletteIcon,

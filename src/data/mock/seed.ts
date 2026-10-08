@@ -57,7 +57,7 @@ export const PEOPLE: Person[] = [
 export const ACCOUNTS: Account[] = [
   { id: 'acc-bank', ...meta, name: 'Conto corrente', type: 'bank', currency: 'EUR', openingBalanceMinor: 240000, color: 'blue', includeInTotal: true, archived: false, sortOrder: 0 },
   { id: 'acc-revolut', ...meta, name: 'Revolut', type: 'ewallet', currency: 'EUR', openingBalanceMinor: 60000, color: 'sky', includeInTotal: true, archived: false, sortOrder: 1 },
-  { id: 'acc-paypal', ...meta, name: 'PayPal', type: 'ewallet', currency: 'EUR', openingBalanceMinor: 8000, color: 'indigo', includeInTotal: true, archived: false, sortOrder: 2 },
+  { id: 'acc-paypal', ...meta, name: 'PayPal', type: 'ewallet', currency: 'EUR', openingBalanceMinor: 40000, color: 'indigo', includeInTotal: true, archived: false, sortOrder: 2 },
   { id: 'acc-cash', ...meta, name: 'Contanti', type: 'cash', currency: 'EUR', openingBalanceMinor: 12000, color: 'green', includeInTotal: true, archived: false, sortOrder: 3 },
   { id: 'acc-card', ...meta, name: 'Carta di credito', type: 'credit_card', currency: 'EUR', openingBalanceMinor: 0, color: 'slate', includeInTotal: true, archived: false, sortOrder: 4 },
   { id: 'acc-savings', ...meta, name: 'Conto deposito', type: 'savings', currency: 'EUR', openingBalanceMinor: 500000, color: 'olive', includeInTotal: false, archived: false, sortOrder: 5 },
@@ -167,6 +167,7 @@ export function createDataset(today: LocalDate = PINNED_TODAY): Dataset {
       add({ type: 'transfer', amountMinor: 70000, date, accountId: 'acc-bank', toAccountId: 'acc-revolut', description: 'Ricarica Revolut' });
     }
     if (day === 11) add({ type: 'transfer', amountMinor: 20000, date, accountId: 'acc-bank', toAccountId: 'acc-savings', description: 'Risparmio del mese' });
+    if (day === 2) add({ type: 'transfer', amountMinor: 10000, date, accountId: 'acc-bank', toAccountId: 'acc-cash', description: 'Prelievo' });
     if (day === 20) add({ type: 'expense', amountMinor: 2790, date, accountId: 'acc-bank', categoryId: 'cat-bills', merchant: 'Fibra casa', isRecurring: true, necessity: 'need' });
     if (day === 14 && (date.startsWith('2026-08') || date.startsWith('2026-10'))) {
       add({ type: 'expense', amountMinor: date.startsWith('2026-08') ? 7120 : 7840, date, accountId: 'acc-bank', categoryId: 'cat-bills', merchant: 'Luce e gas', isRecurring: true, necessity: 'need' });

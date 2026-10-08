@@ -5,9 +5,8 @@ import { ScrollView, View } from 'react-native';
 import { Calendar } from '@/components/calendar';
 import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
-import { PressableScale } from '@/components/pressable-scale';
 import { SheetHeader } from '@/components/sheet-header';
-import { AppText } from '@/components/text';
+import { ColorPicker, IconPicker } from '@/components/swatch-picker';
 import { ToastHost } from '@/components/toast-host';
 import { useSaveGoal, useSnapshot } from '@/data/queries';
 import type { Snapshot } from '@/data/repositories';
@@ -22,7 +21,7 @@ import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
 import { useSettings } from '@/state/settings';
 import { useToast } from '@/state/toast';
-import { layout, radius, spacing, useTheme } from '@/theme';
+import { layout, spacing, useTheme } from '@/theme';
 
 const ICONS = ['PiggyBank', 'AirplaneTilt', 'Laptop', 'Lifebuoy', 'House', 'Car', 'Bicycle', 'Gift', 'GraduationCap', 'Heart', 'Camera', 'Plant'];
 const COLORS = ['blue', 'green', 'yellow', 'sky', 'magenta', 'teal', 'olive', 'slate', 'orange', 'plum'];
@@ -37,7 +36,7 @@ export function GoalForm() {
 }
 
 function GoalFormBody({ data, editing }: { data: Snapshot; editing?: Goal }) {
-  const { colors, lineColor } = useTheme();
+  const { colors } = useTheme();
   const save = useSaveGoal();
   const showToast = useToast((s) => s.show);
   const masked = useSettings((s) => s.privacy);
@@ -113,57 +112,8 @@ function GoalFormBody({ data, editing }: { data: Snapshot; editing?: Goal }) {
           />
         ) : null}
 
-        <View style={{ gap: spacing.sm }}>
-          <AppText variant="subheadStrong" tone="secondary">
-            {it.goals.form.icon}
-          </AppText>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-            {ICONS.map((name) => {
-              const selected = name === icon;
-              return (
-                <PressableScale
-                  key={name}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selected }}
-                  accessibilityLabel={it.goals.form.iconLabel(it.goals.form.iconNames[name] ?? name)}
-                  onPress={() => {
-                    haptics.selection();
-                    setIcon(name);
-                  }}
-                  style={{ width: 48, height: 48, borderRadius: radius.key, alignItems: 'center', justifyContent: 'center', backgroundColor: selected ? colors.ink : colors.surfaceMuted }}
-                >
-                  <Icon name={name} size={22} color={selected ? colors.onInk : colors.ink} />
-                </PressableScale>
-              );
-            })}
-          </View>
-        </View>
-
-        <View style={{ gap: spacing.sm }}>
-          <AppText variant="subheadStrong" tone="secondary">
-            {it.goals.form.color}
-          </AppText>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-            {COLORS.map((key) => {
-              const selected = key === color;
-              return (
-                <PressableScale
-                  key={key}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selected }}
-                  accessibilityLabel={it.goals.form.colorLabel(it.goals.form.colorNames[key] ?? key)}
-                  onPress={() => {
-                    haptics.selection();
-                    setColor(key);
-                  }}
-                  style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.full, borderWidth: 2, borderColor: selected ? colors.ink : 'transparent' }}
-                >
-                  <View style={{ width: 30, height: 30, borderRadius: radius.full, backgroundColor: lineColor(key).fill }} />
-                </PressableScale>
-              );
-            })}
-          </View>
-        </View>
+        <IconPicker label={it.goals.form.icon} icons={ICONS} value={icon} onChange={setIcon} />
+        <ColorPicker label={it.goals.form.color} keys={COLORS} value={color} onChange={setColor} />
 
         <ChoiceRow label={it.goals.form.account}>
           {data.accounts

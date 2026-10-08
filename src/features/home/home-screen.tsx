@@ -13,6 +13,7 @@ import { BalanceSection } from './balance-section';
 import { GreetingRow } from './greeting-row';
 import { HomeBackdrop } from './home-backdrop';
 import { LatestStops } from './latest-stops';
+import { SharedRow } from './shared-row';
 import { LinesList } from './lines-list';
 import { MonthBand } from './month-band';
 import { SpentHero } from './spent-hero';
@@ -63,7 +64,10 @@ export function HomeScreen() {
           ) : (
             <>
               <MonthBand summary={summary} />
-              <BalanceSection summary={summary} today={data.today} />
+              <View style={{ gap: spacing.xs }}>
+                <BalanceSection summary={summary} today={data.today} />
+                <SharedRow data={data} />
+              </View>
               <LinesList summary={summary} />
               <LatestStops transactions={summary.latest} categories={data.categories} today={data.today} currency={summary.currency} meId={data.meId} />
             </>

@@ -1,4 +1,4 @@
-import type { Account, Budget, Category, Goal, GoalContribution, Id, LocalDate, Person, Subscription, Transaction } from '@/domain/types';
+import type { Account, Budget, Category, Goal, GoalContribution, Id, LocalDate, Person, SplitShare, Subscription, Transaction } from '@/domain/types';
 
 /**
  * Data access contract. Every method is async, like the SQLite implementation of phase 2.
@@ -21,6 +21,19 @@ export type BudgetDraft = Omit<Budget, 'id' | 'createdAt' | 'updatedAt'> & { id?
 
 /** A goal to create (no `id`) or to update; contributions are recorded separately. */
 export type GoalDraft = Omit<Goal, 'id' | 'createdAt' | 'updatedAt' | 'contributions'> & { id?: Id };
+
+/** An account to create (no `id`) or to update. */
+export type AccountDraft = Omit<Account, 'id' | 'createdAt' | 'updatedAt'> & { id?: Id };
+
+/** A category to create (no `id`) or to update. */
+export type CategoryDraft = Omit<Category, 'id' | 'createdAt' | 'updatedAt'> & { id?: Id };
+
+/** What a settlement changed, so it can be undone. `amountMinor` positive: the person paid the user. */
+export interface SettleRecord {
+  amountMinor: number;
+  previous: { id: Id; split: SplitShare[] }[];
+  transactionId?: Id;
+}
 
 export interface Snapshot {
   today: LocalDate;
@@ -60,4 +73,21 @@ export interface Repositories {
   restoreGoal(id: Id): Promise<void>;
   addContribution(goalId: Id, contribution: Omit<GoalContribution, 'id'>): Promise<Goal>;
   removeContribution(goalId: Id, contributionId: Id): Promise<Goal>;
+  saveAccount(draft: AccountDraft): Promise<Account>;
+  /** Only for accounts without movements; the others are archived. */
+  deleteAccount(id: Id): Promise<void>;
+  restoreAccount(id: Id): Promise<void>;
+  saveCategory(draft: CategoryDraft): Promise<Category>;
+  /** Only for unused categories; the others are archived. */
+  deleteCategory(id: Id): Promise<void>;
+  restoreCategory(id: Id): Promise<void>;
+  updatePerson(id: Id, name: string): Promise<Person>;
+  deletePerson(id: Id): Promise<void>;
+  restorePerson(id: Id): Promise<void>;
+  /**
+   * Marks every open share with the person settled on `date`. With an account, the payment is
+   * recorded as a settlement movement (`description` is its text).
+   */
+  settleWith(personId: Id, options: { date: LocalDate; accountId?: Id; description?: string }): Promise<SettleRecord>;
+  undoSettle(record: SettleRecord): Promise<void>;
 }

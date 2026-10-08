@@ -34,6 +34,12 @@ describe('spendingByCategory', () => {
 });
 
 describe('incomeBetween', () => {
+  it('leaves out money received to settle a split', () => {
+    const txs = [tx({ type: 'income', amountMinor: 3000, date: '2026-10-03', settlementWith: 'person-mario' })];
+    expect(incomeBetween(txs, '2026-10-01', '2026-10-31', 'EUR')).toBe(0);
+  });
+
+
   it('sums income in range and currency', () => {
     const txs = [
       tx({ type: 'income', amountMinor: 175000, date: '2026-10-27' }),

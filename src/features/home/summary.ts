@@ -132,7 +132,7 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
       paceRatio: pace * terminusRatio,
       forecastRatio: forecastMinor / scaleMinor,
     },
-    balance: totalBalance(accounts, transactions, currency),
+    balance: totalBalance(accounts, transactions, currency, meId),
     income: incomeMinor > 0 ? { incomeMinor, netMinor: incomeMinor - spendingBetween(transactions, from, today, options) } : null,
     subscriptionsMonthlyMinor: subscriptions
       .filter((s) => s.active && s.currency === currency)

@@ -1,7 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useRepositories } from './provider';
-import type { BudgetDraft, GoalDraft, NewSubscription, NewTransaction, Repositories, SubscriptionChanges, TransactionChanges } from './repositories';
+import type {
+  AccountDraft,
+  BudgetDraft,
+  CategoryDraft,
+  GoalDraft,
+  NewSubscription,
+  NewTransaction,
+  Repositories,
+  SettleRecord,
+  SubscriptionChanges,
+  TransactionChanges,
+} from './repositories';
 
 const SNAPSHOT_KEY = ['snapshot'] as const;
 
@@ -90,3 +101,15 @@ export const useAddContribution = () =>
   );
 export const useRemoveContribution = () =>
   useSnapshotMutation((r, { goalId, contributionId }: { goalId: string; contributionId: string }) => r.removeContribution(goalId, contributionId));
+export const useSaveAccount = () => useSnapshotMutation((r, draft: AccountDraft) => r.saveAccount(draft));
+export const useDeleteAccount = () => useSnapshotMutation((r, id: string) => r.deleteAccount(id));
+export const useRestoreAccount = () => useSnapshotMutation((r, id: string) => r.restoreAccount(id));
+export const useSaveCategory = () => useSnapshotMutation((r, draft: CategoryDraft) => r.saveCategory(draft));
+export const useDeleteCategory = () => useSnapshotMutation((r, id: string) => r.deleteCategory(id));
+export const useRestoreCategory = () => useSnapshotMutation((r, id: string) => r.restoreCategory(id));
+export const useUpdatePerson = () => useSnapshotMutation((r, { id, name }: { id: string; name: string }) => r.updatePerson(id, name));
+export const useDeletePerson = () => useSnapshotMutation((r, id: string) => r.deletePerson(id));
+export const useRestorePerson = () => useSnapshotMutation((r, id: string) => r.restorePerson(id));
+export const useSettleWith = () =>
+  useSnapshotMutation((r, { personId, ...options }: { personId: string; date: string; accountId?: string; description?: string }) => r.settleWith(personId, options));
+export const useUndoSettle = () => useSnapshotMutation((r, record: SettleRecord) => r.undoSettle(record));

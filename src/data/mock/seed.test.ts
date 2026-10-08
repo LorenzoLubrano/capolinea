@@ -26,7 +26,7 @@ describe('example dataset', () => {
 
   it('has salary income in October and a positive total balance', () => {
     expect(incomeBetween(data.transactions, '2026-10-01', PINNED_TODAY, 'EUR')).toBe(175000);
-    expect(totalBalance(data.accounts, data.transactions, 'EUR').totalMinor).toBeGreaterThan(0);
+    expect(totalBalance(data.accounts, data.transactions, 'EUR', data.meId).totalMinor).toBeGreaterThan(0);
   });
 
   it('includes generated subscription charges linked to their subscription', () => {

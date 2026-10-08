@@ -100,6 +100,11 @@ export interface Transaction extends RecordMeta {
   paidByPersonId?: Id;
   /** Present when the expense is split; shares sum to `amountMinor`. */
   split?: SplitShare[];
+  /**
+   * Money paid to or received from this person to even out split expenses. It moves the account,
+   * but it is neither spending nor income: the user's share was counted with the split.
+   */
+  settlementWith?: Id;
 }
 
 export type FrequencyUnit = 'week' | 'month' | 'year';

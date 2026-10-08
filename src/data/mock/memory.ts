@@ -1,13 +1,17 @@
 import { addDays } from '@/domain/dates';
+import { settlementPlan } from '@/domain/splits';
 import { generateDueCharges, occurrenceAfter } from '@/domain/subscriptions';
-import type { Budget, Goal, Person, RecordMeta, Subscription, Transaction } from '@/domain/types';
+import type { Account, Budget, Category, Goal, Person, RecordMeta, Subscription, Transaction } from '@/domain/types';
 
 import type {
+  AccountDraft,
   BudgetDraft,
+  CategoryDraft,
   GoalDraft,
   NewSubscription,
   NewTransaction,
   Repositories,
+  SettleRecord,
   Snapshot,
   SubscriptionChanges,
   TransactionChanges,
@@ -21,6 +25,8 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
     transactions: [...dataset.transactions],
     subscriptions: [...dataset.subscriptions],
     people: [...dataset.people],
+    accounts: [...dataset.accounts],
+    categories: [...dataset.categories],
     budgets: [...dataset.budgets],
     goals: [...dataset.goals],
   };
@@ -49,6 +55,15 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
     state.goals = state.goals.map((g) => (g.id === goal.id ? goal : g));
     return goal;
   };
+  /** Create (no `id`) or update a record of a collection, keeping its identity and creation time. */
+  const save = <T extends RecordMeta>(list: T[], draft: Omit<T, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }, kind: string): { list: T[]; saved: T } => {
+    const stamp = now();
+    const existing = draft.id ? list.find((item) => item.id === draft.id) : undefined;
+    const saved = (existing
+      ? { ...existing, ...draft, id: existing.id, updatedAt: stamp }
+      : { ...draft, id: newId(kind), createdAt: stamp, updatedAt: stamp }) as T;
+    return { list: existing ? list.map((item) => (item.id === saved.id ? saved : item)) : [...list, saved], saved };
+  };
 
   return {
     async snapshot(): Promise<Snapshot> {
@@ -56,6 +71,9 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
       return {
         ...state,
         transactions: live(state.transactions),
+        accounts: live(state.accounts),
+        categories: live(state.categories),
+        people: live(state.people),
         subscriptions: live(state.subscriptions),
         budgets: live(state.budgets),
         goals: live(state.goals),
@@ -202,6 +220,96 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
       await wait();
       const goal = findGoal(goalId);
       return replaceGoal({ ...goal, contributions: goal.contributions.filter((c) => c.id !== contributionId), updatedAt: now() });
+    },
+
+    async saveAccount(draft: AccountDraft) {
+      await wait();
+      const { list, saved } = save<Account>(state.accounts, draft, 'account');
+      state.accounts = list;
+      return saved;
+    },
+
+    async deleteAccount(id) {
+      await wait();
+      state.accounts = setDeleted(state.accounts, id, true);
+    },
+
+    async restoreAccount(id) {
+      await wait();
+      state.accounts = setDeleted(state.accounts, id, false);
+    },
+
+    async saveCategory(draft: CategoryDraft) {
+      await wait();
+      const { list, saved } = save<Category>(state.categories, draft, 'category');
+      state.categories = list;
+      return saved;
+    },
+
+    async deleteCategory(id) {
+      await wait();
+      state.categories = setDeleted(state.categories, id, true);
+    },
+
+    async restoreCategory(id) {
+      await wait();
+      state.categories = setDeleted(state.categories, id, false);
+    },
+
+    async updatePerson(id, name) {
+      await wait();
+      const current = state.people.find((p) => p.id === id);
+      if (!current) throw new Error('Person not found: ' + id);
+      const person = { ...current, name, updatedAt: now() };
+      state.people = state.people.map((p) => (p.id === id ? person : p));
+      return person;
+    },
+
+    async deletePerson(id) {
+      await wait();
+      state.people = setDeleted(state.people, id, true);
+    },
+
+    async restorePerson(id) {
+      await wait();
+      state.people = setDeleted(state.people, id, false);
+    },
+
+    async settleWith(personId, { date, accountId, description }): Promise<SettleRecord> {
+      await wait();
+      const plan = settlementPlan(state.transactions, state.meId, personId, date);
+      const byId = new Map(plan.changes.map((c) => [c.id, c.split]));
+      const previous = state.transactions.filter((t) => byId.has(t.id)).map((t) => ({ id: t.id, split: t.split! }));
+      state.transactions = state.transactions.map((t) => (byId.has(t.id) ? { ...t, split: byId.get(t.id), updatedAt: now() } : t));
+      let transactionId: string | undefined;
+      if (accountId && plan.amountMinor !== 0) {
+        const stamp = now();
+        const payment: Transaction = {
+          id: newId('tx'),
+          createdAt: stamp,
+          updatedAt: stamp,
+          type: plan.amountMinor > 0 ? 'income' : 'expense',
+          amountMinor: Math.abs(plan.amountMinor),
+          currency: state.currency,
+          date,
+          accountId,
+          description,
+          tags: [],
+          isRecurring: false,
+          settlementWith: personId,
+        };
+        state.transactions = [...state.transactions, payment];
+        transactionId = payment.id;
+      }
+      return { amountMinor: plan.amountMinor, previous, transactionId };
+    },
+
+    async undoSettle(record) {
+      await wait();
+      const byId = new Map(record.previous.map((p) => [p.id, p.split]));
+      state.transactions = state.transactions
+        .filter((t) => t.id !== record.transactionId)
+        .map((t) => (byId.has(t.id) ? { ...t, split: byId.get(t.id), updatedAt: now() } : t));
     },
 
     async addPerson(name: string) {

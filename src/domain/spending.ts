@@ -11,10 +11,10 @@ export interface SpendingOptions {
 /**
  * How much a transaction moves the user's spending, in minor units.
  * Expenses count (only the user's share when split), refunds subtract,
- * income and transfers never count.
+ * income, transfers and settlements never count.
  */
 export function spendingImpact(tx: Transaction, meId: Id): number {
-  if (tx.deletedAt) return 0;
+  if (tx.deletedAt || tx.settlementWith) return 0;
   if (tx.type === 'refund') return -tx.amountMinor;
   if (tx.type !== 'expense') return 0;
   if (!tx.split) return tx.amountMinor;

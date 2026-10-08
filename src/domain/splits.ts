@@ -1,4 +1,4 @@
-import type { Id, SplitShare, Transaction } from './types';
+import type { Id, LocalDate, SplitShare, Transaction } from './types';
 
 /** Equal shares that always add up to the total: leftover cents go to the first people. */
 export function splitEvenly(totalMinor: number, personIds: Id[]): SplitShare[] {
@@ -82,4 +82,43 @@ export function balancesByPerson(txs: Transaction[], meId: Id): Record<Id, numbe
     }
   }
   return balances;
+}
+
+/** Which share of a split is open between the user and one person, and its sign for the user. */
+function openShare(tx: Transaction, meId: Id, personId: Id): { share: SplitShare; amountMinor: number } | null {
+  if (tx.deletedAt || !tx.split) return null;
+  const payer = tx.paidByPersonId ?? meId;
+  const debtor = payer === meId ? personId : payer === personId ? meId : null;
+  const share = debtor ? tx.split.find((s) => s.personId === debtor && !s.settled) : undefined;
+  if (!share) return null;
+  return { share, amountMinor: payer === meId ? share.amountMinor : -share.amountMinor };
+}
+
+/** Split expenses still open with one person, newest first. Positive: they owe the user; negative: the user owes them. */
+export function openItems(txs: Transaction[], meId: Id, personId: Id): { tx: Transaction; amountMinor: number }[] {
+  return txs
+    .map((tx) => ({ tx, open: openShare(tx, meId, personId) }))
+    .filter((entry) => entry.open !== null)
+    .sort((a, b) => b.tx.date.localeCompare(a.tx.date) || b.tx.createdAt.localeCompare(a.tx.createdAt))
+    .map(({ tx, open }) => ({ tx, amountMinor: open!.amountMinor }));
+}
+
+/**
+ * Evening out with one person: every open share between the two is marked settled on `date`.
+ * `amountMinor` is who pays whom: positive, the person pays the user.
+ */
+export function settlementPlan(
+  txs: Transaction[],
+  meId: Id,
+  personId: Id,
+  date: LocalDate,
+): { changes: { id: Id; split: SplitShare[] }[]; amountMinor: number } {
+  const items = openItems(txs, meId, personId);
+  return {
+    amountMinor: items.reduce((sum, item) => sum + item.amountMinor, 0),
+    changes: items.map(({ tx }) => {
+      const { share } = openShare(tx, meId, personId)!;
+      return { id: tx.id, split: tx.split!.map((s) => (s === share ? { ...s, settled: true, settledAt: date } : s)) };
+    }),
+  };
 }

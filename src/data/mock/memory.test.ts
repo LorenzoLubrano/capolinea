@@ -124,3 +124,70 @@ describe('memory repositories: budgets, subscriptions, goals', () => {
     expect((await repos.snapshot()).goals.some((g) => g.id === goal.id)).toBe(true);
   });
 });
+
+describe('memory repositories: accounts, categories, people', () => {
+  it('creates, edits, deletes and restores an account', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const created = await repos.saveAccount({
+      name: 'Satispay', type: 'ewallet', currency: 'EUR', openingBalanceMinor: 2500, color: 'teal', includeInTotal: true, archived: false, sortOrder: 6,
+    });
+    await repos.saveAccount({ ...created, name: 'Satispay personale', archived: true });
+    expect((await repos.snapshot()).accounts.find((a) => a.id === created.id)).toMatchObject({ name: 'Satispay personale', archived: true, createdAt: created.createdAt });
+    await repos.deleteAccount(created.id);
+    expect((await repos.snapshot()).accounts.some((a) => a.id === created.id)).toBe(false);
+    await repos.restoreAccount(created.id);
+    expect((await repos.snapshot()).accounts.some((a) => a.id === created.id)).toBe(true);
+  });
+
+  it('creates, edits, deletes and restores a category', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const created = await repos.saveCategory({ name: 'Animali', kind: 'expense', icon: 'Heart', color: 'orange', isDefault: false, archived: false, sortOrder: 15 });
+    await repos.saveCategory({ ...created, name: 'Gatto' });
+    expect((await repos.snapshot()).categories.find((c) => c.id === created.id)?.name).toBe('Gatto');
+    await repos.deleteCategory(created.id);
+    expect((await repos.snapshot()).categories.some((c) => c.id === created.id)).toBe(false);
+    await repos.restoreCategory(created.id);
+    expect((await repos.snapshot()).categories.some((c) => c.id === created.id)).toBe(true);
+  });
+
+  it('renames, deletes and restores a person', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const sara = await repos.addPerson('Sara');
+    await repos.updatePerson(sara.id, 'Sara B.');
+    expect((await repos.snapshot()).people.find((p) => p.id === sara.id)?.name).toBe('Sara B.');
+    await repos.deletePerson(sara.id);
+    expect((await repos.snapshot()).people.some((p) => p.id === sara.id)).toBe(false);
+    await repos.restorePerson(sara.id);
+    expect((await repos.snapshot()).people.some((p) => p.id === sara.id)).toBe(true);
+  });
+
+  it('settles with a person, records the payment on an account, and can undo it', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const record = await repos.settleWith('person-mario', { date: '2026-10-24', accountId: 'acc-cash', description: 'Saldo con Mario' });
+    expect(record.amountMinor).toBe(3000);
+    let snapshot = await repos.snapshot();
+    const dinner = snapshot.transactions.find((t) => t.description === 'Cena con Mario')!;
+    expect(dinner.split!.find((s) => s.personId === 'person-mario')).toMatchObject({ settled: true, settledAt: '2026-10-24' });
+    const payment = snapshot.transactions.find((t) => t.id === record.transactionId)!;
+    expect(payment).toMatchObject({ type: 'income', amountMinor: 3000, accountId: 'acc-cash', settlementWith: 'person-mario', date: '2026-10-24' });
+
+    await repos.undoSettle(record);
+    snapshot = await repos.snapshot();
+    expect(snapshot.transactions.find((t) => t.id === dinner.id)!.split!.find((s) => s.personId === 'person-mario')?.settled).toBe(false);
+    expect(snapshot.transactions.some((t) => t.id === record.transactionId)).toBe(false);
+  });
+
+  it('records what the user pays back as an expense that is a settlement', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const record = await repos.settleWith('person-giulia', { date: '2026-10-24', accountId: 'acc-revolut', description: 'Saldo con Giulia' });
+    expect(record.amountMinor).toBe(-1200);
+    const payment = (await repos.snapshot()).transactions.find((t) => t.id === record.transactionId);
+    expect(payment).toMatchObject({ type: 'expense', amountMinor: 1200, settlementWith: 'person-giulia' });
+  });
+
+  it('can settle without recording a payment', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    const record = await repos.settleWith('person-mario', { date: '2026-10-24' });
+    expect(record.transactionId).toBeUndefined();
+  });
+});

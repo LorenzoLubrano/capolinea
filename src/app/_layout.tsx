@@ -81,6 +81,15 @@ function AppStack() {
         <Stack.Screen name="transaction-filters" options={{ ...sheet, sheetAllowedDetents: [0.75, 1] }} />
         <Stack.Screen name="profile" options={{ ...pushed, title: it.profile.title }} />
         <Stack.Screen name="settings/appearance" options={{ ...pushed, title: it.appearance.title }} />
+        <Stack.Screen name="accounts" options={{ ...pushed, title: it.accounts.title }} />
+        <Stack.Screen name="account/[id]" options={{ ...pushed, title: '' }} />
+        <Stack.Screen name="categories" options={{ ...pushed, title: it.categoryList.title }} />
+        <Stack.Screen name="shared" options={{ ...pushed, title: it.shared.title }} />
+        <Stack.Screen name="person/[id]" options={{ ...pushed, title: '' }} />
+        <Stack.Screen name="account-edit" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="category-edit" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="person-edit" options={{ ...sheet, sheetAllowedDetents: [0.5, 1] }} />
+        <Stack.Screen name="settle" options={{ ...sheet, sheetAllowedDetents: [1] }} />
       </Stack>
       <ToastHost />
     </ThemeProvider>

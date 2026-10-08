@@ -31,7 +31,7 @@ export function spendingByCategory(
 export function incomeBetween(txs: Transaction[], from: LocalDate, to: LocalDate, currency: CurrencyCode): number {
   return txs.reduce(
     (sum, tx) =>
-      !tx.deletedAt && tx.type === 'income' && tx.currency === currency && isWithin(tx.date, from, to)
+      !tx.deletedAt && !tx.settlementWith && tx.type === 'income' && tx.currency === currency && isWithin(tx.date, from, to)
         ? sum + tx.amountMinor
         : sum,
     0,

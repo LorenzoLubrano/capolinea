@@ -12,6 +12,7 @@ export function describeTransaction(
     names.accountName,
     tx.subscriptionId ? it.transactions.subscription : undefined,
     tx.split ? it.transactions.split : undefined,
+    tx.settlementWith ? it.transactions.settlement : undefined,
   ]
     .filter(Boolean)
     .join(' · ');

@@ -71,3 +71,13 @@ Registro delle decisioni di prodotto e tecniche. Il piano completo della fase 1 
 - Giorni: puntini su una scala fissa (fino a 15 €, 15–40, 40–100, oltre 100), uguale in ogni periodo, con l'anello su oggi. Contano solo le spese variabili: affitto, bollette e abbonamenti cadono sempre negli stessi giorni e non dicono niente delle abitudini. Lo stesso vale per «le spese più grandi».
 - Esercenti: il nome è testo libero, quindi maiuscole, accenti e spazi non contano; vale la grafia dell'ultimo acquisto. I rimborsi abbassano il totale ma non sono acquisti.
 - Componenti nuovi condivisi: `BarChart` (usato anche dal dettaglio di categoria del Budget) e `LoadingBlocks`/`LoadError`.
+
+## 08/10/2026: blocco Conti, categorie e spese condivise (passo 5)
+
+- Conti, Categorie e Spese condivise si aprono dal Profilo (gruppo «I tuoi soldi»); in Home il saldo totale apre i Conti e, solo quando qualcuno deve qualcosa, compare la riga delle spese condivise.
+- Correggere il saldo di un conto non crea movimenti finti: cambia il saldo di partenza, così il saldo di oggi è quello scritto.
+- Un conto o una categoria si possono eliminare solo se niente li usa (movimenti, abbonamenti, budget, obiettivi); altrimenti si archiviano: spariscono dalle scelte e dal saldo totale, lo storico resta.
+- Errore corretto: una spesa divisa pagata da un altro faceva scendere il tuo conto. Ora il conto cambia solo quando paghi tu.
+- Pareggio: saldare con una persona segna saldate tutte le quote aperte tra voi e, se vuoi, registra il movimento sul conto. Quel movimento (`settlementWith`) muove il saldo ma non conta né nella spesa né nelle entrate, perché la tua quota era già contata con la spesa divisa. Si annulla dall'avviso.
+- Dati di esempio: aggiunto un prelievo al mese sui contanti e un saldo di partenza più realistico per PayPal (prima andavano in rosso).
+- Selettori di icona e colore promossi a componenti condivisi (`swatch-picker.tsx`), usati da obiettivi, conti e categorie.

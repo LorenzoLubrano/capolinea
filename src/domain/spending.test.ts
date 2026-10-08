@@ -28,6 +28,10 @@ describe('spendingImpact', () => {
     expect(spendingImpact(tx({ type: 'transfer', amountMinor: 50000 }), ME)).toBe(0);
     expect(spendingImpact(tx({ deletedAt: '2026-10-11T10:00:00Z' }), ME)).toBe(0);
   });
+
+  it('ignores a settlement: it evens out a split, the spending was counted with the split', () => {
+    expect(spendingImpact(tx({ type: 'expense', amountMinor: 1200, settlementWith: 'person-giulia' }), ME)).toBe(0);
+  });
 });
 
 describe('spendingBetween', () => {

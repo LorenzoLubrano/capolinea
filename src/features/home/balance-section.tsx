@@ -1,6 +1,10 @@
 import { View } from 'react-native';
 
+import { router } from 'expo-router';
+
+import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
+import { PressableScale } from '@/components/pressable-scale';
 import { AppText } from '@/components/text';
 import { daysInMonth } from '@/domain/dates';
 import { it } from '@/i18n/it';
@@ -29,7 +33,11 @@ export function BalanceSection({ summary, today }: { summary: HomeSummary; today
   return (
     <View>
       <View style={{ height: 2, backgroundColor: colors.ink }} />
-      <View
+      <PressableScale
+        accessibilityRole="button"
+        accessibilityHint={it.home.openAccounts}
+        feedback="dim"
+        onPress={() => router.push('/accounts')}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -46,8 +54,11 @@ export function BalanceSection({ summary, today }: { summary: HomeSummary; today
             {it.home.accounts(balance.accountCount)}
           </AppText>
         </View>
-        <Money minor={balance.totalMinor} currency={currency} variant="figure" label={it.home.balance} />
-      </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+          <Money minor={balance.totalMinor} currency={currency} variant="figure" label={it.home.balance} />
+          <Icon name="CaretRight" size={16} color={colors.inkTertiary} />
+        </View>
+      </PressableScale>
       <View style={{ flexDirection: 'row', gap: spacing.md, paddingTop: spacing.smd }}>
         {income ? (
           <>

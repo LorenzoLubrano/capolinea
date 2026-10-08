@@ -150,7 +150,16 @@ export function TransactionDetail() {
   const refunds = data.transactions.filter((t) => t.refundOfId === tx.id);
   const title = tx.merchant ?? tx.description ?? category?.name ?? it.detail.types[tx.type];
   const isIn = tx.type === 'income' || tx.type === 'refund';
-  const rule = (tx.split ? it.detail.counts.split : it.detail.counts[tx.type]) + (refundsOf(tx, data).length ? ` ${it.detail.countsRefunded}` : '');
+  const settledWith = tx.settlementWith ? data.people.find((p) => p.id === tx.settlementWith) : undefined;
+  const paidBy = tx.paidByPersonId && tx.paidByPersonId !== data.meId ? data.people.find((p) => p.id === tx.paidByPersonId) : undefined;
+  const baseRule = tx.settlementWith
+    ? it.detail.counts.settlement(settledWith?.name ?? '')
+    : tx.split
+      ? paidBy
+        ? it.detail.counts.splitPaidByOther(paidBy.name)
+        : it.detail.counts.split
+      : it.detail.counts[tx.type];
+  const rule = baseRule + (refundsOf(tx, data).length ? ` ${it.detail.countsRefunded}` : '');
 
   const onDelete = () => {
     haptics.medium();
@@ -184,23 +193,23 @@ export function TransactionDetail() {
     const pathname = ({ expense: '/add-expense', income: '/add-income', transfer: '/add-transfer', refund: '/add-refund' } as const)[tx.type];
     router.push({ pathname, params: { id: tx.id } });
   };
-  const refundable = tx.type === 'expense' ? refundableMinor(tx, data.transactions) : 0;
+  const refundable = tx.type === 'expense' && !tx.settlementWith ? refundableMinor(tx, data.transactions) : 0;
 
   return (
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
-      <SheetHeader title={it.detail.types[tx.type]} left={{ label: it.detail.close, onPress: () => router.back() }} />
+      <SheetHeader title={tx.settlementWith ? it.detail.settlementType : it.detail.types[tx.type]} left={{ label: it.detail.close, onPress: () => router.back() }} />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.md, paddingBottom: spacing.xl, gap: spacing.lg }}>
         <View style={{ gap: spacing.sm }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-            {tx.type === 'transfer' ? (
+            {tx.type === 'transfer' || tx.settlementWith ? (
               <View style={{ width: 28, height: 28, borderRadius: radius.badge, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="ArrowsLeftRight" size={16} color={colors.ink} />
+                <Icon name={tx.settlementWith ? 'HandCoins' : 'ArrowsLeftRight'} size={16} color={colors.ink} />
               </View>
             ) : (
               <LineBadge color={category?.color ?? 'grey'} name={category?.name ?? '?'} size={28} />
             )}
             <AppText variant="callout" tone="secondary">
-              {tx.type === 'transfer' ? it.detail.types.transfer : (category?.name ?? '')}
+              {tx.type === 'transfer' ? it.detail.types.transfer : tx.settlementWith ? it.shared.title : (category?.name ?? '')}
             </AppText>
           </View>
           <AppText variant="title2" accessibilityRole="header">
