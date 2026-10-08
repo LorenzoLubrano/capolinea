@@ -195,7 +195,7 @@ export function DayDots({
         accessible
         accessibilityRole={interactive ? 'adjustable' : 'image'}
         accessibilityLabel={speakable(it.analytics.days.chartLabel(summary))}
-        accessibilityValue={current ? { text: describe(current) } : undefined}
+        accessibilityValue={current ? { text: speakable(describe(current)) } : undefined}
         accessibilityActions={interactive ? [{ name: 'increment' }, { name: 'decrement' }] : undefined}
         onAccessibilityAction={(event) => move(event.nativeEvent.actionName === 'increment' ? 1 : -1)}
       >

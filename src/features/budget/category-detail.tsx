@@ -16,7 +16,7 @@ import { useSnapshot } from '@/data/queries';
 import { describeTransaction } from '@/features/transactions/describe';
 import { it } from '@/i18n/it';
 import { dayLabel, monthName, shortMonth } from '@/services/format/dates';
-import { formatMoney } from '@/services/format/money';
+import { formatMoney, speakable } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { layout, spacing, useTheme } from '@/theme';
 
@@ -105,7 +105,7 @@ export function CategoryBudgetDetail() {
             color={fill}
             height={BAR_HEIGHT}
             reference={detail.budgetMinor}
-            accessibilityLabel={it.budget.detail.historyLabel(historySummary)}
+            accessibilityLabel={speakable(it.budget.detail.historyLabel(historySummary))}
           />
           {detail.budgetMinor !== null ? (
             <AppText variant="caption" tone="tertiary">

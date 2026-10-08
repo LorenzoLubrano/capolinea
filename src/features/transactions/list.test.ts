@@ -56,6 +56,12 @@ describe('applyFilters', () => {
     expect(run({ kind: 'transfer' })).toEqual([transfer.id]);
   });
 
+  it('filters by an exact range, which wins over the period', () => {
+    const september = { from: '2026-09-01', to: '2026-09-30', label: 'Settembre 2026' };
+    expect(run({ range: september })).toEqual([transfer.id]);
+    expect(run({ range: september, period: 'month' })).toEqual([transfer.id]);
+  });
+
   it('filters by period', () => {
     expect(run({ period: 'month' })).toEqual([expense.id, refund.id, salary.id]);
     expect(run({ period: 'last-month' })).toEqual([transfer.id]);
@@ -86,5 +92,6 @@ describe('activeFilterCount', () => {
     expect(activeFilterCount(DEFAULT_FILTERS)).toBe(0);
     expect(activeFilterCount({ ...DEFAULT_FILTERS, kind: 'income' })).toBe(0);
     expect(activeFilterCount({ ...DEFAULT_FILTERS, period: 'month', categoryIds: ['a', 'b'], sort: 'amount-desc' })).toBe(3);
+    expect(activeFilterCount({ ...DEFAULT_FILTERS, range: { from: '2026-09-01', to: '2026-09-30', label: 'Settembre 2026' } })).toBe(1);
   });
 });

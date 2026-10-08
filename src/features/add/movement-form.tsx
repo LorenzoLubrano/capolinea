@@ -62,25 +62,29 @@ export function MovementForm({ kind: routeKind }: { kind: MovementKind }) {
   const original = kind === 'refund' ? data.transactions.find((t) => t.id === (editing?.refundOfId ?? params.of)) : undefined;
   const switchable = !editing && SWITCHABLE.includes(kind);
   return (
-    <MovementFormBody
-      key={`${editing?.id ?? 'new'}-${kind}`}
-      kind={kind}
-      data={data}
-      editing={editing}
-      original={original}
-      params={params}
-      carry={carry}
-      savedInRow={savedInRow}
-      onSavedInRow={setSavedInRow}
-      onKindChange={
-        switchable
-          ? (next, kept) => {
-              setCarry(kept);
-              setKind(next);
-            }
-          : undefined
-      }
-    />
+    <View style={{ flex: 1 }}>
+      <MovementFormBody
+        key={`${editing?.id ?? 'new'}-${kind}`}
+        kind={kind}
+        data={data}
+        editing={editing}
+        original={original}
+        params={params}
+        carry={carry}
+        savedInRow={savedInRow}
+        onSavedInRow={setSavedInRow}
+        onKindChange={
+          switchable
+            ? (next, kept) => {
+                setCarry(kept);
+                setKind(next);
+              }
+            : undefined
+        }
+      />
+      {/* Outside the body, which remounts on a kind switch: the toast and its Annulla stay put. Under the header and the switch. */}
+      <ToastHost top={switchable ? 116 : 60} />
+    </View>
   );
 }
 
@@ -149,10 +153,11 @@ function MovementFormBody({
   const [description, setDescription] = useState(editing?.description ?? '');
   const [note, setNote] = useState(editing?.notes ?? '');
   const rememberEntry = useLastEntry((s) => s.remember);
-  // Something written and not saved: the sheet asks before closing. A new one compares with empty.
+  // Something written and not saved: the sheet asks before closing. What it opened with counts as
+  // unchanged, except an amount carried over from another kind, which the user did type.
   const allowLeave = useDiscardGuard(
     editing ? { input, categoryId, accountId, toAccountId, date, merchant, description, note } : { input, categoryId, merchant, description, note },
-    editing ? undefined : { input: '', categoryId: undefined, merchant: '', description: '', note: '' },
+    carry && !editing ? { input: '', categoryId: undefined, merchant: '', description: '', note: '' } : undefined,
   );
 
   // The split sheet hands its draft back through a store: start it from this movement, or empty.
@@ -305,14 +310,14 @@ function MovementFormBody({
     <View style={{ flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' }}>
       <SheetHeader
         title={onKindChange ? it.add.title : title}
-        left={{ label: savedInRow > 0 ? it.add.done : it.add.cancel, onPress: () => router.back() }}
+        left={{ label: savedInRow > 0 ? it.add.done : it.add.cancel, onPress: () => !busy && router.back() }}
       />
       {onKindChange ? (
         <View style={{ paddingHorizontal: spacing.gutter, paddingBottom: spacing.xs }}>
           <Segmented
             label={it.add.kindLabel}
             value={kind}
-            onChange={(next) => onKindChange(next, { input, accountId, date })}
+            onChange={(next) => !busy && onKindChange(next, { input, accountId, date })}
             options={SWITCHABLE.map((value) => ({ value, label: it.add[value as 'expense' | 'income' | 'transfer'] }))}
           />
         </View>
@@ -509,7 +514,11 @@ function MovementFormBody({
           <PressableScale
             accessibilityRole="button"
             feedback="dim"
-            onPress={() => router.replace('/add-subscription')}
+            onPress={() => {
+              const shown = useToast.getState().current;
+              if (shown) useToast.getState().hide(shown.id);
+              router.replace('/add-subscription');
+            }}
             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 48, borderBottomWidth: 1, borderColor: colors.hairline, marginTop: -spacing.md }}
           >
             <AppText variant="callout">
@@ -522,8 +531,8 @@ function MovementFormBody({
       </ScrollView>
 
       <SaveBar
-        onKey={(key: KeypadKey) => setInput((current) => appendKeypadKey(current, key))}
-        onClear={() => setInput('')}
+        onKey={(key: KeypadKey) => !busy && setInput((current) => appendKeypadKey(current, key))}
+        onClear={() => !busy && setInput('')}
         label={saveLabel}
         ready={!missing}
         busy={busy}
@@ -534,8 +543,6 @@ function MovementFormBody({
             : undefined
         }
       />
-      {/* Under the header, and under the kind switch when there is one. */}
-      <ToastHost top={onKindChange ? 116 : 60} />
     </View>
   );
 }

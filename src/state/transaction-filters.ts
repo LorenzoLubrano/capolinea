@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import type { Id } from '@/domain/types';
-import { DEFAULT_FILTERS, type Filters, type KindFilter, type PeriodFilter, type SortOrder } from '@/features/transactions/list';
+import { DEFAULT_FILTERS, type DateRange, type Filters, type KindFilter, type PeriodFilter, type SortOrder } from '@/features/transactions/list';
 
 interface TransactionFiltersState extends Filters {
   /** Search text, kept here so the filter sheet can count the same results as the list. */
@@ -9,6 +9,7 @@ interface TransactionFiltersState extends Filters {
   setQuery: (query: string) => void;
   setKind: (kind: KindFilter) => void;
   setPeriod: (period: PeriodFilter) => void;
+  setRange: (range: DateRange) => void;
   setSort: (sort: SortOrder) => void;
   toggleCategory: (id: Id) => void;
   toggleAccount: (id: Id) => void;
@@ -26,11 +27,12 @@ export const useTransactionFilters = create<TransactionFiltersState>((set) => ({
   query: '',
   setQuery: (query) => set({ query }),
   setKind: (kind) => set({ kind }),
-  setPeriod: (period) => set({ period }),
+  setPeriod: (period) => set({ period, range: null }),
+  setRange: (range) => set({ range }),
   setSort: (sort) => set({ sort }),
   toggleCategory: (id) => set((state) => ({ categoryIds: toggle(state.categoryIds, id) })),
   toggleAccount: (id) => set((state) => ({ accountIds: toggle(state.accountIds, id) })),
   resetSheet: () =>
-    set({ sort: DEFAULT_FILTERS.sort, period: DEFAULT_FILTERS.period, categoryIds: [], accountIds: [] }),
+    set({ sort: DEFAULT_FILTERS.sort, period: DEFAULT_FILTERS.period, range: null, categoryIds: [], accountIds: [] }),
   resetAll: () => set({ ...DEFAULT_FILTERS, query: '' }),
 }));

@@ -151,7 +151,12 @@ export function CategoryAnalysisSheet() {
         empty={it.analytics.category.noMovements}
         movements={analysis.movements}
         data={data}
-        seeAll={() => openInMovements((f) => f.toggleCategory(id))}
+        seeAll={() =>
+          openInMovements((f) => {
+            f.toggleCategory(id);
+            f.setRange({ from: analysis.period.from, to: analysis.period.to, label: periodLabel(analysis.period) });
+          })
+        }
       />
     </DetailSheet>
   );
@@ -197,7 +202,12 @@ export function MerchantAnalysisSheet() {
         empty={it.analytics.merchant.noMovements}
         movements={analysis.movements}
         data={data}
-        seeAll={() => openInMovements((f) => f.setQuery(name))}
+        seeAll={() =>
+          openInMovements((f) => {
+            f.setQuery(name);
+            f.setRange({ from: analysis.period.from, to: analysis.period.to, label: periodLabel(analysis.period) });
+          })
+        }
       />
     </DetailSheet>
   );

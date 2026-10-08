@@ -6,15 +6,23 @@ export type KindFilter = 'all' | 'expense' | 'income' | 'transfer';
 export type PeriodFilter = 'all' | 'month' | 'last-month' | '3-months';
 export type SortOrder = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
 
+/** An exact span from elsewhere (Analisi): it wins over the period while set. */
+export interface DateRange {
+  from: LocalDate;
+  to: LocalDate;
+  label: string;
+}
+
 export interface Filters {
   kind: KindFilter;
   period: PeriodFilter;
+  range: DateRange | null;
   categoryIds: Id[];
   accountIds: Id[];
   sort: SortOrder;
 }
 
-export const DEFAULT_FILTERS: Filters = { kind: 'all', period: 'all', categoryIds: [], accountIds: [], sort: 'date-desc' };
+export const DEFAULT_FILTERS: Filters = { kind: 'all', period: 'all', range: null, categoryIds: [], accountIds: [], sort: 'date-desc' };
 
 function periodRange(period: PeriodFilter, today: LocalDate): { from: LocalDate; to: LocalDate } | null {
   switch (period) {
@@ -38,7 +46,7 @@ function kindOf(tx: Transaction): Exclude<KindFilter, 'all'> {
 }
 
 export function applyFilters(transactions: Transaction[], filters: Filters, today: LocalDate): Transaction[] {
-  const range = periodRange(filters.period, today);
+  const range = filters.range ?? periodRange(filters.period, today);
   return transactions.filter(
     (tx) =>
       (filters.kind === 'all' || kindOf(tx) === filters.kind) &&
@@ -91,7 +99,7 @@ export function groupByDay(transactions: Transaction[], meId: Id): DaySection[] 
 /** Filters set in the filter sheet (the kind has its own chips on the list). */
 export function activeFilterCount(filters: Filters): number {
   return (
-    Number(filters.period !== DEFAULT_FILTERS.period) +
+    Number(filters.period !== DEFAULT_FILTERS.period || filters.range !== null) +
     Number(filters.categoryIds.length > 0) +
     Number(filters.accountIds.length > 0) +
     Number(filters.sort !== DEFAULT_FILTERS.sort)

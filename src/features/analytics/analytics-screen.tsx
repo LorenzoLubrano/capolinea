@@ -18,7 +18,7 @@ import type { Period, PeriodUnit } from '@/domain/analysis';
 import { it } from '@/i18n/it';
 import { useAnnounce } from '@/services/a11y';
 import { dayLabel, monthName, periodLabel, weekdayName } from '@/services/format/dates';
-import { formatMoney } from '@/services/format/money';
+import { formatMoney, speakable } from '@/services/format/money';
 import { formatShare } from '@/services/format/numbers';
 import { useAnalysisPeriod } from '@/state/analysis-period';
 import { useSettings } from '@/state/settings';
@@ -261,7 +261,7 @@ function BudgetsSection({ analysis, data }: { analysis: Analysis; data: Snapshot
             <View
               key={m.month}
               accessible
-              accessibilityLabel={`${name}, ${spentOf}, ${outcome}`}
+              accessibilityLabel={speakable(`${name}, ${spentOf}, ${outcome}`)}
               style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.smd, minHeight: 52, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
             >
               <View style={{ flex: 1, gap: spacing.xxs }}>

@@ -22,7 +22,7 @@ import { useDiscardGuard } from '@/services/discard-guard';
 import { useAnnounce } from '@/services/a11y';
 import { shortDate } from '@/services/format/dates';
 import { frequencyLabel } from '@/services/format/frequency';
-import { formatMoney } from '@/services/format/money';
+import { formatMoney, speakable } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
 import { useSettings } from '@/state/settings';
 import { useToast } from '@/state/toast';
@@ -68,6 +68,7 @@ export function SubscriptionForm() {
 
 function TemplatePicker({ data, onPick }: { data: Snapshot; onPick: (t: SubscriptionTemplate | 'custom') => void }) {
   const { colors } = useTheme();
+  const masked = useSettings((s) => s.privacy);
   const categories = new Map(data.categories.map((c) => [c.id, c]));
   const tile = { borderRadius: radius.control, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.hairline } as const;
 
@@ -90,7 +91,7 @@ function TemplatePicker({ data, onPick }: { data: Snapshot; onPick: (t: Subscrip
               <PressableScale
                 key={t.name}
                 accessibilityRole="button"
-                accessibilityLabel={`${t.name}, ${formatMoney(t.amountMinor, data.currency)}, ${frequencyLabel(t.frequency)}`}
+                accessibilityLabel={speakable(`${t.name}, ${formatMoney(t.amountMinor, data.currency, { masked })}, ${frequencyLabel(t.frequency)}`)}
                 onPress={() => {
                   haptics.selection();
                   onPick(t);

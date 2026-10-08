@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { it } from '@/i18n/it';
 import { announce, useReduceMotion, useScreenReader } from '@/services/a11y';
+import { speakable } from '@/services/format/money';
+import { useLock } from '@/state/lock';
 import { useToast } from '@/state/toast';
 import { layout, motion, radius, shadows, spacing, useTheme } from '@/theme';
 
@@ -30,7 +32,7 @@ const FADE_OUT = FadeOut.duration(120).easing(motion.easeOutTiming).reduceMotion
  * bar; a sheet mounts its own host, with `top` or `bottom` clearing its own controls.
  */
 export function ToastHost({ top, bottom }: { top?: number; bottom?: number }) {
-  return top !== undefined || bottom !== undefined ? <ScreenToastHost top={top} bottom={bottom} /> : <Host focused />;
+  return top !== undefined || bottom !== undefined ? <ScreenToastHost top={top} bottom={bottom} /> : <RootToastHost />;
 }
 
 /**
@@ -40,6 +42,12 @@ export function ToastHost({ top, bottom }: { top?: number; bottom?: number }) {
 function ScreenToastHost({ top, bottom }: { top?: number; bottom?: number }) {
   const focused = useIsFocused();
   return <Host top={top} bottom={bottom} focused={focused} />;
+}
+
+/** The root host draws over every screen, so it waits while the app is locked. */
+function RootToastHost() {
+  const locked = useLock((s) => s.locked);
+  return <Host focused={!locked} />;
 }
 
 function Host({ top, bottom, focused }: { top?: number; bottom?: number; focused: boolean }) {
@@ -64,7 +72,7 @@ function Host({ top, bottom, focused }: { top?: number; bottom?: number; focused
   }, [current, hide, onTop, reader]);
 
   useEffect(() => {
-    if (current && onTop) announce(current.actionLabel ? it.toast.withAction(current.text, current.actionLabel) : current.text);
+    if (current && onTop) announce(speakable(current.actionLabel ? it.toast.withAction(current.text, current.actionLabel) : current.text));
   }, [current, onTop]);
 
   if (!current || !onTop) return null;

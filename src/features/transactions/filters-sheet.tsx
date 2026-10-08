@@ -14,7 +14,7 @@ import { haptics } from '@/services/haptics';
 import { useTransactionFilters } from '@/state/transaction-filters';
 import { layout, spacing, useTheme } from '@/theme';
 
-import type { PeriodFilter, SortOrder } from './list';
+import { DEFAULT_FILTERS, type PeriodFilter, type SortOrder } from './list';
 import { useVisibleTransactions } from './use-visible-transactions';
 
 const SORTS: SortOrder[] = ['date-desc', 'date-asc', 'amount-desc', 'amount-asc'];
@@ -61,8 +61,14 @@ export function FiltersSheet() {
           ))}
         </Group>
         <Group title={it.filters.period}>
+          {filters.range ? <Chip label={filters.range.label} selected onPress={pick(() => setPeriod(DEFAULT_FILTERS.period))} /> : null}
           {PERIODS.map((period) => (
-            <Chip key={period} label={it.filters.periods[period]} selected={filters.period === period} onPress={pick(() => setPeriod(period))} />
+            <Chip
+              key={period}
+              label={it.filters.periods[period]}
+              selected={!filters.range && filters.period === period}
+              onPress={pick(() => setPeriod(period))}
+            />
           ))}
         </Group>
         <Group title={it.filters.categories}>
