@@ -112,3 +112,41 @@ export function dailyAllowance(remainingMinor: number, today: LocalDate): number
   const daysLeft = monthLength(today) - dayOfMonth(today) + 1;
   return Math.floor(remainingMinor / daysLeft);
 }
+
+export type BudgetOutcome = 'kept' | 'over' | 'running' | 'none';
+
+export interface BudgetMonth {
+  /** First day of the month. */
+  month: LocalDate;
+  /** The global budget in force that month; null without one. */
+  budgetMinor: number | null;
+  spentMinor: number;
+  outcome: BudgetOutcome;
+}
+
+export interface BudgetHistoryInput extends SpendingOptions {
+  budgets: Budget[];
+  transactions: Transaction[];
+  /** The window ends with this date's month. */
+  until: LocalDate;
+  today: LocalDate;
+  months: number;
+}
+
+/** Month by month, oldest first, whether the global budget held. Months before the first movement are left out. */
+export function budgetHistory({ budgets, transactions, until, today, months, ...options }: BudgetHistoryInput): BudgetMonth[] {
+  const first = transactions.reduce<LocalDate | null>((min, t) => (!t.deletedAt && (min === null || t.date < min) ? t.date : min), null);
+  if (!first) return [];
+  const last = monthStart(until < today ? until : today);
+  const result: BudgetMonth[] = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const month = addMonthsClamped(last, -i);
+    if (monthEnd(month) < first) continue;
+    const running = month === monthStart(today);
+    const spentMinor = spendingBetween(transactions, month, running ? today : monthEnd(month), options);
+    const budget = activeBudget(budgets, month.slice(0, 7), 'global');
+    const outcome: BudgetOutcome = !budget ? 'none' : running ? 'running' : spentMinor > budget.amountMinor ? 'over' : 'kept';
+    result.push({ month, budgetMinor: budget?.amountMinor ?? null, spentMinor, outcome });
+  }
+  return result;
+}

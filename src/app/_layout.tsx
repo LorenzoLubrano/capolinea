@@ -76,6 +76,8 @@ function AppStack() {
         <Stack.Screen name="goal-edit" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="goal-contribution" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="transaction/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="analysis/category/[id]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
+        <Stack.Screen name="analysis/merchant/[name]" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="transaction-filters" options={{ ...sheet, sheetAllowedDetents: [0.75, 1] }} />
         <Stack.Screen name="profile" options={{ ...pushed, title: it.profile.title }} />
         <Stack.Screen name="settings/appearance" options={{ ...pushed, title: it.appearance.title }} />

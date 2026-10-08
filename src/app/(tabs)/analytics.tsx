@@ -1,6 +1,5 @@
-import { ComingSoon } from '@/components/coming-soon';
-import { it } from '@/i18n/it';
+import { AnalyticsScreen } from '@/features/analytics/analytics-screen';
 
-export default function Screen() {
-  return <ComingSoon title={it.tabs.analytics} body={it.placeholder.analytics} />;
+export default function Analytics() {
+  return <AnalyticsScreen />;
 }

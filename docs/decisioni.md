@@ -61,3 +61,13 @@ Registro delle decisioni di prodotto e tecniche. Il piano completo della fase 1 
 - Ogni barra di budget ha la tacca del ritmo del mese; diventa rossa solo oltre il budget. Accanto: quanto resta e quanto si può spendere al giorno fino a fine mese.
 - Abbonamenti: totale al mese e all'anno, calendario con i giorni di addebito, elenco. Sospendere ferma gli addebiti; riattivare riparte dal primo addebito da oggi, senza recuperare il periodo in pausa. Eliminare un abbonamento lascia i suoi addebiti tra i movimenti.
 - Obiettivi: quota mensile per arrivare alla data scelta e arrivo previsto al ritmo dei versamenti degli ultimi tre mesi.
+
+## 08/10/2026: blocco Analisi (passo 5)
+
+- Periodo scelto con Settimana, Mese, Anno e le frecce per andare indietro, fino al periodo del primo movimento. Le schede di dettaglio usano lo stesso periodo.
+- Una domanda per sezione, con la risposta a parole sotto: rispetto al solito, dove vanno i soldi, in quali giorni, da chi compro, spese più grandi, peso degli abbonamenti, come sono andati i budget. Tre grafici: barre del periodo, classifica delle categorie, puntini dei giorni. Il resto sono elenchi.
+- «Il solito» è la mediana dei periodi precedenti (4 settimane, 3 mesi, 1 anno) sugli stessi giorni finora: la settimana con l'affitto non fa sembrare economiche tutte le altre. Sotto il 5% di differenza si dice «in linea». Più spesa del solito non è un errore: niente rosso.
+- La linea tratteggiata del grafico è il periodo tipo intero («mese tipo»), la mediana dei periodi completi. I periodi prima del primo movimento non compaiono: niente dati non vuol dire zero spese.
+- Giorni: puntini su una scala fissa (fino a 15 €, 15–40, 40–100, oltre 100), uguale in ogni periodo, con l'anello su oggi. Contano solo le spese variabili: affitto, bollette e abbonamenti cadono sempre negli stessi giorni e non dicono niente delle abitudini. Lo stesso vale per «le spese più grandi».
+- Esercenti: il nome è testo libero, quindi maiuscole, accenti e spazi non contano; vale la grafia dell'ultimo acquisto. I rimborsi abbassano il totale ma non sono acquisti.
+- Componenti nuovi condivisi: `BarChart` (usato anche dal dettaglio di categoria del Budget) e `LoadingBlocks`/`LoadError`.

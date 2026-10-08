@@ -1,5 +1,5 @@
 import { tx } from './testing/builders';
-import { activeBudget, averageMonthlySpending, budgetStatus, dailyAllowance, forecastMonthEnd, monthlyHistory, monthPace } from './budget';
+import { activeBudget, averageMonthlySpending, budgetHistory, budgetStatus, dailyAllowance, forecastMonthEnd, monthlyHistory, monthPace } from './budget';
 import type { Budget } from './types';
 
 const ME = 'person-me';
@@ -119,5 +119,37 @@ describe('forecastMonthEnd for one category', () => {
   it('projects only that category', () => {
     const txs = [tx({ date: '2026-10-10', amountMinor: 3100, categoryId: 'cat-food' }), tx({ date: '2026-10-10', amountMinor: 99900 })];
     expect(forecastMonthEnd(txs, '2026-10-31', { currency: 'EUR', meId: ME, upcomingRecurringMinor: 0, categoryId: 'cat-food' })).toBe(3100);
+  });
+});
+
+describe('budgetHistory', () => {
+  const meta = { createdAt: '2026-08-01T08:00:00Z', updatedAt: '2026-08-01T08:00:00Z', currency: 'EUR' };
+  const budgets: Budget[] = [
+    { ...meta, id: 'g-1', scope: 'global', amountMinor: 150000, fromMonth: '2026-08' },
+    { ...meta, id: 'g-2', scope: 'global', amountMinor: 160000, fromMonth: '2026-10' },
+  ];
+  const txs = [
+    tx({ date: '2026-07-20', amountMinor: 20000 }),
+    tx({ date: '2026-08-10', amountMinor: 140000 }),
+    tx({ date: '2026-09-10', amountMinor: 160000 }),
+    tx({ date: '2026-10-10', amountMinor: 50000 }),
+  ];
+  const base = { budgets, transactions: txs, today: '2026-10-24', months: 6, currency: 'EUR', meId: ME };
+
+  it('says month by month whether the global budget held, from the first movement on', () => {
+    expect(budgetHistory({ ...base, until: '2026-10-24' })).toEqual([
+      { month: '2026-07-01', budgetMinor: null, spentMinor: 20000, outcome: 'none' },
+      { month: '2026-08-01', budgetMinor: 150000, spentMinor: 140000, outcome: 'kept' },
+      { month: '2026-09-01', budgetMinor: 150000, spentMinor: 160000, outcome: 'over' },
+      { month: '2026-10-01', budgetMinor: 160000, spentMinor: 50000, outcome: 'running' },
+    ]);
+  });
+
+  it('ends at the month of `until`, so a past period shows the months up to it', () => {
+    const history = budgetHistory({ ...base, until: '2026-09-15', months: 2 });
+    expect(history.map((m) => [m.month, m.outcome])).toEqual([
+      ['2026-08-01', 'kept'],
+      ['2026-09-01', 'over'],
+    ]);
   });
 });

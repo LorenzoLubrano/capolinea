@@ -2,12 +2,14 @@ import {
   addDays,
   addMonthsClamped,
   dayOfMonth,
+  daysBetween,
   daysInMonth,
   isWithin,
   monthEnd,
   monthGrid,
   monthStart,
   samePeriodPreviousMonth,
+  weekdayMondayFirst,
 } from './dates';
 
 describe('daysInMonth', () => {
@@ -95,5 +97,22 @@ describe('monthGrid', () => {
 
   it('handles a month that starts on Monday', () => {
     expect(monthGrid('2026-06-01')[0][0]).toBe('2026-06-01');
+  });
+});
+
+describe('daysBetween', () => {
+  it('counts calendar days from one date to another', () => {
+    expect(daysBetween('2026-10-01', '2026-10-24')).toBe(23);
+    expect(daysBetween('2026-12-30', '2027-01-02')).toBe(3);
+    expect(daysBetween('2026-10-24', '2026-10-24')).toBe(0);
+    expect(daysBetween('2026-10-24', '2026-10-20')).toBe(-4);
+  });
+});
+
+describe('weekdayMondayFirst', () => {
+  it('is 0 for Monday and 6 for Sunday', () => {
+    expect(weekdayMondayFirst('2026-10-19')).toBe(0);
+    expect(weekdayMondayFirst('2026-10-24')).toBe(5);
+    expect(weekdayMondayFirst('2026-10-25')).toBe(6);
   });
 });

@@ -60,6 +60,13 @@ export function dayOfMonth(date: LocalDate): number {
   return parse(date).day;
 }
 
+/** Calendar days from `from` to `to`: 0 for the same day, negative when `to` comes first. */
+export function daysBetween(from: LocalDate, to: LocalDate): number {
+  const a = parse(from);
+  const b = parse(to);
+  return Math.round((Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day)) / 86400000);
+}
+
 /** Inclusive on both ends; `YYYY-MM-DD` strings compare correctly as text. */
 export function isWithin(date: LocalDate, from: LocalDate, to: LocalDate): boolean {
   return date >= from && date <= to;
@@ -72,7 +79,7 @@ export function samePeriodPreviousMonth(today: LocalDate): { from: LocalDate; to
 }
 
 /** 0 for Monday … 6 for Sunday. */
-function weekdayMondayFirst(date: LocalDate): number {
+export function weekdayMondayFirst(date: LocalDate): number {
   const { year, month, day } = parse(date);
   return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
 }

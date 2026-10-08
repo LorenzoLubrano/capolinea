@@ -1,4 +1,4 @@
-import { dayLabel, fullDate, monthName, monthNames, monthYear, shortDate } from './dates';
+import { dayLabel, fullDate, monthName, monthNames, monthYear, periodLabel, shortDate, shortMonth, weekdayName } from './dates';
 
 describe('monthName', () => {
   it('names the month in Italian, lower case', () => {
@@ -42,5 +42,33 @@ describe('fullDate', () => {
 describe('monthYear', () => {
   it('names month and year, capitalised', () => {
     expect(monthYear('2026-10-24')).toBe('Ottobre 2026');
+  });
+});
+
+describe('periodLabel', () => {
+  it('writes a week as a range of days', () => {
+    expect(periodLabel({ unit: 'week', from: '2026-10-19', to: '2026-10-25' })).toBe('19–25 ottobre');
+    expect(periodLabel({ unit: 'week', from: '2026-09-28', to: '2026-10-04' })).toBe('28 settembre – 4 ottobre');
+    expect(periodLabel({ unit: 'week', from: '2025-12-29', to: '2026-01-04' })).toBe('29 dicembre 2025 – 4 gennaio 2026');
+  });
+
+  it('writes a month with its year and a year as a number', () => {
+    expect(periodLabel({ unit: 'month', from: '2026-10-01', to: '2026-10-31' })).toBe('Ottobre 2026');
+    expect(periodLabel({ unit: 'year', from: '2026-01-01', to: '2026-12-31' })).toBe('2026');
+  });
+});
+
+describe('shortMonth', () => {
+  it('abbreviates the month without a dot', () => {
+    expect(shortMonth('2026-10-01')).toBe('ott');
+    expect(shortMonth('2026-08-01')).toBe('ago');
+  });
+});
+
+describe('weekdayName', () => {
+  it('names the weekday, Monday first', () => {
+    expect(weekdayName(0)).toBe('lunedì');
+    expect(weekdayName(5)).toBe('sabato');
+    expect(weekdayName(6)).toBe('domenica');
   });
 });

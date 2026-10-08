@@ -50,7 +50,8 @@ const SUGGESTIONS = 4;
 const PROPOSAL_MONTHS = 3;
 const HISTORY_MONTHS = 6;
 
-function upcomingRecurring(snapshot: Snapshot, categoryId?: Id): number {
+/** Subscription charges still due after today in this month, optionally for one category. */
+export function upcomingRecurring(snapshot: Snapshot, categoryId?: Id): number {
   const { subscriptions, today, currency } = snapshot;
   return subscriptions
     .filter((s) => s.currency === currency && (!categoryId || s.categoryId === categoryId))

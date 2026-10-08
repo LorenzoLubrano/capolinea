@@ -2,13 +2,13 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { PressableScale } from '@/components/pressable-scale';
+import { LoadError, LoadingBlocks } from '@/components/load-state';
 import { Screen } from '@/components/screen';
 import { Segmented } from '@/components/segmented';
 import { AppText } from '@/components/text';
 import { useSnapshot } from '@/data/queries';
 import { it } from '@/i18n/it';
-import { radius, spacing, useTheme } from '@/theme';
+import { spacing } from '@/theme';
 
 import { GoalsSection } from './goals-section';
 import { MonthSection } from './month-section';
@@ -19,9 +19,16 @@ const SECTIONS: Section[] = ['month', 'subscriptions', 'goals'];
 
 /** Budget: the month's plan in three peer views, switched in place. */
 export function BudgetScreen() {
-  const { colors } = useTheme();
-  const params = useLocalSearchParams<{ section?: Section }>();
-  const [section, setSection] = useState<Section>(params.section && SECTIONS.includes(params.section) ? params.section : 'month');
+  // `at` makes every link from another screen new, even to the section already asked for.
+  const params = useLocalSearchParams<{ section?: Section; at?: string }>();
+  const requested = params.section && SECTIONS.includes(params.section) ? params.section : undefined;
+  const [section, setSection] = useState<Section>(requested ?? 'month');
+  const link = `${requested ?? ''}|${params.at ?? ''}`;
+  const [lastLink, setLastLink] = useState(link);
+  if (link !== lastLink) {
+    setLastLink(link);
+    if (requested) setSection(requested);
+  }
   const { data, isPending, isError, refetch } = useSnapshot();
 
   return (
@@ -37,19 +44,9 @@ export function BudgetScreen() {
           options={SECTIONS.map((value) => ({ value, label: it.budget.sections[value] }))}
         />
         {isPending ? (
-          <View style={{ gap: spacing.md }} accessibilityLabel="Caricamento">
-            {[120, 44, 44, 44].map((h, i) => (
-              <View key={i} style={{ height: h, borderRadius: radius.sign, backgroundColor: colors.track }} />
-            ))}
-          </View>
+          <LoadingBlocks heights={[120, 44, 44, 44]} />
         ) : isError || !data ? (
-          <View style={{ gap: spacing.sm }}>
-            <AppText variant="title3">{it.home.error.title}</AppText>
-            <AppText tone="secondary">{it.home.error.body}</AppText>
-            <PressableScale accessibilityRole="button" onPress={() => refetch()} style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}>
-              <AppText variant="bodyStrong">{it.home.error.retry}</AppText>
-            </PressableScale>
-          </View>
+          <LoadError onRetry={() => refetch()} />
         ) : section === 'month' ? (
           <MonthSection data={data} />
         ) : section === 'subscriptions' ? (

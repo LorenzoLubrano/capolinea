@@ -1,3 +1,4 @@
+import type { Period } from '@/domain/analysis';
 import { addDays } from '@/domain/dates';
 import type { LocalDate } from '@/domain/types';
 import { it as strings } from '@/i18n/it';
@@ -52,4 +53,28 @@ export function fullDate(date: LocalDate, locale = DEFAULT_LOCALE): string {
 export function monthYear(date: LocalDate, locale = DEFAULT_LOCALE): string {
   const text = formatter(locale, { month: 'long', year: 'numeric' }).format(toDate(date));
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** `ott`: for chart labels. */
+export function shortMonth(date: LocalDate, locale = DEFAULT_LOCALE): string {
+  return formatter(locale, { month: 'short' }).format(toDate(date)).replace('.', '');
+}
+
+/** `lunedì` for 0 … `domenica` for 6. */
+export function weekdayName(index: number, locale = DEFAULT_LOCALE): string {
+  // 2026-10-19 is a Monday.
+  return formatter(locale, { weekday: 'long' }).format(toDate(addDays('2026-10-19', index)));
+}
+
+/** `19–25 ottobre`, `28 settembre – 4 ottobre`, `Ottobre 2026`, `2026`. */
+export function periodLabel(period: Period, locale = DEFAULT_LOCALE): string {
+  if (period.unit === 'year') return period.from.slice(0, 4);
+  if (period.unit === 'month') return monthYear(period.from, locale);
+  const day = (date: LocalDate) => Number(date.slice(8));
+  if (period.from.slice(0, 7) === period.to.slice(0, 7)) return `${day(period.from)}–${day(period.to)} ${monthName(period.to, locale)}`;
+  if (period.from.slice(0, 4) === period.to.slice(0, 4)) {
+    return `${day(period.from)} ${monthName(period.from, locale)} – ${day(period.to)} ${monthName(period.to, locale)}`;
+  }
+  const withYear = (date: LocalDate) => `${day(date)} ${monthName(date, locale)} ${date.slice(0, 4)}`;
+  return `${withYear(period.from)} – ${withYear(period.to)}`;
 }
