@@ -1,4 +1,4 @@
-import { goalProgress, goalStops } from './goals';
+import { goalProgress, goalStops, spacedStops } from './goals';
 import type { Goal } from './types';
 
 const base: Goal = {
@@ -34,6 +34,15 @@ describe('goalProgress', () => {
     expect(goalProgress({ ...base, targetDate: undefined }, '2026-10-24').monthlyNeededMinor).toBeNull();
   });
 
+  it('says the goal is late when the current pace arrives after the target month', () => {
+    expect(goalProgress(base, '2026-10-24').late).toBe(true);
+    expect(goalProgress({ ...base, targetDate: '2027-08-01' }, '2026-10-24').late).toBe(false);
+    expect(goalProgress({ ...base, targetDate: '2027-09-30' }, '2026-10-24').late).toBe(false);
+    expect(goalProgress({ ...base, targetDate: undefined }, '2026-10-24').late).toBe(false);
+    expect(goalProgress({ ...base, contributions: [] }, '2026-10-24').late).toBe(false);
+    expect(goalProgress({ ...base, targetDate: '2026-09-30' }, '2026-10-24').late).toBe(false);
+  });
+
   it('projects the arrival from the last three months of contributions', () => {
     expect(goalProgress(base, '2026-10-24').projectedDate).toBe('2027-08-24');
     expect(goalProgress({ ...base, contributions: [] }, '2026-10-24').projectedDate).toBeNull();
@@ -65,5 +74,16 @@ describe('goalStops', () => {
   it('ignores contributions after today and stops at the target', () => {
     expect(goalStops(base, '2026-08-31')).toEqual([0.15, 0.25, 0.325]);
     expect(goalStops({ ...base, targetMinor: 60000 }, '2026-10-24')).toEqual([0.5, 5 / 6, 1]);
+  });
+});
+
+describe('spacedStops', () => {
+  it('drops the stops that would overlap a later one, keeping the latest', () => {
+    expect(spacedStops([0.15, 0.25, 0.325, 0.375, 0.425], 0.1)).toEqual([0.15, 0.325, 0.425]);
+  });
+
+  it('keeps stops that are far enough apart, and nothing from nothing', () => {
+    expect(spacedStops([0.2, 0.5, 0.8], 0.1)).toEqual([0.2, 0.5, 0.8]);
+    expect(spacedStops([], 0.1)).toEqual([]);
   });
 });

@@ -40,12 +40,16 @@ export function ProfileScreen() {
       <View style={{ gap: spacing.xl }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
           <View style={{ width: 56, height: 56, borderRadius: radius.full, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}>
-            <AppText variant="title2" tone="onInk">
-              {name.charAt(0)}
-            </AppText>
+            {name ? (
+              <AppText variant="title2" tone="onInk">
+                {name.charAt(0)}
+              </AppText>
+            ) : (
+              <Icon name="User" size={26} color={colors.onInk} weight="bold" />
+            )}
           </View>
           <View style={{ flex: 1, gap: spacing.xxs }}>
-            <AppText variant="title2">{name}</AppText>
+            {name ? <AppText variant="title2">{name}</AppText> : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
               <Icon name="DeviceMobile" size={16} color={colors.inkSecondary} />
               <AppText variant="footnote" tone="secondary" style={{ flexShrink: 1 }}>

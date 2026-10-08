@@ -27,7 +27,12 @@ export function goalOutlook(goal: Goal, progress: GoalProgress, money: (minor: n
   return it.goals.noPace;
 }
 
-/** Obiettivi: each goal as a ring closing towards its target. */
+/** The warning under a late goal: the pace of the last three months misses the date. */
+export function goalLateWarning(progress: GoalProgress): string | null {
+  return progress.late && progress.projectedDate ? it.goals.late(monthYear(progress.projectedDate).toLowerCase()) : null;
+}
+
+/** Obiettivi: each goal as a line towards its terminus. */
 export function GoalsSection({ data }: { data: Snapshot }) {
   const { colors, lineColor } = useTheme();
   const masked = useSettings((s) => s.privacy);
@@ -54,11 +59,12 @@ export function GoalsSection({ data }: { data: Snapshot }) {
         {goals.map(({ goal, progress }) => {
           const color = lineColor(goal.color).fill;
           const outlook = goalOutlook(goal, progress, money);
+          const late = goalLateWarning(progress);
           return (
             <PressableScale
               key={goal.id}
               accessibilityRole="button"
-              accessibilityLabel={`${goal.name}, ${it.goals.percent(formatPercent(progress.ratio))}, ${outlook}`}
+              accessibilityLabel={[goal.name, it.goals.percent(formatPercent(progress.ratio)), outlook, late].filter(Boolean).join(', ')}
               feedback="dim"
               onPress={() => router.push({ pathname: '/goal/[id]', params: { id: goal.id } })}
               style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.hairline }}
@@ -81,6 +87,14 @@ export function GoalsSection({ data }: { data: Snapshot }) {
                 <AppText variant="footnote" tone="secondary" numberOfLines={2}>
                   {outlook}
                 </AppText>
+                {late ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+                    <Icon name="Warning" size={14} weight="bold" color={colors.warning} />
+                    <AppText variant="footnote" tone="warning" style={{ flexShrink: 1 }}>
+                      {late}
+                    </AppText>
+                  </View>
+                ) : null}
               </View>
               <View style={{ alignSelf: 'center' }}>
                 <Icon name="CaretRight" size={16} color={colors.inkTertiary} />

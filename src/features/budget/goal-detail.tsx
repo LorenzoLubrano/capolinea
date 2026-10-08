@@ -22,7 +22,7 @@ import { useSettings } from '@/state/settings';
 import { useToast } from '@/state/toast';
 import { layout, spacing, useTheme } from '@/theme';
 
-import { goalOutlook } from './goals-section';
+import { goalLateWarning, goalOutlook } from './goals-section';
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   const { colors } = useTheme();
@@ -138,7 +138,16 @@ export function GoalDetail() {
           ) : null}
           {progress.projectedDate ? (
             <Row label={it.goals.detail.projected}>
-              <AppText variant="bodyStrong">{monthYear(progress.projectedDate)}</AppText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+                {progress.late ? <Icon name="Warning" size={14} weight="bold" color={colors.warning} /> : null}
+                <AppText
+                  variant="bodyStrong"
+                  tone={progress.late ? 'warning' : 'primary'}
+                  accessibilityLabel={progress.late ? goalLateWarning(progress) ?? undefined : undefined}
+                >
+                  {monthYear(progress.projectedDate)}
+                </AppText>
+              </View>
             </Row>
           ) : null}
           {account ? (

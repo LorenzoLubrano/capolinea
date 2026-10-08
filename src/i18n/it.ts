@@ -1,6 +1,10 @@
 /**
  * Italian UI strings. Every user-facing text lives here so another language can be added later.
  */
+
+/** «a marzo», «ad aprile». */
+const toMonth = (month: string) => (/^[aeiou]/i.test(month) ? `ad ${month}` : `a ${month}`);
+
 export const it = {
   money: {
     hidden: 'importo nascosto',
@@ -457,8 +461,9 @@ export const it = {
   goals: {
     saved: (amount: string, n: number) => `${amount} da parte in ${n === 1 ? '1 obiettivo' : `${n} obiettivi`}`,
     reached: 'Raggiunto',
-    monthly: (amount: string, month: string) => `${amount} al mese per arrivare a ${month}`,
-    projected: (month: string) => `Al ritmo attuale arrivi a ${month}`,
+    monthly: (amount: string, month: string) => `${amount} al mese per arrivare ${toMonth(month)}`,
+    projected: (month: string) => `Al ritmo attuale arrivi ${toMonth(month)}`,
+    late: (month: string) => `Al ritmo attuale arrivi ${toMonth(month)}, dopo la data`,
     overdue: (month: string, amount: string) => `La data di ${month} è passata: mancano ${amount}`,
     noPace: 'Ancora nessun versamento negli ultimi tre mesi.',
     add: 'Nuovo obiettivo',

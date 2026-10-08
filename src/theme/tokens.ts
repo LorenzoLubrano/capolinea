@@ -66,10 +66,10 @@ const tabular: TextStyle['fontVariant'] = ['tabular-nums'];
  * Colours are applied by the Text component from the theme.
  */
 export const type = {
-  display: { fontFamily: fonts.figure, fontSize: 54, lineHeight: 58, letterSpacing: -1.6, fontVariant: tabular },
+  display: { fontFamily: fonts.figure, fontSize: 54, lineHeight: 58, letterSpacing: -0.8, fontVariant: tabular },
   displayCents: { fontFamily: fonts.figureMedium, fontSize: 28, lineHeight: 34, letterSpacing: -0.4, fontVariant: tabular },
   figure: { fontFamily: fonts.figure, fontSize: 22, lineHeight: 26, letterSpacing: -0.4, fontVariant: tabular },
-  amountInput: { fontFamily: fonts.figure, fontSize: 64, lineHeight: 70, letterSpacing: -2, fontVariant: tabular },
+  amountInput: { fontFamily: fonts.figure, fontSize: 64, lineHeight: 70, letterSpacing: -1, fontVariant: tabular },
   title1: { fontFamily: fonts.bold, fontSize: 30, lineHeight: 36, letterSpacing: -0.6 },
   title2: { fontFamily: fonts.bold, fontSize: 22, lineHeight: 28, letterSpacing: -0.3 },
   title3: { fontFamily: fonts.bold, fontSize: 17, lineHeight: 22, letterSpacing: -0.1 },

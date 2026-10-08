@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { View } from 'react-native';
 
+import { spacedStops } from '@/domain/goals';
 import { radius, useTheme } from '@/theme';
 
 import { Icon } from './icon';
@@ -11,12 +13,20 @@ import { Icon } from './icon';
 export function GoalLine({ ratio, stops, color, height = 6 }: { ratio: number; stops: number[]; color: string; height?: number }) {
   const { colors } = useTheme();
   const dot = height + 6;
+  const [width, setWidth] = useState(0);
+  // A stop needs a ring of clear track around it to read as a stop, not as a chain.
+  const shown = width ? spacedStops(stops, (dot * 2) / width) : [];
   return (
-    <View style={{ height: dot + 6, justifyContent: 'center' }} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+    <View
+      style={{ height: dot + 6, justifyContent: 'center' }}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden
+    >
       <View style={{ height, borderRadius: radius.full, backgroundColor: colors.track, overflow: 'hidden' }}>
         <View style={{ width: `${Math.min(Math.max(ratio, 0), 1) * 100}%`, height: '100%', borderRadius: radius.full, backgroundColor: color }} />
       </View>
-      {stops.map((share, i) => (
+      {shown.map((share, i) => (
         <View
           key={i}
           style={{

@@ -33,6 +33,8 @@ export function Chip({
         alignItems: 'center',
         gap: spacing.xs + 2,
         minHeight: 44,
+        minWidth: 56,
+        justifyContent: 'center',
         paddingLeft: leading ? spacing.xs + 2 : spacing.smd,
         paddingRight: trailing ? spacing.sm : spacing.smd,
         borderRadius: radius.full,
