@@ -10,13 +10,19 @@ import { buildSharedOverview } from '@/features/money/money';
 import { it } from '@/i18n/it';
 import { formatMoney } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
+import { useSync } from '@/state/sync';
 import { radius, spacing, useTheme } from '@/theme';
 
-/** Profilo, opened from the avatar on the Home. Entries arrive here block by block. */
+const RULES = ['budgetNear', 'budgetOver', 'subscriptionSoon', 'chargeCreated', 'largeExpense', 'weeklySummary', 'monthlySummary', 'eveningReminder', 'goals'] as const;
+
+/** Profilo, opened from the avatar on the Home: the user's money, security and privacy, preferences, data. */
 export function ProfileScreen() {
   const { colors } = useTheme();
   const { data } = useSnapshot();
   const masked = useSettings((s) => s.privacy);
+  const pin = useSettings((s) => s.pin);
+  const notifications = useSettings((s) => s.notifications);
+  const syncStatus = useSync((s) => s.status);
   const name = data?.people.find((p) => p.isMe)?.name ?? '';
   const accounts = data?.accounts.filter((a) => !a.archived).length ?? 0;
   const expenseCategories = data?.categories.filter((c) => c.kind === 'expense' && !c.archived).length ?? 0;
@@ -43,7 +49,7 @@ export function ProfileScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
               <Icon name="DeviceMobile" size={16} color={colors.inkSecondary} />
               <AppText variant="footnote" tone="secondary" style={{ flexShrink: 1 }}>
-                {it.profile.localOnly}
+                {syncStatus === 'off' ? it.profile.localOnly : it.sync.states.on.title}
               </AppText>
             </View>
           </View>
@@ -55,8 +61,30 @@ export function ProfileScreen() {
           <SettingsRow icon="Users" title={it.profile.shared} hint={sharedHint} onPress={() => router.push('/shared')} />
         </SettingsGroup>
 
-        <SettingsGroup title={it.profile.preferences} footer={it.profile.comingSoon}>
+        <SettingsGroup title={it.profile.securityPrivacy}>
+          <SettingsRow icon="LockSimple" title={it.profile.security} hint={it.profile.securityHint(pin !== null)} onPress={() => router.push('/settings/security')} />
+          <SettingsRow icon={masked ? 'EyeSlash' : 'Eye'} title={it.profile.privacy} hint={it.profile.privacyHint(masked)} onPress={() => router.push('/settings/privacy')} />
+        </SettingsGroup>
+
+        <SettingsGroup title={it.profile.preferences}>
+          <SettingsRow
+            icon="Bell"
+            title={it.profile.notifications}
+            hint={it.profile.notificationsHint(RULES.filter((rule) => notifications[rule]).length)}
+            onPress={() => router.push('/settings/notifications')}
+          />
           <SettingsRow icon="Palette" title={it.profile.appearance} hint={it.profile.appearanceHint} onPress={() => router.push('/settings/appearance')} />
+          <SettingsRow icon="CurrencyEur" title={it.profile.currency} hint={it.profile.currencyHint} onPress={() => router.push('/settings/currency')} />
+        </SettingsGroup>
+
+        <SettingsGroup title={it.profile.yourData}>
+          <SettingsRow icon="Export" title={it.profile.export} hint={it.profile.exportHint} onPress={() => router.push('/settings/export')} />
+          <SettingsRow icon={syncStatus === 'off' ? 'CloudSlash' : 'CloudCheck'} title={it.profile.sync} hint={it.sync.states[syncStatus].title} onPress={() => router.push('/settings/sync')} />
+          <SettingsRow icon="Trash" title={it.profile.deleteData} destructive onPress={() => router.push('/settings/delete')} />
+        </SettingsGroup>
+
+        <SettingsGroup>
+          <SettingsRow icon="Info" title={it.profile.info} onPress={() => router.push('/settings/info')} />
         </SettingsGroup>
       </View>
     </Screen>

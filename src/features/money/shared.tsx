@@ -1,6 +1,6 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, Switch, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
@@ -13,6 +13,7 @@ import { Screen } from '@/components/screen';
 import { SettingsGroup } from '@/components/settings-group';
 import { SheetHeader } from '@/components/sheet-header';
 import { AppText } from '@/components/text';
+import { ThemedSwitch } from '@/components/themed-switch';
 import { ToastHost } from '@/components/toast-host';
 import { useAddPerson, useDeletePerson, useRestorePerson, useSettleWith, useSnapshot, useUndoSettle, useUpdatePerson } from '@/data/queries';
 import type { Snapshot } from '@/data/repositories';
@@ -370,15 +371,13 @@ function SettleBody({ data, person }: { data: Snapshot; person: Person }) {
                   {it.shared.settle.recordHint}
                 </AppText>
               </View>
-              <Switch
+              <ThemedSwitch
                 accessibilityLabel={it.shared.settle.record}
                 value={record}
                 onValueChange={(value) => {
                   haptics.selection();
                   setRecord(value);
                 }}
-                trackColor={{ true: colors.ink, false: colors.track }}
-                thumbColor={colors.surface}
               />
             </View>
             {record ? (

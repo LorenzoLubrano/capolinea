@@ -10,6 +10,7 @@ import type {
   NewTransaction,
   Repositories,
   SettleRecord,
+  Snapshot,
   SubscriptionChanges,
   TransactionChanges,
 } from './repositories';
@@ -113,3 +114,4 @@ export const useRestorePerson = () => useSnapshotMutation((r, id: string) => r.r
 export const useSettleWith = () =>
   useSnapshotMutation((r, { personId, ...options }: { personId: string; date: string; accountId?: string; description?: string }) => r.settleWith(personId, options));
 export const useUndoSettle = () => useSnapshotMutation((r, record: SettleRecord) => r.undoSettle(record));
+export const useReplaceAll = () => useSnapshotMutation((r, data: Snapshot) => r.replaceAll(data));

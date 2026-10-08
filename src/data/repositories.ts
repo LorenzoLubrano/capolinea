@@ -90,4 +90,6 @@ export interface Repositories {
    */
   settleWith(personId: Id, options: { date: LocalDate; accountId?: Id; description?: string }): Promise<SettleRecord>;
   undoSettle(record: SettleRecord): Promise<void>;
+  /** Swaps every collection at once: restoring a backup, wiping the local data. */
+  replaceAll(data: Snapshot): Promise<void>;
 }

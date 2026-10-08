@@ -74,7 +74,10 @@ function UsualSection({ analysis, data }: { analysis: Analysis; data: Snapshot }
         <Money minor={analysis.totalMinor} currency={data.currency} variant="display" centsVariant="displayCents" label={it.analytics.usual.spent} />
         <ComparisonLine comparison={analysis.comparison} current={analysis.current} unit={analysis.period.unit} currency={data.currency} />
       </View>
-      <TrendChartView key={`${analysis.period.unit}-${analysis.period.from}`} trend={analysis.trend} unit={analysis.period.unit} color={colors.ink} currency={data.currency} />
+      {/* Without any spending yet the chart would only draw empty bars. */}
+      {analysis.trend.buckets.some((b) => b.spentMinor > 0) ? (
+        <TrendChartView key={`${analysis.period.unit}-${analysis.period.from}`} trend={analysis.trend} unit={analysis.period.unit} color={colors.ink} currency={data.currency} />
+      ) : null}
     </AnalysisSection>
   );
 }

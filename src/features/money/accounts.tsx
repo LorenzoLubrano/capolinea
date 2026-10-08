@@ -1,6 +1,6 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, Switch, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Chip } from '@/components/chip';
@@ -13,6 +13,7 @@ import { SheetHeader } from '@/components/sheet-header';
 import { StopRow } from '@/components/stop-row';
 import { ColorPicker } from '@/components/swatch-picker';
 import { AppText } from '@/components/text';
+import { ThemedSwitch } from '@/components/themed-switch';
 import { ToastHost } from '@/components/toast-host';
 import { useDeleteAccount, useRestoreAccount, useSaveAccount, useSnapshot } from '@/data/queries';
 import type { Snapshot } from '@/data/repositories';
@@ -357,15 +358,13 @@ function AccountFormBody({ data, editing }: { data: Snapshot; editing?: Account 
               {it.accounts.form.inTotalHint}
             </AppText>
           </View>
-          <Switch
+          <ThemedSwitch
             accessibilityLabel={it.accounts.form.inTotal}
             value={includeInTotal}
             onValueChange={(value) => {
               haptics.selection();
               setIncludeInTotal(value);
             }}
-            trackColor={{ true: colors.ink, false: colors.track }}
-            thumbColor={colors.surface}
           />
         </View>
         {editing ? (

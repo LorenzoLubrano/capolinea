@@ -81,3 +81,14 @@ Registro delle decisioni di prodotto e tecniche. Il piano completo della fase 1 
 - Pareggio: saldare con una persona segna saldate tutte le quote aperte tra voi e, se vuoi, registra il movimento sul conto. Quel movimento (`settlementWith`) muove il saldo ma non conta né nella spesa né nelle entrate, perché la tua quota era già contata con la spesa divisa. Si annulla dall'avviso.
 - Dati di esempio: aggiunto un prelievo al mese sui contanti e un saldo di partenza più realistico per PayPal (prima andavano in rosso).
 - Selettori di icona e colore promossi a componenti condivisi (`swatch-picker.tsx`), usati da obiettivi, conti e categorie.
+
+## 08/10/2026: blocco Impostazioni (passo 5)
+
+- Profilo in quattro gruppi: I tuoi soldi, Sicurezza e privacy, Preferenze, I tuoi dati; poi Info.
+- Librerie aggiunte, tutte ufficiali Expo e incluse in Expo Go: `expo-local-authentication` (volto o impronta), `expo-crypto` (PIN), `expo-file-system` ed `expo-sharing` (esportazione), `expo-screen-capture` (anteprima nel multitasking). `npm audit` segnala vulnerabilità solo negli strumenti di build di Expo (erano già presenti; +1 moderata in `uuid`); niente arriva nell'app sul telefono e `npm audit fix --force` romperebbe le versioni di Expo.
+- PIN: da 4 a 6 cifre; rifiutati quelli facili (cifre uguali, in fila, a coppie). Si salva solo un SHA-256 con sale casuale e si confronta in tempo costante. Nella fase 1 vive in memoria; nella fase 2 va in SecureStore. Per toglierlo o cambiarlo serve quello attuale. La biometria si attiva solo dopo una conferma riuscita, e la riserva è il PIN dell'app, non il codice del telefono.
+- Anteprima nel multitasking coperta di base: su iOS sfocata, su Android finestra protetta, che blocca anche gli screenshot dell'app (si può spegnere in Privacy).
+- Esportazione: CSV per Excel e Numbers in italiano (punto e virgola, virgola decimale, BOM UTF-8), con le celle di testo protette dalle formule (CSV injection); backup completo in JSON con formato e versione. Il file passa dalla cache privata dell'app e viene cancellato alla prossima esportazione o al prossimo avvio: non lo si cancella subito perché l'app che lo riceve potrebbe ancora leggerlo.
+- Notifiche: regole locali con soglie e un'anteprima di come arrivano; con la privacy attiva nessuna cifra, nemmeno le percentuali. Nel prototipo non partono.
+- Sincronizzazione: concept con i sei stati simulati (accesso finto, nessun server); offline, errore e conflitto si vedono dal pannello prototipo, che per ora ha solo questa parte.
+- Elimina dati locali: conferma scritta «ELIMINA» al posto dell'Annulla, perché non si torna indietro. Si riparte dalle categorie predefinite e da Contanti a zero; si perdono anche PIN e accesso alla sincronizzazione, l'aspetto resta. Le categorie predefinite ora stanno in `src/data/defaults.ts`, non nei dati di esempio.

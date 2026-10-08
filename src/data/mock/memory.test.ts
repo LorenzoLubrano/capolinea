@@ -1,4 +1,6 @@
 import { createMemoryRepositories } from './memory';
+import { createEmptyDataset } from '../defaults';
+
 import { createDataset } from './seed';
 
 describe('memory repositories', () => {
@@ -189,5 +191,19 @@ describe('memory repositories: accounts, categories, people', () => {
     const repos = createMemoryRepositories(createDataset(), 0);
     const record = await repos.settleWith('person-mario', { date: '2026-10-24' });
     expect(record.transactionId).toBeUndefined();
+  });
+});
+
+describe('memory repositories: replacing all the data', () => {
+  it('replaces everything at once, as a restore or a local wipe does', async () => {
+    const repos = createMemoryRepositories(createDataset(), 0);
+    await repos.replaceAll(createEmptyDataset('2026-10-24'));
+    const snapshot = await repos.snapshot();
+    expect(snapshot.transactions).toEqual([]);
+    expect(snapshot.subscriptions).toEqual([]);
+    expect(snapshot.goals).toEqual([]);
+    expect(snapshot.accounts.map((a) => a.name)).toEqual(['Contanti']);
+    expect(snapshot.categories.length).toBeGreaterThan(10);
+    expect(snapshot.people.filter((p) => p.isMe)).toHaveLength(1);
   });
 });

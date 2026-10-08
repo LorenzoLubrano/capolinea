@@ -312,6 +312,20 @@ export function createMemoryRepositories(dataset: Dataset = createDataset(), lat
         .map((t) => (byId.has(t.id) ? { ...t, split: byId.get(t.id), updatedAt: now() } : t));
     },
 
+    async replaceAll(data) {
+      await wait();
+      Object.assign(state, {
+        ...data,
+        people: [...data.people],
+        accounts: [...data.accounts],
+        categories: [...data.categories],
+        subscriptions: [...data.subscriptions],
+        budgets: [...data.budgets],
+        goals: [...data.goals],
+        transactions: [...data.transactions],
+      });
+    },
+
     async addPerson(name: string) {
       await wait();
       const stamp = now();
