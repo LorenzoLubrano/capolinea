@@ -996,6 +996,7 @@ export const it = {
     showAll: (n: number) => `Mostra tutti (${n})`,
     showAllCategories: (n: number) => `Mostra tutte (${n})`,
     showLess: 'Mostra meno',
+    allMovements: (n: number) => `Tutti i ${n} movimenti, in Movimenti`,
     empty: { title: 'Nessuna spesa in questo periodo', body: 'Quando registri una spesa, qui trovi quanto, dove e quando spendi.' },
     usual: {
       question: 'Quanto spendo rispetto al solito?',

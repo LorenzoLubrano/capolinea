@@ -20,10 +20,11 @@ import { formatMoney } from '@/services/format/money';
 import { formatShare } from '@/services/format/numbers';
 import { useAnalysisPeriod } from '@/state/analysis-period';
 import { useSettings } from '@/state/settings';
+import { useTransactionFilters } from '@/state/transaction-filters';
 import { layout, spacing, useTheme } from '@/theme';
 
 import { buildCategoryAnalysis, buildMerchantAnalysis } from './analysis';
-import { ComparisonLine, MerchantRow } from './parts';
+import { ComparisonLine, LinkRow, MerchantRow } from './parts';
 import { TrendChartView } from './trend-chart';
 
 /** A detail sheet: header with Chiudi, scrolling body, optional footer button. */
@@ -47,9 +48,13 @@ function DetailSheet({ title, children, footer }: { title: string; children: Rea
   );
 }
 
-function Movements({ title, empty, movements, data }: { title: string; empty: string; movements: Transaction[]; data: Snapshot }) {
+/** A year of a busy category is hundreds of rows: the sheet shows the latest, Movimenti has them all. */
+const MOVEMENTS_SHOWN = 20;
+
+function Movements({ title, empty, movements, data, seeAll }: { title: string; empty: string; movements: Transaction[]; data: Snapshot; seeAll: () => void }) {
   const categories = new Map(data.categories.map((c) => [c.id, c]));
   const accounts = new Map(data.accounts.map((a) => [a.id, a.name]));
+  const shown = movements.slice(0, MOVEMENTS_SHOWN);
   return (
     <View style={{ gap: spacing.xs }}>
       <AppText variant="title3" accessibilityRole="header">
@@ -60,7 +65,7 @@ function Movements({ title, empty, movements, data }: { title: string; empty: st
           {empty}
         </AppText>
       ) : (
-        movements.map((tx, i) => (
+        shown.map((tx, i) => (
           <StopRow
             key={tx.id}
             tx={tx}
@@ -69,13 +74,23 @@ function Movements({ title, empty, movements, data }: { title: string; empty: st
             currency={data.currency}
             meId={data.meId}
             first={i === 0}
-            last={i === movements.length - 1}
+            last={i === shown.length - 1}
             onPress={() => router.push({ pathname: '/transaction/[id]', params: { id: tx.id } })}
           />
         ))
       )}
+      {movements.length > shown.length ? <LinkRow label={it.analytics.allMovements(movements.length)} onPress={seeAll} /> : null}
     </View>
   );
+}
+
+/** Closes the sheets and opens Movimenti with the filter that finds the same movements. */
+function openInMovements(filter: (filters: ReturnType<typeof useTransactionFilters.getState>) => void) {
+  const filters = useTransactionFilters.getState();
+  filters.resetAll();
+  filter(useTransactionFilters.getState());
+  if (router.canDismiss()) router.dismissAll();
+  router.navigate('/transactions');
 }
 
 /** Analisi › a category over the analysed period: total, share, trend, where, movements. */
@@ -131,7 +146,13 @@ export function CategoryAnalysisSheet() {
           </View>
         </View>
       ) : null}
-      <Movements title={it.analytics.category.movements} empty={it.analytics.category.noMovements} movements={analysis.movements} data={data} />
+      <Movements
+        title={it.analytics.category.movements}
+        empty={it.analytics.category.noMovements}
+        movements={analysis.movements}
+        data={data}
+        seeAll={() => openInMovements((f) => f.toggleCategory(id))}
+      />
     </DetailSheet>
   );
 }
@@ -171,7 +192,13 @@ export function MerchantAnalysisSheet() {
         ) : null}
       </View>
       <TrendChartView trend={analysis.trend} unit={unit} color={color} currency={data.currency} />
-      <Movements title={it.analytics.merchant.movements} empty={it.analytics.merchant.noMovements} movements={analysis.movements} data={data} />
+      <Movements
+        title={it.analytics.merchant.movements}
+        empty={it.analytics.merchant.noMovements}
+        movements={analysis.movements}
+        data={data}
+        seeAll={() => openInMovements((f) => f.setQuery(name))}
+      />
     </DetailSheet>
   );
 }
