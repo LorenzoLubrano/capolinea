@@ -36,6 +36,8 @@ export const shadows = {
  */
 export const motion = {
   press: 120,
+  /** What a change made in a sheet waits before it moves the screen underneath: the sheet's way out. */
+  afterSheet: 300,
   fast: 150,
   base: 250,
   slow: 400,
@@ -112,7 +114,7 @@ export const backdrop = {
   interchangeDelay: 650,
   interchangeFade: 300,
   /** The saved category's line lights up once the add sheet has gone. */
-  pulseDelay: 300,
+  pulseDelay: motion.afterSheet,
   pulseIn: 225,
   pulseOut: 675,
   pulseStrength: 0.7,

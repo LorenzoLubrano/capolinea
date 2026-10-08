@@ -122,3 +122,10 @@ Critica di impeccable (due revisioni isolate, 28/40) e controllo tecnico per app
 - Robustezza: i fogli con dati scritti non si chiudono per sbaglio e chiedono prima di scartare (solo sul telefono: il web non ha l'avviso nativo).
 - Adattamento: Benvenuto, Blocco e PIN scorrono; cifre e righe si riorganizzano col testo grande; tastiera che non copre i campi su iOS; fascia sotto la barra di stato nelle schede. Su Android la tastiera resta affidata al ridimensionamento della finestra: da provare sul S24.
 - Casi limite: confronti oltre il doppio in «volte»; obiettivi con data passata; rimborsi oltre la spesa mostrati a parte; nomi della fascia fuori dalla tacca «oggi»; fogli di Analisi limitati a 20 movimenti con il link a Movimenti filtrato.
+- Movimento e revisioni finali: «Riduci animazioni» letto dal vivo (anche cambiato ad app aperta), l'impulso della linea e le dissolvenze restano anche con le animazioni ridotte, schermate spinte in dissolvenza; il toast di un foglio che si chiude compare una volta sola, sulla schermata sotto, e mai sopra la schermata di blocco. Obiettivi in ritardo segnalati quando il ritmo degli ultimi tre mesi arriva dopo la data; fermate degli obiettivi distanziate; cifre grandi meno strette, perché il punto delle migliaia resti leggibile. Il link «Tutti i N movimenti» apre Movimenti sullo stesso periodo dell'analisi (filtro con date esatte).
+
+Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
+
+- Linee delle categorie: niente più tacca del ritmo costante, che contraddiceva l'avviso; l'arrivo previsto è un tratteggio come nella fascia del mese, e se supera il budget compare il capolinea. L'anello «oggi» della fascia resta il ritmo costante.
+- La fascia del mese si muove quando il foglio di inserimento si è chiuso (Home e Budget tengono i valori finché sono coperti, poi 300 ms): dopo una serie di «Un'altra» si vede un solo spostamento. Le altre animazioni proposte (obiettivo che si riempie, PIN che scuote, rullo del totale, linea dell'onboarding) restano fuori.
+- Home vuota: se il primo avvio ha impostato un budget, la fascia c'è già, vuota e col capolinea. Il + si indica una volta sola.

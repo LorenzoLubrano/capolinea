@@ -118,7 +118,7 @@ export const it = {
     openAccounts: 'Apre i conti',
     empty: {
       title: 'Il mese parte da qui',
-      body: 'Tocca + per la tua prima spesa: importo, categoria, fatto.',
+      body: 'La prima spesa si scrive in tre tocchi: importo, categoria, fatto.',
       guide: 'Il + è qui sotto, al centro.',
     },
     error: {
@@ -401,7 +401,7 @@ export const it = {
       over: 'Oltre il capolinea',
     },
     refundedBeyond: (amount: string) => `Rimborsi oltre la spesa: ${amount}`,
-    paceHint: "L'anello «oggi» indica dove saresti con una spesa costante.",
+    paceHint: "L'anello «oggi» indica dove saresti con una spesa costante; il tratteggio, dove arrivi a fine mese.",
     editor: {
       global: 'Budget del mese',
       category: 'Budget per categoria',
@@ -729,7 +729,7 @@ export const it = {
       body: 'Puoi cambiare tutto più tardi in Profilo › Sicurezza e privacy.',
       done: 'Fine',
     },
-    ready: 'Tutto pronto. Tocca + per la prima spesa.',
+    ready: 'Tutto pronto.',
   },
   lock: {
     title: 'Scrivi il PIN',

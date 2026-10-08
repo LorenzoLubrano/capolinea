@@ -64,7 +64,7 @@ export function CategoryBudgetDetail() {
           </View>
           {detail.budgetMinor !== null && detail.status ? (
             <>
-              <ProgressLine ratio={detail.spentMinor / detail.budgetMinor} color={fill} edge={lineColor(category?.color ?? 'grey').edge} pace={detail.pace} height={8} />
+              <ProgressLine ratio={detail.spentMinor / detail.budgetMinor} color={fill} edge={lineColor(category?.color ?? 'grey').edge} forecast={detail.forecastMinor / detail.budgetMinor} height={8} />
               {detail.refundedMinor > 0 ? (
                 <AppText variant="footnote" tone="secondary">
                   {it.budget.refundedBeyond(money(detail.refundedMinor))}

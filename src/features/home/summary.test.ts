@@ -17,6 +17,7 @@ describe('buildHomeSummary', () => {
     const withBudget = summary.lines.filter((l) => l.budgetMinor);
     expect(withBudget.length).toBeGreaterThan(0);
     expect(withBudget.every((l) => l.status)).toBe(true);
+    expect(withBudget.every((l) => l.forecastMinor !== undefined && l.forecastMinor >= l.spentMinor)).toBe(true);
     expect(summary.lines.filter((l) => !l.budgetMinor).every((l) => l.status === undefined)).toBe(true);
   });
 

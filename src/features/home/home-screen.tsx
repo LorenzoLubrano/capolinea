@@ -7,6 +7,7 @@ import { Screen } from '@/components/screen';
 import { AppText } from '@/components/text';
 import { useSnapshot } from '@/data/queries';
 import { it } from '@/i18n/it';
+import { useHeldWhileBlurred } from '@/services/focus';
 import { radius, spacing, useTheme } from '@/theme';
 
 import { newestAddition } from './backdrop';
@@ -38,7 +39,10 @@ function HomeSkeleton() {
 
 export function HomeScreen() {
   const { colors } = useTheme();
-  const { data, isPending, isError, refetch } = useSnapshot();
+  const snapshot = useSnapshot();
+  const { isPending, isError, refetch } = snapshot;
+  // A save from a sheet lands when the Home is back in view: the band moves where it can be seen.
+  const data = useHeldWhileBlurred(snapshot.data);
   const summary = useMemo(() => (data ? buildHomeSummary(data) : null), [data]);
   const me = data?.people.find((p) => p.isMe);
 
@@ -55,14 +59,18 @@ export function HomeScreen() {
         <View style={{ gap: spacing.xl, paddingTop: spacing.md }}>
           <SpentHero summary={summary} />
           {summary.latest.length === 0 ? (
-            <View style={{ gap: spacing.xs }}>
-              <AppText variant="title3">{it.home.empty.title}</AppText>
-              <AppText tone="secondary">{it.home.empty.body}</AppText>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingTop: spacing.sm }}>
-                <Icon name="ArrowDown" size={16} color={colors.ink} weight="bold" />
-                <AppText variant="subheadStrong">{it.home.empty.guide}</AppText>
+            <>
+              {/* With a budget from the first launch, the band is there from the start: empty, with its terminus. */}
+              {summary.budget ? <MonthBand summary={summary} /> : null}
+              <View style={{ gap: spacing.xs }}>
+                <AppText variant="title3">{it.home.empty.title}</AppText>
+                <AppText tone="secondary">{it.home.empty.body}</AppText>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingTop: spacing.sm }}>
+                  <Icon name="ArrowDown" size={16} color={colors.ink} weight="bold" />
+                  <AppText variant="subheadStrong">{it.home.empty.guide}</AppText>
+                </View>
               </View>
-            </View>
+            </>
           ) : (
             <>
               <MonthBand summary={summary} />

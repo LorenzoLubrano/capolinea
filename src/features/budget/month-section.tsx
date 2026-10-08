@@ -15,6 +15,7 @@ import { buildHomeSummary } from '@/features/home/summary';
 import { it } from '@/i18n/it';
 import { monthName } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
+import { useHeldWhileBlurred } from '@/services/focus';
 import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
 
@@ -33,8 +34,10 @@ function SpentOf({ spent, budget, currency, variant }: { spent: number; budget: 
 }
 
 /** Mese: the global budget with today's pace, then one line per category budget. */
-export function MonthSection({ data }: { data: Snapshot }) {
+export function MonthSection({ data: live }: { data: Snapshot }) {
   const { colors, lineColor } = useTheme();
+  // A save from a sheet over Budget moves the band and the lines once the sheet has gone.
+  const data = useHeldWhileBlurred(live);
   const masked = useSettings((s) => s.privacy);
   const overview = buildBudgetOverview(data);
   const summary = buildHomeSummary(data);
@@ -130,7 +133,7 @@ export function MonthSection({ data }: { data: Snapshot }) {
                 </AppText>
                 <SpentOf spent={row.spentMinor} budget={row.budgetMinor} currency={currency} variant="subhead" />
               </View>
-              <ProgressLine ratio={row.ratio} color={lineColor(row.color).fill} edge={lineColor(row.color).edge} pace={overview.pace} />
+              <ProgressLine ratio={row.ratio} color={lineColor(row.color).fill} edge={lineColor(row.color).edge} forecast={row.forecastMinor / row.budgetMinor} />
               {row.refundedMinor > 0 ? (
                 <AppText variant="footnote" tone="secondary">
                   {it.budget.refundedBeyond(money(row.refundedMinor))}

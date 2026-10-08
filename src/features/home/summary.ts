@@ -45,7 +45,7 @@ export interface HomeSummary {
   income: { incomeMinor: number; netMinor: number } | null;
   subscriptionsMonthlyMinor: number;
   /** Status only for lines with a budget, from the line's own forecast. */
-  lines: { categoryId: Id; name: string; color: string; icon?: string; spentMinor: number; budgetMinor?: number; status?: BudgetStatus }[];
+  lines: { categoryId: Id; name: string; color: string; icon?: string; spentMinor: number; budgetMinor?: number; forecastMinor?: number; status?: BudgetStatus }[];
   latest: Transaction[];
 }
 
@@ -105,6 +105,9 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
   const lines = head.slice(0, TOP_LINES).map(({ categoryId, amountMinor }) => {
     const category = categoryById.get(categoryId!);
     const categoryBudget = activeBudget(budgets, month, 'category', categoryId!);
+    const forecastMinor = categoryBudget
+      ? forecastMonthEnd(transactions, today, { ...options, categoryId: categoryId!, upcomingRecurringMinor: upcomingFor(categoryId!) })
+      : 0;
     return {
       categoryId: categoryId!,
       name: category?.name ?? strings.categories.uncategorized,
@@ -114,11 +117,8 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
       ...(categoryBudget
         ? {
             budgetMinor: categoryBudget.amountMinor,
-            status: budgetStatus({
-              spentMinor: amountMinor,
-              budgetMinor: categoryBudget.amountMinor,
-              forecastMinor: forecastMonthEnd(transactions, today, { ...options, categoryId: categoryId!, upcomingRecurringMinor: upcomingFor(categoryId!) }),
-            }),
+            forecastMinor,
+            status: budgetStatus({ spentMinor: amountMinor, budgetMinor: categoryBudget.amountMinor, forecastMinor }),
           }
         : {}),
     };

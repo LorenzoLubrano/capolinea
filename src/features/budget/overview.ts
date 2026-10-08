@@ -28,6 +28,8 @@ export interface CategoryBudgetRow {
   /** Refunds beyond the month's spending in the category, 0 otherwise. */
   refundedMinor: number;
   ratio: number;
+  /** Where the category arrives at the end of the month: the dashed extension of its line. */
+  forecastMinor: number;
   status: BudgetStatus;
 }
 
@@ -108,6 +110,7 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
       spentMinor: spent,
       refundedMinor: Math.max(-net, 0),
       ratio: spent / budget.amountMinor,
+      forecastMinor: categoryForecast,
       status: budgetStatus({ spentMinor: spent, budgetMinor: budget.amountMinor, forecastMinor: categoryForecast }),
     });
   }

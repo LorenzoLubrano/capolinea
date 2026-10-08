@@ -37,6 +37,7 @@ export function MonthBand({ summary, compact = false }: { summary: HomeSummary; 
     transitionProperty: ['left', 'width'] as ('left' | 'width')[],
     transitionDuration: reduced ? 0 : motion.slow,
     transitionTimingFunction: motion.easeOut,
+    transitionDelay: reduced ? 0 : motion.afterSheet,
   };
 
   const segments = band.segments.map((segment, i) => ({

@@ -52,7 +52,13 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
               </View>
               {line.budgetMinor ? (
                 <>
-                  <ProgressLine ratio={ratio!} color={lineColor(line.color).fill} edge={lineColor(line.color).edge} height={4} />
+                  <ProgressLine
+                    ratio={ratio!}
+                    color={lineColor(line.color).fill}
+                    edge={lineColor(line.color).edge}
+                    forecast={line.budgetMinor && line.forecastMinor !== undefined ? line.forecastMinor / line.budgetMinor : undefined}
+                    height={4}
+                  />
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
                     {over || warn ? <Icon name="Warning" size={12} weight="bold" color={over ? colors.alert : colors.warning} /> : null}
                     {over ? (

@@ -29,6 +29,14 @@ describe('buildBudgetOverview', () => {
     expect(early.categories.every((c) => c.status === 'on_track')).toBe(true);
   });
 
+  it('gives each category its forecast, which its status agrees with', () => {
+    for (const c of overview.categories) {
+      expect(c.forecastMinor).toBeGreaterThanOrEqual(c.spentMinor);
+      if (c.status === 'trending_over') expect(c.forecastMinor).toBeGreaterThan(c.budgetMinor);
+      if (c.status === 'on_track') expect(c.forecastMinor).toBeLessThan(c.budgetMinor * 0.95);
+    }
+  });
+
   it('suggests categories with spending but no budget, biggest first', () => {
     const budgeted = new Set(overview.categories.map((c) => c.categoryId));
     expect(overview.withoutBudget.length).toBeLessThanOrEqual(4);
