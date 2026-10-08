@@ -73,13 +73,6 @@ export const it = {
       overBy: 'Oltre il capolinea di',
       forecast: 'Arrivo previsto',
       noBudget: 'Senza budget: la fascia mostra solo dove vanno i soldi',
-      status: {
-        on_track: 'In linea con il mese',
-        ahead: 'Sopra il ritmo di oggi',
-        near: 'Vicino al capolinea',
-        full: 'Al capolinea',
-        over: 'Oltre il capolinea',
-      },
       a11y: (spent: string, budget: string, forecast: string) =>
         `Fascia del mese: speso ${spent} su un budget di ${budget}. Arrivo previsto ${forecast}.`,
     },
@@ -96,9 +89,6 @@ export const it = {
     lines: 'Le tue linee',
     budget: 'Budget',
     noBudget: 'Nessun budget',
-    nearLimit: 'Quasi al capolinea',
-    atLimit: 'Al capolinea',
-    overBy: 'Oltre di',
     latest: 'Ultime fermate',
     seeAll: 'Vedi tutti',
     privacyShow: 'Mostra gli importi',
@@ -375,7 +365,13 @@ export const it = {
     withoutBudget: 'Senza budget questo mese',
     addBudget: 'Aggiungi budget',
     spentOf: (spent: string, budget: string) => `${spent} di ${budget}`,
-    statusWords: { on_track: 'In linea', ahead: 'Sopra il ritmo', near: 'Quasi al capolinea', full: 'Al capolinea', over: 'Oltre il capolinea' },
+    statusWords: {
+      on_track: 'Nei tempi',
+      near: 'Arrivo vicino al capolinea',
+      trending_over: 'Arrivo oltre il capolinea',
+      full: 'Al capolinea',
+      over: 'Oltre il capolinea',
+    },
     refundedBeyond: (amount: string) => `Rimborsi oltre la spesa: ${amount}`,
     paceHint: 'La tacca indica dove dovresti essere oggi.',
     editor: {

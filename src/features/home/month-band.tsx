@@ -4,6 +4,7 @@ import Animated, { useReducedMotion } from 'react-native-reanimated';
 
 import { Icon } from '@/components/icon';
 import { Money } from '@/components/money';
+import { StatusLine } from '@/components/status-line';
 import { AppText } from '@/components/text';
 import { it } from '@/i18n/it';
 import { formatMoney } from '@/services/format/money';
@@ -198,6 +199,7 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
         <View style={{ gap: spacing.xs }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: spacing.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs }}>
+              {budget.remainingMinor < 0 ? <Icon name="Warning" size={14} weight="bold" color={colors.alert} /> : null}
               <AppText variant="subhead" tone={budget.remainingMinor < 0 ? 'alert' : 'secondary'}>
                 {budget.remainingMinor < 0 ? it.home.band.overBy : it.home.band.remaining}
               </AppText>
@@ -217,17 +219,8 @@ export function MonthBand({ summary }: { summary: HomeSummary }) {
               <Money minor={budget.forecastMinor} currency={currency} variant="subheadStrong" wholeUnits />
             </View>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <Icon
-              name={budget.status === 'on_track' ? 'Check' : 'Warning'}
-              size={14}
-              weight="bold"
-              color={budget.status === 'over' ? colors.alert : budget.status === 'on_track' ? colors.ink : colors.warning}
-            />
-            <AppText variant="footnote" tone={budget.status === 'over' ? 'alert' : budget.status === 'on_track' ? 'secondary' : 'warning'}>
-              {it.home.band.status[budget.status]}
-            </AppText>
-          </View>
+          {/* Past the terminus the row above already says it, in red: no second line. */}
+          {budget.status !== 'over' ? <StatusLine status={budget.status} /> : null}
         </View>
       ) : (
         <AppText variant="footnote" tone="secondary">

@@ -44,7 +44,8 @@ export interface HomeSummary {
   balance: { totalMinor: number; accountCount: number };
   income: { incomeMinor: number; netMinor: number } | null;
   subscriptionsMonthlyMinor: number;
-  lines: { categoryId: Id; name: string; color: string; spentMinor: number; budgetMinor?: number }[];
+  /** Status only for lines with a budget, from the line's own forecast. */
+  lines: { categoryId: Id; name: string; color: string; spentMinor: number; budgetMinor?: number; status?: BudgetStatus }[];
   latest: Transaction[];
 }
 
@@ -62,20 +63,20 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
   const comparison = compareWithPreviousMonth(transactions, today, options);
   const spentMinor = comparison.currentMinor;
 
-  const upcomingRecurringMinor = subscriptions
-    .filter((s) => s.currency === currency)
-    .reduce((sum, s) => sum + chargesBetween(s, addDays(today, 1), to).length * s.amountMinor, 0);
-  const forecastMinor = forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor });
+  const upcomingFor = (categoryId?: Id) =>
+    subscriptions
+      .filter((s) => s.currency === currency && (!categoryId || s.categoryId === categoryId))
+      .reduce((sum, s) => sum + chargesBetween(s, addDays(today, 1), to).length * s.amountMinor, 0);
+  const forecastMinor = forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor: upcomingFor() });
 
   const month = today.slice(0, 7);
   const globalBudget = activeBudget(budgets, month, 'global');
-  const pace = monthPace(today);
   const budget = globalBudget
     ? {
         amountMinor: globalBudget.amountMinor,
         remainingMinor: globalBudget.amountMinor - spentMinor,
         forecastMinor,
-        status: budgetStatus({ spentMinor, budgetMinor: globalBudget.amountMinor, pace }),
+        status: budgetStatus({ spentMinor, budgetMinor: globalBudget.amountMinor, forecastMinor }),
       }
     : null;
 
@@ -109,7 +110,16 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
       name: category?.name ?? strings.categories.uncategorized,
       color: category?.color ?? 'grey',
       spentMinor: amountMinor,
-      ...(categoryBudget ? { budgetMinor: categoryBudget.amountMinor } : {}),
+      ...(categoryBudget
+        ? {
+            budgetMinor: categoryBudget.amountMinor,
+            status: budgetStatus({
+              spentMinor: amountMinor,
+              budgetMinor: categoryBudget.amountMinor,
+              forecastMinor: forecastMonthEnd(transactions, today, { ...options, categoryId: categoryId!, upcomingRecurringMinor: upcomingFor(categoryId!) }),
+            }),
+          }
+        : {}),
     };
   });
 
@@ -129,7 +139,7 @@ export function buildHomeSummary(snapshot: Snapshot): HomeSummary {
       segments,
       scaleMinor,
       terminusRatio,
-      paceRatio: pace * terminusRatio,
+      paceRatio: monthPace(today) * terminusRatio,
       forecastRatio: forecastMinor / scaleMinor,
     },
     balance: totalBalance(accounts, transactions, currency, meId),

@@ -34,30 +34,27 @@ describe('forecastMonthEnd', () => {
 });
 
 describe('budgetStatus', () => {
-  const pace = 0.5;
+  const budgetMinor = 160000;
 
-  it('is over when spending exceeds the budget', () => {
-    expect(budgetStatus({ spentMinor: 160100, budgetMinor: 160000, pace })).toBe('over');
+  it('is over when spending exceeds the budget, and full when it reaches it exactly', () => {
+    expect(budgetStatus({ spentMinor: 160100, budgetMinor, forecastMinor: 170000 })).toBe('over');
+    expect(budgetStatus({ spentMinor: 160000, budgetMinor, forecastMinor: 165000 })).toBe('full');
   });
 
-  it('is full when spending reaches the budget exactly', () => {
-    expect(budgetStatus({ spentMinor: 160000, budgetMinor: 160000, pace })).toBe('full');
+  it('warns when the month is heading past the terminus, even if little is spent yet', () => {
+    expect(budgetStatus({ spentMinor: 40000, budgetMinor, forecastMinor: 170000 })).toBe('trending_over');
   });
 
-  it('is near the limit from 80% of the budget', () => {
-    expect(budgetStatus({ spentMinor: 128000, budgetMinor: 160000, pace: 0.9 })).toBe('near');
+  it('is near when the forecast lands within 5% of the terminus', () => {
+    expect(budgetStatus({ spentMinor: 120000, budgetMinor, forecastMinor: 154000 })).toBe('near');
   });
 
-  it('is ahead of pace when spending runs more than 5 points over the month elapsed', () => {
-    expect(budgetStatus({ spentMinor: 90000, budgetMinor: 160000, pace })).toBe('ahead');
+  it('stays on track with fixed costs paid early: rent on the first is no alarm', () => {
+    expect(budgetStatus({ spentMinor: 55000, budgetMinor, forecastMinor: 62800 })).toBe('on_track');
   });
 
-  it('is on track otherwise', () => {
-    expect(budgetStatus({ spentMinor: 80000, budgetMinor: 160000, pace })).toBe('on_track');
-  });
-
-  it('accepts a custom near-limit threshold', () => {
-    expect(budgetStatus({ spentMinor: 112000, budgetMinor: 160000, pace: 0.9, nearThreshold: 0.7 })).toBe('near');
+  it('stays on track late in the month when the forecast is clearly under the terminus', () => {
+    expect(budgetStatus({ spentMinor: 135000, budgetMinor, forecastMinor: 148000 })).toBe('on_track');
   });
 });
 

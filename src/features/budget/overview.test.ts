@@ -23,6 +23,12 @@ describe('buildBudgetOverview', () => {
     expect([...ratios].sort((a, b) => b - a)).toEqual(ratios);
   });
 
+  it('reads every status from the forecast, never from a straight-line pace', () => {
+    const early = buildBudgetOverview(createDataset('2026-10-01'));
+    expect(early.global?.status).toBe('on_track');
+    expect(early.categories.every((c) => c.status === 'on_track')).toBe(true);
+  });
+
   it('suggests categories with spending but no budget, biggest first', () => {
     const budgeted = new Set(overview.categories.map((c) => c.categoryId));
     expect(overview.withoutBudget.length).toBeLessThanOrEqual(4);

@@ -7,9 +7,9 @@ import { LineBadge } from '@/components/line-badge';
 import { Money } from '@/components/money';
 import { PressableScale } from '@/components/pressable-scale';
 import { ProgressLine } from '@/components/progress-line';
+import { StatusLine } from '@/components/status-line';
 import { AppText } from '@/components/text';
 import type { Snapshot } from '@/data/repositories';
-import type { BudgetStatus } from '@/domain/budget';
 import { it } from '@/i18n/it';
 import { monthName } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
@@ -17,21 +17,6 @@ import { useSettings } from '@/state/settings';
 import { spacing, useTheme } from '@/theme';
 
 import { buildBudgetOverview } from './overview';
-
-/** Status in words, icon and colour together; red only past the limit. */
-export function StatusLine({ status }: { status: BudgetStatus }) {
-  const { colors } = useTheme();
-  const alert = status === 'over';
-  const warn = status === 'near' || status === 'full' || status === 'ahead';
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-      <Icon name={alert || warn ? 'Warning' : 'Check'} size={14} weight="bold" color={alert ? colors.alert : warn ? colors.warning : colors.inkSecondary} />
-      <AppText variant="footnote" tone={alert ? 'alert' : warn ? 'warning' : 'secondary'}>
-        {it.budget.statusWords[status]}
-      </AppText>
-    </View>
-  );
-}
 
 function SpentOf({ spent, budget, currency, variant }: { spent: number; budget: number; currency: string; variant: 'figure' | 'subhead' }) {
   return (

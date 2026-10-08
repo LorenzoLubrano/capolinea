@@ -8,6 +8,18 @@ describe('buildHomeSummary', () => {
   const data = createDataset();
   const summary = buildHomeSummary(data);
 
+  it('reads the budget status from the forecast: the rent of the first is no alarm', () => {
+    expect(buildHomeSummary(createDataset('2026-10-01')).budget?.status).toBe('on_track');
+    expect(summary.budget?.status).toBe(summary.budget!.forecastMinor >= 0.95 * summary.budget!.amountMinor ? 'near' : 'on_track');
+  });
+
+  it('gives each line with a budget its own status, from its own forecast', () => {
+    const withBudget = summary.lines.filter((l) => l.budgetMinor);
+    expect(withBudget.length).toBeGreaterThan(0);
+    expect(withBudget.every((l) => l.status)).toBe(true);
+    expect(summary.lines.filter((l) => !l.budgetMinor).every((l) => l.status === undefined)).toBe(true);
+  });
+
   it('reports the month spending and the comparison at the same day', () => {
     const comparison = compareWithPreviousMonth(data.transactions, data.today, { currency: 'EUR', meId: data.meId });
     expect(summary.spentMinor).toBe(comparison.currentMinor);

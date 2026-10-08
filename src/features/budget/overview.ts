@@ -71,6 +71,7 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
   const spentMinor = spendingBetween(transactions, from, today, options);
+  const forecastMinor = forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor: upcomingRecurring(snapshot) });
   const globalBudget = activeBudget(budgets, month, 'global');
   const global = globalBudget
     ? {
@@ -79,9 +80,9 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
         spentMinor,
         remainingMinor: globalBudget.amountMinor - spentMinor,
         perDayMinor: dailyAllowance(globalBudget.amountMinor - spentMinor, today),
-        forecastMinor: forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor: upcomingRecurring(snapshot) }),
+        forecastMinor,
         ratio: spentMinor / globalBudget.amountMinor,
-        status: budgetStatus({ spentMinor, budgetMinor: globalBudget.amountMinor, pace }),
+        status: budgetStatus({ spentMinor, budgetMinor: globalBudget.amountMinor, forecastMinor }),
       }
     : null;
 
@@ -91,6 +92,11 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
     if (!budget) continue;
     const net = spendingBetween(transactions, from, today, { ...options, categoryId: category.id });
     const spent = Math.max(net, 0);
+    const categoryForecast = forecastMonthEnd(transactions, today, {
+      ...options,
+      categoryId: category.id,
+      upcomingRecurringMinor: upcomingRecurring(snapshot, category.id),
+    });
     categoryRows.push({
       categoryId: category.id,
       budgetId: budget.id,
@@ -100,7 +106,7 @@ export function buildBudgetOverview(snapshot: Snapshot): BudgetOverview {
       spentMinor: spent,
       refundedMinor: Math.max(-net, 0),
       ratio: spent / budget.amountMinor,
-      status: budgetStatus({ spentMinor: spent, budgetMinor: budget.amountMinor, pace }),
+      status: budgetStatus({ spentMinor: spent, budgetMinor: budget.amountMinor, forecastMinor: categoryForecast }),
     });
   }
   categoryRows.sort((a, b) => b.ratio - a.ratio);
@@ -146,15 +152,16 @@ export function buildCategoryDetail(snapshot: Snapshot, categoryId: Id): Categor
   const budget = activeBudget(budgets, today.slice(0, 7), 'category', categoryId);
   const net = spendingBetween(transactions, from, today, options);
   const spentMinor = Math.max(net, 0);
+  const forecastMinor = forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor: upcomingRecurring(snapshot, categoryId) });
 
   return {
     budgetId: budget?.id ?? null,
     budgetMinor: budget?.amountMinor ?? null,
     spentMinor,
     refundedMinor: Math.max(-net, 0),
-    forecastMinor: forecastMonthEnd(transactions, today, { ...options, upcomingRecurringMinor: upcomingRecurring(snapshot, categoryId) }),
+    forecastMinor,
     perDayMinor: budget ? dailyAllowance(budget.amountMinor - spentMinor, today) : null,
-    status: budget ? budgetStatus({ spentMinor, budgetMinor: budget.amountMinor, pace }) : null,
+    status: budget ? budgetStatus({ spentMinor, budgetMinor: budget.amountMinor, forecastMinor }) : null,
     pace,
     history: monthlyHistory(transactions, today, HISTORY_MONTHS, options),
     movements: transactions

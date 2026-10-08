@@ -9,6 +9,7 @@ import { Money } from '@/components/money';
 import { ProgressLine } from '@/components/progress-line';
 import { SheetHeader } from '@/components/sheet-header';
 import { StopRow } from '@/components/stop-row';
+import { StatusLine } from '@/components/status-line';
 import { AppText } from '@/components/text';
 import { ToastHost } from '@/components/toast-host';
 import { useSnapshot } from '@/data/queries';
@@ -19,7 +20,6 @@ import { formatMoney } from '@/services/format/money';
 import { useSettings } from '@/state/settings';
 import { layout, spacing, useTheme } from '@/theme';
 
-import { StatusLine } from './month-section';
 import { buildCategoryDetail } from './overview';
 
 const BAR_HEIGHT = 72;

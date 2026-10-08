@@ -6,7 +6,6 @@ import { LineBadge } from '@/components/line-badge';
 import { PressableScale } from '@/components/pressable-scale';
 import { Money } from '@/components/money';
 import { AppText } from '@/components/text';
-import { budgetStatus } from '@/domain/budget';
 import { it } from '@/i18n/it';
 import { radius, spacing, useTheme } from '@/theme';
 
@@ -24,11 +23,9 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
       </AppText>
       {summary.lines.map((line) => {
         const ratio = line.budgetMinor ? line.spentMinor / line.budgetMinor : null;
-        // The same words as Budget; pace 1 because the lines speak of the limit, not of the pace.
-        const status = line.budgetMinor ? budgetStatus({ spentMinor: line.spentMinor, budgetMinor: line.budgetMinor, pace: 1 }) : null;
-        const over = status === 'over';
-        const full = status === 'full';
-        const near = status === 'near' || full;
+        const over = line.status === 'over';
+        // The same words as Budget, from the line's own forecast.
+        const warn = line.status === 'near' || line.status === 'trending_over' || line.status === 'full';
         return (
           <PressableScale
             key={line.categoryId}
@@ -65,20 +62,20 @@ export function LinesList({ summary }: { summary: HomeSummary }) {
                     />
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                    {over || near ? <Icon name="Warning" size={12} weight="bold" color={over ? colors.alert : colors.warning} /> : null}
+                    {over || warn ? <Icon name="Warning" size={12} weight="bold" color={over ? colors.alert : colors.warning} /> : null}
                     {over ? (
                       <>
                         <AppText variant="footnote" tone="alert">
-                          {it.home.overBy}
+                          {it.home.band.overBy}
                         </AppText>
                         <Money minor={line.spentMinor - line.budgetMinor} currency={currency} variant="footnote" tone="alert" wholeUnits />
                       </>
                     ) : (
                       <>
-                        <AppText variant="footnote" tone={near ? 'warning' : 'secondary'}>
-                          {near ? `${full ? it.home.atLimit : it.home.nearLimit} · ${it.home.budget.toLowerCase()}` : it.home.budget}
+                        <AppText variant="footnote" tone={warn ? 'warning' : 'secondary'} numberOfLines={1} style={{ flexShrink: 1 }}>
+                          {warn && line.status ? `${it.budget.statusWords[line.status]} · ${it.home.budget.toLowerCase()}` : it.home.budget}
                         </AppText>
-                        <Money minor={line.budgetMinor} currency={currency} variant="footnote" tone={near ? 'warning' : 'secondary'} wholeUnits />
+                        <Money minor={line.budgetMinor} currency={currency} variant="footnote" tone={warn ? 'warning' : 'secondary'} wholeUnits />
                       </>
                     )}
                   </View>

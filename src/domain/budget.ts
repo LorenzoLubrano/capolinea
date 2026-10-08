@@ -2,7 +2,7 @@ import { addMonthsClamped, dayOfMonth, daysInMonth, isWithin, monthEnd, monthSta
 import { spendingBetween, spendingImpact, type SpendingOptions } from './spending';
 import type { Budget, BudgetScope, CurrencyCode, Id, LocalDate, Transaction } from './types';
 
-export type BudgetStatus = 'on_track' | 'ahead' | 'near' | 'full' | 'over';
+export type BudgetStatus = 'on_track' | 'near' | 'trending_over' | 'full' | 'over';
 
 function monthLength(date: LocalDate): number {
   const [year, month] = date.split('-').map(Number);
@@ -50,19 +50,22 @@ export function forecastMonthEnd(txs: Transaction[], today: LocalDate, options: 
 export interface BudgetStatusInput {
   spentMinor: number;
   budgetMinor: number;
-  pace: number;
-  /** Share of the budget that triggers "near the limit"; 0.8 by default. */
-  nearThreshold?: number;
+  /** Where the month is expected to arrive (`forecastMonthEnd`). */
+  forecastMinor: number;
 }
 
-const PACE_TOLERANCE = 0.05;
+/** From this share of the budget, the forecast counts as close to the terminus. */
+const NEAR_FORECAST = 0.95;
 
-export function budgetStatus({ spentMinor, budgetMinor, pace, nearThreshold = 0.8 }: BudgetStatusInput): BudgetStatus {
-  const used = spentMinor / budgetMinor;
+/**
+ * The status follows where the month will arrive, not a straight-line pace: fixed costs paid early
+ * (rent on the first) raise no alarm, and the words never contradict the forecast next to them.
+ */
+export function budgetStatus({ spentMinor, budgetMinor, forecastMinor }: BudgetStatusInput): BudgetStatus {
   if (spentMinor > budgetMinor) return 'over';
   if (spentMinor === budgetMinor) return 'full';
-  if (used >= nearThreshold) return 'near';
-  if (used > pace + PACE_TOLERANCE) return 'ahead';
+  if (forecastMinor > budgetMinor) return 'trending_over';
+  if (forecastMinor >= budgetMinor * NEAR_FORECAST) return 'near';
   return 'on_track';
 }
 
