@@ -2,6 +2,7 @@
   "name": "app-spese",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "@expo-google-fonts/archivo": "0.4.2",
     "@expo-google-fonts/archivo-narrow": "0.4.2",

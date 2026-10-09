@@ -94,4 +94,4 @@ Per aggiungere una libreria usa `npx expo install <pacchetto>`, che sceglie la v
 
 ## Licenza
 
-Da scegliere prima di pubblicare il repository.
+[GPL-3.0-only](LICENSE). Le librerie usate hanno licenze permissive: Expo e React Native MIT, SQLCipher BSD, i caratteri Archivo SIL OFL 1.1, le icone Phosphor MIT.
