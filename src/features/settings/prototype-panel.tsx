@@ -41,7 +41,7 @@ export function PrototypePanel() {
     if (replaceAll.isPending) return;
     haptics.selection();
     const today = resolveFakeDate(when, new Date());
-    setLoaded(kind, when);
+    setLoaded(kind, when, when === 'real' ? undefined : today);
     replaceAll.mutate(prototypeDataset(kind, today), {
       onSuccess: () => {
         useTransactionFilters.getState().resetAll();

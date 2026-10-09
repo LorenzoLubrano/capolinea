@@ -34,6 +34,10 @@ function AppStack() {
   const reduceMotion = useReduceMotion();
   // Exports left from the last session are deleted: the app keeps no copy of the data.
   useEffect(() => clearExports(), []);
+  // Rendered once the fonts are loaded and the database is open.
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const navigationTheme = {
     ...base,
@@ -131,10 +135,6 @@ export default function RootLayout() {
     ArchivoNarrow_600SemiBold,
     ArchivoNarrow_700Bold,
   });
-
-  useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
 

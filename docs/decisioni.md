@@ -142,6 +142,17 @@ Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
 - Schema in `src/data/sqlite/schema.ts`, una migrazione per versione, numero in `PRAGMA user_version`. Una migrazione pubblicata non si cambia più: un bisogno nuovo è una migrazione nuova, con un test che parte da un database della versione prima.
 - Le migrazioni in sospeso girano in un'unica transazione: il database è o tutto aggiornato o com'era. Prima del primo cambiamento si fa una copia del database (non per un database nuovo); se la copia non riesce, non si migra. Un database scritto da un'app più recente non si apre.
 - Tabelle `STRICT` con controlli: importi in centesimi interi, date che sono giorni veri, tipi e flag solo tra i valori ammessi, un solo «io». Questi controlli rifiutano dati rotti invece di salvarli.
-- I riferimenti tra tabelle (conto, categoria, persona, abbonamento) si controllano al commit: un backup si ripristina in qualsiasi ordine, ma un movimento su un conto che non esiste viene rifiutato.
+- Il database lega solo i versamenti al loro obiettivo (controllo al commit, e con l'obiettivo se ne vanno i versamenti). Gli altri riferimenti possono puntare a record eliminati in modo morbido, che il backup non contiene (gli addebiti di un abbonamento eliminato, il rimborso di una spesa eliminata): li controlla l'app quando legge un backup (`features/settings/restore.ts`). Prima versione con tutti i riferimenti controllati dal database, corretta il 09/10 prima di qualsiasi installazione: rifiutava il ripristino di backup fatti dall'app stessa.
 - Etichette e quote di una spesa divisa stanno in colonne JSON (si leggono sempre con il movimento); i versamenti degli obiettivi hanno una tabella loro. La valuta va nella tabella `meta`; l'«io» si ricava dalle persone.
 - La copia prima della migrazione usa `VACUUM INTO`. Da provare al passo 6: con SQLCipher la copia deve restare cifrata.
+
+## 09/10/2026: fase 2, passo 2 (lo strato dati passa a SQLite)
+
+- `src/data/sqlite/repositories.ts` implementa le stesse funzioni della memoria. Le prove di contratto (`src/data/testing/repositories-contract.ts`) girano uguali sulla memoria e su SQLite: 27 casi, più 4 propri del database (primo avvio, riapertura, data di oggi).
+- Sul telefono il database `capolinea.db` si apre all'avvio, si prepara e si migra; la schermata iniziale resta finché i dati non sono pronti. Se non si apre, compare l'avviso già esistente «Non riesco a leggere i dati» con «Riprova»: i dati restano come sono.
+- La copia prima di una migrazione va accanto al database, con la versione nel nome (`capolinea-v1-….db`).
+- Le chiamate al database passano una alla volta: le transazioni di expo-sqlite non sono esclusive e due scritture insieme si mescolerebbero. Un test lo dimostra (senza la fila: «cannot start a transaction within a transaction»).
+- Gli identificativi nuovi sono UUID (`expo-crypto`), pronti per una sincronizzazione futura. Annullare un pareggio elimina il pagamento in modo morbido, come ogni altra eliminazione.
+- «Oggi» viene dall'orologio del telefono, mai dai dati ripristinati. Tornando nell'app in un altro giorno, i dati si rileggono.
+- L'anteprima web (solo sviluppo) resta sulla memoria con i dati di esempio: expo-sqlite non entra nel pacchetto web. Sul telefono, in sviluppo, si parte dal database vuoto; il pannello prototipo carica i dati di esempio e, se serve, sposta «oggi».
+

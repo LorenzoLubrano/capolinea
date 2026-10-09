@@ -115,25 +115,34 @@ describe('schema', () => {
     await expect(insert(db, table, row)).rejects.toThrow(BROKEN);
   });
 
-  it('checks references at commit, so a backup can be written in any order', async () => {
+  it('accepts movements that point at records a backup leaves out', async () => {
     const db = await newDatabase();
 
-    // Children before parents: every reference points forward until the commit.
-    await db.withTransactionAsync(async () => {
-      for (const table of Object.keys(ROWS).reverse()) for (const row of [...ROWS[table]].reverse()) await insert(db, table, row);
-    });
+    // The charge of a deleted subscription, the refund of a deleted expense: kept, their records are not.
+    await insert(db, 'transactions', { ...ROWS.transactions[1], subscription_id: 'sub-deleted', refund_of_id: 'tx-deleted', account_id: 'acc-deleted' });
 
-    expect(await db.getFirstAsync('SELECT count(*) AS n FROM transactions', [])).toEqual({ n: 2 });
+    expect(await db.getFirstAsync('SELECT count(*) AS n FROM transactions', [])).toEqual({ n: 1 });
   });
 
-  it('refuses a movement on an account that does not exist', async () => {
+  it('refuses a contribution to a goal that does not exist, at commit', async () => {
     const db = await newDatabase();
 
     await expect(
-      db.withTransactionAsync(() => insert(db, 'transactions', { ...ROWS.transactions[1], to_account_id: null, refund_of_id: null, settlement_with: null, account_id: 'acc-ghost' })),
+      db.withTransactionAsync(async () => {
+        await insert(db, 'goal_contributions', { ...ROWS.goal_contributions[0], goal_id: 'goal-ghost' });
+      }),
     ).rejects.toThrow('FOREIGN KEY constraint failed');
 
-    expect(await db.getFirstAsync('SELECT count(*) AS n FROM transactions', [])).toEqual({ n: 0 });
+    expect(await db.getFirstAsync('SELECT count(*) AS n FROM goal_contributions', [])).toEqual({ n: 0 });
+  });
+
+  it('drops the contributions of a goal removed with them', async () => {
+    const db = await newDatabase();
+    await db.withTransactionAsync(() => insertAll(db));
+
+    await db.runAsync("DELETE FROM goals WHERE id = 'goal-trip'", []);
+
+    expect(await db.getFirstAsync('SELECT count(*) AS n FROM goal_contributions', [])).toEqual({ n: 0 });
   });
 });
 

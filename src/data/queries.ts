@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { useRepositories } from './provider';
+import { SNAPSHOT_KEY, useRepositories } from './provider';
 import type {
   AccountDraft,
   BudgetDraft,
@@ -14,8 +14,6 @@ import type {
   SubscriptionChanges,
   TransactionChanges,
 } from './repositories';
-
-const SNAPSHOT_KEY = ['snapshot'] as const;
 
 export function useSnapshot() {
   const repos = useRepositories();
