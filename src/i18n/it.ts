@@ -648,13 +648,13 @@ export const it = {
     samples: {
       budgetNear: {
         title: 'Budget quasi finito',
-        body: (threshold: number) => `Spesa alimentare è all’${threshold}% del budget: restano 63 € per 7 giorni.`,
-        masked: 'Spesa alimentare è vicina al budget del mese.',
+        body: (threshold: number) => `Spesa alimentare: ${threshold}% del budget, restano 63 € per 7 giorni.`,
+        masked: 'Spesa alimentare: budget quasi finito.',
       },
       budgetOver: {
         title: 'Budget superato',
-        body: () => 'Ristoranti ha superato il budget di 12 €.',
-        masked: 'Ristoranti ha superato il budget del mese.',
+        body: () => 'Ristoranti: budget superato di 12 €.',
+        masked: 'Ristoranti: budget superato.',
       },
       subscriptionSoon: {
         title: 'Addebito in arrivo',
@@ -664,7 +664,7 @@ export const it = {
       chargeCreated: {
         title: 'Addebito registrato',
         body: () => 'Spotify, 10,99 €, aggiunto ai movimenti.',
-        masked: 'Spotify è stato aggiunto ai movimenti.',
+        masked: 'Spotify: addebito aggiunto ai movimenti.',
       },
       largeExpense: {
         title: 'Spesa grande',
@@ -824,6 +824,30 @@ export const it = {
     tomorrow: 'domani',
     subscriptionSoon: (name: string, amount: string, when: string) => `${name}, ${amount}, ${when}.`,
     subscriptionSoonMasked: (name: string) => `${name} si rinnova a breve.`,
+    /** `change`: against the usual week, -0.09 is 9% less; null with nothing to compare with. */
+    weekly: (spent: string, change: number | null) => {
+      if (change === null) return `Hai speso ${spent} questa settimana.`;
+      const percent = Math.round(Math.abs(change) * 100);
+      if (percent === 0) return `Hai speso ${spent}, come al solito.`;
+      return `Hai speso ${spent}, il ${percent}% ${change < 0 ? 'in meno' : 'in più'} del solito.`;
+    },
+    monthlyTitle: (month: string) => `${month.charAt(0).toUpperCase()}${month.slice(1)} in breve`,
+    monthlyWithin: (spent: string, budget: string) => `Speso ${spent} su ${budget}: budget rispettato.`,
+    monthlyOver: (spent: string, budget: string, over: string) => `Speso ${spent} su ${budget}: budget superato di ${over}.`,
+    monthlyPlain: (spent: string, month: string) => `Speso ${spent} ${toMonth(month)}.`,
+    monthBudget: 'Spesa del mese',
+    budgetNear: (name: string, percent: number, left: string, days: number) =>
+      `${name}: ${percent}% del budget, restano ${left} per ${days === 1 ? '1 giorno' : `${days} giorni`}.`,
+    budgetNearMasked: (name: string) => `${name}: budget quasi finito.`,
+    budgetOver: (name: string, over: string) => `${name}: budget superato di ${over}.`,
+    budgetOverMasked: (name: string) => `${name}: budget superato.`,
+    chargeCreated: (name: string, amount: string) => `${name}, ${amount}, aggiunto ai movimenti.`,
+    chargeCreatedMasked: (name: string) => `${name}: addebito aggiunto ai movimenti.`,
+    largeExpense: (label: string, amount: string) => `${label}, ${amount}: più della soglia che hai scelto.`,
+    anExpense: 'Una spesa',
+    goalTitle: (name: string, milestone: number) =>
+      milestone === 100 ? `${name}: obiettivo raggiunto` : `${name} ${milestone === 25 ? 'a un quarto' : milestone === 50 ? 'a metà strada' : 'a tre quarti'}`,
+    goal: (saved: string, target: string) => `Hai messo da parte ${saved} su ${target}.`,
   },
   notificationSettings: {
     title: 'Notifiche',

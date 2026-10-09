@@ -1,8 +1,12 @@
 import type { Snapshot } from '@/data/repositories';
-import { addDays, toLocalDate, weekdayMondayFirst } from '@/domain/dates';
+import { periodAt } from '@/domain/analysis';
+import { activeBudget } from '@/domain/budget';
+import { addDays, addMonthsClamped, monthEnd, monthStart, toLocalDate, weekdayMondayFirst } from '@/domain/dates';
+import { spendingBetween } from '@/domain/spending';
 import type { LocalDate } from '@/domain/types';
+import { buildAnalysis } from '@/features/analytics/analysis';
 import { it } from '@/i18n/it';
-import { weekdayName } from '@/services/format/dates';
+import { monthName, weekdayName } from '@/services/format/dates';
 import { formatMoney } from '@/services/format/money';
 import type { NotificationRules } from '@/state/settings';
 
@@ -16,6 +20,7 @@ export interface PlannedNotification {
 
 const NOTICE_HOUR = 9;
 const EVENING_HOUR = 21;
+const WEEKLY_HOUR = 20;
 /** Evenings scheduled ahead: the reminders keep coming for a week even if the app is not opened. */
 const EVENINGS = 7;
 
@@ -54,6 +59,34 @@ export function planNotifications(snapshot: Snapshot, rules: NotificationRules, 
       const date = addDays(today, i);
       planned.push({ id: `evening:${date}`, at: atHour(date, EVENING_HOUR), title, body: masked });
     }
+  }
+
+  if (rules.weeklySummary) {
+    // This Sunday evening, or the next one once it has gone.
+    const sunday = addDays(today, 6 - weekdayMondayFirst(today));
+    const day = atHour(sunday, WEEKLY_HOUR) > now ? sunday : addDays(sunday, 7);
+    // The numbers of Analisi on that Sunday, with what is recorded so far.
+    const week = buildAnalysis({ ...snapshot, today: day }, 'week', 0);
+    const { title, masked } = it.notificationRules.samples.weeklySummary;
+    const body = privacy ? masked : it.notificationMessages.weekly(formatMoney(week.totalMinor, snapshot.currency), week.comparison ? week.comparison.change : null);
+    planned.push({ id: `week:${periodAt('week', day).from}`, at: atHour(day, WEEKLY_HOUR), title, body });
+  }
+
+  if (rules.monthlySummary) {
+    // The first of next month: the month as recorded, against its budget.
+    const end = monthEnd(today);
+    const spent = spendingBetween(snapshot.transactions, monthStart(today), end, { currency: snapshot.currency, meId: snapshot.meId });
+    const budget = activeBudget(snapshot.budgets, today.slice(0, 7), 'global');
+    const money = (minor: number) => formatMoney(minor, snapshot.currency);
+    const name = monthName(today);
+    const body = privacy
+      ? it.notificationRules.samples.monthlySummary.masked
+      : !budget
+        ? it.notificationMessages.monthlyPlain(money(spent), name)
+        : spent > budget.amountMinor
+          ? it.notificationMessages.monthlyOver(money(spent), money(budget.amountMinor), money(spent - budget.amountMinor))
+          : it.notificationMessages.monthlyWithin(money(spent), money(budget.amountMinor));
+    planned.push({ id: `month:${today.slice(0, 7)}`, at: atHour(addMonthsClamped(monthStart(today), 1), NOTICE_HOUR), title: it.notificationMessages.monthlyTitle(name), body });
   }
 
   return planned.filter((notice) => notice.at > now).sort((a, b) => a.at.getTime() - b.at.getTime());

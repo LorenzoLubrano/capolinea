@@ -1,6 +1,9 @@
 import { createEmptyDataset } from '@/data/defaults';
+import { createDataset } from '@/data/mock/seed';
 import type { Snapshot } from '@/data/repositories';
 import { subscription, tx } from '@/domain/testing/builders';
+import { buildAnalysis } from '@/features/analytics/analysis';
+import { buildBudgetOverview } from '@/features/budget/overview';
 import { formatMoney } from '@/services/format/money';
 import { DEFAULT_NOTIFICATIONS, type NotificationRules } from '@/state/settings';
 
@@ -8,7 +11,20 @@ import { planNotifications } from './plan';
 
 const TODAY = '2026-10-24'; // a Saturday
 const MORNING = new Date(2026, 9, 24, 10, 0);
-const RULES: NotificationRules = { ...DEFAULT_NOTIFICATIONS, subscriptionSoon: true, subscriptionDaysBefore: 1, eveningReminder: false };
+/** Every rule off but the charges on the way: each test turns on what it looks at. */
+const RULES: NotificationRules = {
+  ...DEFAULT_NOTIFICATIONS,
+  budgetNear: false,
+  budgetOver: false,
+  subscriptionSoon: true,
+  subscriptionDaysBefore: 1,
+  chargeCreated: false,
+  largeExpense: false,
+  weeklySummary: false,
+  monthlySummary: false,
+  eveningReminder: false,
+  goals: false,
+};
 
 function data(changes: Partial<Snapshot>): Snapshot {
   return { ...createEmptyDataset(TODAY), ...changes };
@@ -81,3 +97,63 @@ describe('planNotifications: evening reminder', () => {
     expect(planned[0].id).toBe('evening:2026-10-25');
   });
 });
+
+describe('planNotifications: summaries', () => {
+  const summaries = { ...RULES, subscriptionSoon: false, weeklySummary: true, monthlySummary: true };
+  const example = createDataset(TODAY);
+
+  it('sums up the week on Sunday at 20, with the same numbers as Analisi', () => {
+    const week = buildAnalysis({ ...example, today: '2026-10-25' }, 'week', 0);
+    const change = Math.round(Math.abs(week.comparison!.change) * 100);
+    const direction = week.comparison!.change < 0 ? 'in meno' : 'in più';
+
+    const notice = planNotifications(example, summaries, { privacy: false, now: MORNING }).find((n) => n.id.startsWith('week:'));
+
+    expect(notice).toEqual({
+      id: 'week:2026-10-19',
+      at: new Date(2026, 9, 25, 20, 0),
+      title: 'La tua settimana',
+      body: `Hai speso ${formatMoney(week.totalMinor, 'EUR')}, il ${change}% ${direction} del solito.`,
+    });
+  });
+
+  it('moves the week summary to the next Sunday once tonight’s has gone', () => {
+    const sundayNight = new Date(2026, 9, 25, 20, 30);
+
+    const notice = planNotifications(example, summaries, { privacy: false, now: sundayNight }).find((n) => n.id.startsWith('week:'));
+
+    expect(notice).toMatchObject({ id: 'week:2026-10-26', at: new Date(2026, 10, 1, 20, 0) });
+  });
+
+  it('sums up the month on the first of the next one at 9, against the budget', () => {
+    const month = buildBudgetOverview({ ...example, today: '2026-10-31' }).global!;
+
+    const notice = planNotifications(example, summaries, { privacy: false, now: MORNING }).find((n) => n.id.startsWith('month:'));
+
+    expect(notice).toEqual({
+      id: 'month:2026-10',
+      at: new Date(2026, 10, 1, 9, 0),
+      title: 'Ottobre in breve',
+      body: `Speso ${formatMoney(month.spentMinor, 'EUR')} su ${formatMoney(month.amountMinor, 'EUR')}: budget rispettato.`,
+    });
+  });
+
+  it('says how far over the budget the month went, or only what was spent without one', () => {
+    const over = { ...example, budgets: example.budgets.map((b) => (b.scope === 'global' ? { ...b, amountMinor: 10000 } : b)) };
+    const spent = buildBudgetOverview({ ...over, today: '2026-10-31' }).global!.spentMinor;
+    const noBudget = { ...example, budgets: example.budgets.filter((b) => b.scope !== 'global') };
+
+    const [overNotice] = planNotifications(over, summaries, { privacy: false, now: MORNING }).filter((n) => n.id.startsWith('month:'));
+    const [plainNotice] = planNotifications(noBudget, summaries, { privacy: false, now: MORNING }).filter((n) => n.id.startsWith('month:'));
+
+    expect(overNotice.body).toBe(`Speso ${formatMoney(spent, 'EUR')} su ${formatMoney(10000, 'EUR')}: budget superato di ${formatMoney(spent - 10000, 'EUR')}.`);
+    expect(plainNotice.body).toBe(`Speso ${formatMoney(spent, 'EUR')} ad ottobre.`);
+  });
+
+  it('keeps the summaries without figures with privacy on', () => {
+    const bodies = planNotifications(example, summaries, { privacy: true, now: MORNING }).map((n) => n.body);
+
+    expect(bodies).toEqual(['Il riepilogo della settimana è pronto.', 'Il riepilogo del mese è pronto.']);
+  });
+});
+
