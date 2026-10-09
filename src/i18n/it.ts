@@ -658,7 +658,7 @@ export const it = {
       },
       subscriptionSoon: {
         title: 'Addebito in arrivo',
-        body: () => 'Netflix, 13,99 €, sabato dal Revolut.',
+        body: () => 'Netflix, 13,99 €, sabato.',
         masked: 'Netflix si rinnova a breve.',
       },
       chargeCreated: {
@@ -818,6 +818,12 @@ export const it = {
       'Con la privacy attiva le notifiche non mostrano cifre.',
       "Le esportazioni le condividi tu: l'app non ne tiene copie.",
     ],
+  },
+  /** What the notifications sent by the app say; the titles are the ones of `notificationRules`. */
+  notificationMessages: {
+    tomorrow: 'domani',
+    subscriptionSoon: (name: string, amount: string, when: string) => `${name}, ${amount}, ${when}.`,
+    subscriptionSoonMasked: (name: string) => `${name} si rinnova a breve.`,
   },
   notificationSettings: {
     title: 'Notifiche',
