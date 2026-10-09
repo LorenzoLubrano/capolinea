@@ -287,7 +287,11 @@ export function PrivacyStep() {
     if (asking) return;
     // The system asks about notifications once, here: the rules on by default need it.
     setAsking(true);
-    if (await askForNotifications().catch(() => false)) usePermissionChange.getState().changed();
+    const allowed = await askForNotifications().catch((error: unknown) => {
+      if (__DEV__) console.warn('Notification permission not asked', error);
+      return false;
+    });
+    if (allowed) usePermissionChange.getState().changed();
     setAsking(false);
     haptics.success();
     useOnboardingDraft.setState({ accountId: null, budgetId: null });

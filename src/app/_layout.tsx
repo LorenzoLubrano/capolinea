@@ -11,6 +11,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
 
@@ -28,6 +29,10 @@ import { useSettings } from '@/state/settings';
 import { fonts, radius, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+
+// Expected, not a problem: the app sets the motion mode itself (see ReducedMotionConfig below). In
+// development the warning sat at the bottom of the screen, over the keypads.
+LogBox.ignoreLogs(["[Reanimated] Reduced motion setting is overwritten with mode 'never'"]);
 
 function AppStack() {
   const { colors, scheme } = useTheme();
@@ -121,7 +126,12 @@ function AppStack() {
         <Stack.Screen name="settings/pin" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="restore" options={{ ...pushed, title: it.restore.title }} />
         {/* Above everything, sheets included; no gesture, no animation to peek behind it. */}
-        <Stack.Screen name="lock" options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: coldStart ? 'none' : 'fade' }} />
+        <Stack.Screen
+          name="lock"
+          options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: coldStart ? 'none' : 'fade' }}
+          // Started locked: the splash screen goes once the lock screen is on screen, not merely mounted.
+          listeners={{ transitionEnd: (e) => (!e.data.closing && useLock.getState().coldStart ? void SplashScreen.hideAsync() : undefined) }}
+        />
       </Stack>
       <ToastHost />
       <LockGate />

@@ -58,9 +58,12 @@ export function LockScreen() {
   const startHidden = useSettings((s) => s.startHidden);
   const setPrivacy = useSettings((s) => s.setPrivacy);
   const { failedAttempts, lockedOutUntil, fail, unlock } = useLock();
-  // Locked since the start: the splash screen stayed up until this screen covered the app.
+  // Locked since the start: the root layout hides the splash screen once this screen is shown.
+  // Should that signal never come, the splash screen goes anyway: never an app stuck on it.
   useEffect(() => {
-    if (useLock.getState().coldStart) SplashScreen.hideAsync();
+    if (!useLock.getState().coldStart) return;
+    const fallback = setTimeout(() => void SplashScreen.hideAsync(), 2000);
+    return () => clearTimeout(fallback);
   }, []);
   const { data: kind = null } = useQuery({ queryKey: ['biometric-support'], queryFn: biometricSupport, staleTime: Infinity });
   const [digits, setDigits] = useState('');

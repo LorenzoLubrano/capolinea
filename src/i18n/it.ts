@@ -780,7 +780,7 @@ export const it = {
     autoLock: 'Blocco automatico',
     autoLockOptions: { immediate: 'Subito', '1m': 'Dopo 1 minuto', '5m': 'Dopo 5 minuti', '15m': 'Dopo 15 minuti' },
     autoLockHint: "Quanto può restare in secondo piano l'app prima di chiedere di nuovo il PIN.",
-    footer: "Il PIN non lascia il telefono e non è mai salvato in chiaro. Nel prototipo vive solo in memoria: chiudendo l'app si azzera.",
+    footer: "Il PIN non lascia il telefono e non è mai salvato in chiaro: ne resta solo un'impronta, nell'archivio sicuro del telefono.",
     lockOn: 'Blocco con PIN attivo',
     lockOff: 'Blocco disattivato',
     pinChanged: 'PIN cambiato',
