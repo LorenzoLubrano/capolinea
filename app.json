@@ -48,7 +48,8 @@
         {
           "faceIDPermission": "Serve per sbloccare l'app con Face ID."
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

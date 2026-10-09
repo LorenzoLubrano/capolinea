@@ -135,3 +135,13 @@ Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
 - Nome: **Capolinea**, perché il budget nell'app è il capolinea. Scartati per somiglianze o significati: Linea (rete crypto omonima), Budging (sembra un errore di «budgeting» e ci sono Budgy, Budgey, Budg), Formica (marchio di laminati), Avanzo (banca Avanza). Pacchetto `io.github.lorenzolubrano.capolinea`, scelto prima del primo APK perché cambiarlo dopo obbliga a reinstallare.
 - Logo: la fascia del mese che finisce in una moneta con l'euro (scelta tra la fascia con la barra, una «C» da mappa della metro, l'euro con le barre a linee, due portacarte, e tre finali della fascia). La barra verticale del capolinea poteva far pensare a una batteria e non diceva «soldi».
 - I file esportati si chiamano `capolinea-movimenti-AAAA-MM-GG.csv` e `capolinea-backup-AAAA-MM-GG.json`; il formato interno del backup resta `app-spese-backup`, così i backup già fatti si ripristinano.
+
+## 09/10/2026: fase 2, passo 1 (base dati)
+
+- Libreria: `expo-sqlite` (inclusa in Expo Go). Lo strato dati usa solo una piccola interfaccia (`src/data/sqlite/database.ts`) che il database di expo-sqlite rispetta così com'è; nei test la stessa interfaccia gira sul SQLite incluso in Node (`node:sqlite`), quindi il SQL vero è provato a ogni modifica.
+- Schema in `src/data/sqlite/schema.ts`, una migrazione per versione, numero in `PRAGMA user_version`. Una migrazione pubblicata non si cambia più: un bisogno nuovo è una migrazione nuova, con un test che parte da un database della versione prima.
+- Le migrazioni in sospeso girano in un'unica transazione: il database è o tutto aggiornato o com'era. Prima del primo cambiamento si fa una copia del database (non per un database nuovo); se la copia non riesce, non si migra. Un database scritto da un'app più recente non si apre.
+- Tabelle `STRICT` con controlli: importi in centesimi interi, date che sono giorni veri, tipi e flag solo tra i valori ammessi, un solo «io». Questi controlli rifiutano dati rotti invece di salvarli.
+- I riferimenti tra tabelle (conto, categoria, persona, abbonamento) si controllano al commit: un backup si ripristina in qualsiasi ordine, ma un movimento su un conto che non esiste viene rifiutato.
+- Etichette e quote di una spesa divisa stanno in colonne JSON (si leggono sempre con il movimento); i versamenti degli obiettivi hanno una tabella loro. La valuta va nella tabella `meta`; l'«io» si ricava dalle persone.
+- La copia prima della migrazione usa `VACUUM INTO`. Da provare al passo 6: con SQLCipher la copia deve restare cifrata.

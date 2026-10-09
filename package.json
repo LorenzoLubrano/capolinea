@@ -23,6 +23,7 @@
     "expo-screen-capture": "~57.0.4",
     "expo-sharing": "~57.0.22",
     "expo-splash-screen": "~57.0.9",
+    "expo-sqlite": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.3",
     "expo-system-ui": "~57.0.4",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@types/jest": "29.5.14",
+    "@types/node": "24.19.1",
     "@types/react": "~19.2.2",
     "eslint": "9.39.5",
     "eslint-config-expo": "57.0.2",
