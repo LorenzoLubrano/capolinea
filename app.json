@@ -1,17 +1,18 @@
 {
   "expo": {
-    "name": "Spese",
-    "slug": "app-spese",
+    "name": "Capolinea",
+    "slug": "capolinea",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "appspese",
+    "scheme": "capolinea",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "CADisableMinimumFrameDurationOnPhone": true
-      }
+      },
+      "bundleIdentifier": "io.github.lorenzolubrano.capolinea"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +21,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "io.github.lorenzolubrano.capolinea"
     },
     "web": {
       "output": "single",
@@ -33,9 +35,10 @@
         {
           "backgroundColor": "#FAFAF8",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76,
+          "imageWidth": 220,
           "dark": {
-            "backgroundColor": "#0D0D0E"
+            "backgroundColor": "#0D0D0E",
+            "image": "./assets/images/splash-icon-dark.png"
           }
         }
       ],

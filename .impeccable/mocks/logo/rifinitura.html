@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logo Capolinea, rifinitura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #F0EFEB; --page-ink: #111111; --muted: #5F5F5B; --card: #FAFAF8; --line: #E8E7E2; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0D0D0E; --page-ink: #F4F4F1; --muted: #A3A39E; --card: #17171A; --line: #26262A; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--page-ink); font: 15px/1.5 Archivo, system-ui, sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-weight: 800; font-size: 30px; margin: 0 0 4px; letter-spacing: -0.4px; }
+  .lead { color: var(--muted); margin: 0 0 28px; max-width: 760px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin: 0 0 24px; }
+  h2 { font-weight: 800; font-size: 22px; margin: 0 0 2px; }
+  .idea { color: var(--muted); margin: 0 0 16px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+  .cell { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .cap { font-size: 12px; color: var(--muted); text-align: center; }
+  .squircle { border-radius: 23%; overflow: hidden; }
+  .circle { border-radius: 50%; overflow: hidden; }
+  .wall { display: flex; gap: 18px; align-items: flex-end; padding: 18px 20px; border-radius: 16px; }
+  .wall.light { background: linear-gradient(160deg, #DCE6F2, #F3E9DC); }
+  .wall.dark { background: linear-gradient(160deg, #1B2333, #2A1F2E); }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 12px/1 system-ui, sans-serif; }
+  .wall.light .app { color: #1A1A1A; }
+  .wall.dark .app { color: #F2F2F2; }
+  .lockup { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 16px; }
+  .lockup.light { background: #FAFAF8; color: #111111; }
+  .lockup.dark { background: #0D0D0E; color: #F4F4F1; }
+  .word { font: 800 34px/1 Archivo, sans-serif; letter-spacing: -0.8px; display: flex; align-items: center; gap: 6px; }
+  .word .term { display: inline-block; width: 4px; height: 36px; border-radius: 2px; background: currentColor; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 16px; }
+  .notes div { border-top: 2px solid var(--page-ink); padding-top: 8px; }
+  .notes strong { display: block; margin-bottom: 2px; }
+  .notes p { margin: 0; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Capolinea · la fascia che finisce nei soldi</h1>
+  <p class="lead">L’idea A con un finale diverso: al posto della barra del capolinea, un segno che dice «soldi». Stesse prove di prima: grande, nei ritagli di Android, piccola su sfondi chiari e scuri, a un colore e accanto al nome.</p>
+  <div id="ideas"></div>
+</main>
+
+<script>
+// Palette from src/theme/colors.ts.
+const LIGHT = { bg: '#FAFAF8', ink: '#111111', track: '#E8E7E2', blue: '#1C5DAE', green: '#0B9C55', orange: '#E07010', ring: '#FAFAF8' };
+const DARK = { bg: '#0D0D0E', ink: '#F4F4F1', track: '#26262A', blue: '#4A86DA', green: '#0B9C55', orange: '#E07010', ring: '#0D0D0E' };
+// Android themed icon: one tint on a tinted ground.
+const MONO = { bg: '#DCE3F0', ink: '#2B3A55', track: '#B9C3D6', blue: '#2B3A55', green: '#2B3A55', orange: '#2B3A55', ring: '#DCE3F0', mono: true };
+
+const deg = (a) => (a * Math.PI) / 180;
+const pt = (cx, cy, r, a) => [cx + r * Math.cos(deg(a)), cy + r * Math.sin(deg(a))];
+// Arc from angle a1 to a2 going counter-clockwise on screen (decreasing angle).
+function arc(cx, cy, r, a1, a2) {
+  const [x1, y1] = pt(cx, cy, r, a1);
+  const [x2, y2] = pt(cx, cy, r, a2);
+  const large = Math.abs(a1 - a2) > 180 ? 1 : 0;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 0 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
+// The adaptive icon is drawn on Android's 108 grid; launchers show the middle 72 (viewBox 18 18 72 72).
+const EURO = (x, y, size, fill) =>
+  `<text x="${x}" y="${y}" font-family="Archivo, sans-serif" font-weight="800" font-size="${size}" fill="${fill}" text-anchor="middle" dominant-baseline="central">€</text>`;
+
+// The band of idea A, shared by the three endings: three category lines, the track, the «oggi» ring.
+function band(c, end) {
+  const gap = c.mono ? 1.6 : 0;
+  return `
+    <rect x="25" y="49" width="${end - 25}" height="12" rx="6" fill="${c.track}"/>
+    <path d="M 31 49 H ${42 - gap} V 61 H 31 A 6 6 0 0 1 31 49 Z" fill="${c.blue}"/>
+    <rect x="42" y="49" width="${11 - gap}" height="12" fill="${c.green}"/>
+    <rect x="53" y="49" width="7" height="12" fill="${c.orange}"/>
+    <line x1="56.5" y1="44" x2="56.5" y2="61" stroke="${c.ink}" stroke-width="2"/>
+    <circle cx="56.5" cy="40.5" r="4.2" fill="${c.ring}" stroke="${c.ink}" stroke-width="2.6"/>`;
+}
+
+const IDEAS = [
+  {
+    key: 'A1',
+    name: 'A1 · Moneta',
+    idea: 'La fascia finisce in una moneta piena con l\u2019euro: il capolinea è dove arrivano i soldi del mese.',
+    draw: (c) => `
+      <rect x="18" y="18" width="72" height="72" fill="${c.bg}"/>
+      ${band(c, 66)}
+      <circle cx="73" cy="55" r="12" fill="${c.ink}" stroke="${c.bg}" stroke-width="2"/>
+      ${EURO(73, 55.5, 15, c.bg)}`,
+    notes: [
+      ['Pro', 'La moneta dice «soldi» senza dubbi e non somiglia al polo di una batteria.'],
+      ['Contro', 'L\u2019euro dentro la moneta è piccolo: a 48 px si vede soprattutto il disco.'],
+    ],
+  },
+  {
+    key: 'A2',
+    name: 'A2 · Euro',
+    idea: 'La fascia finisce contro il simbolo dell\u2019euro, che prende il posto della barra del capolinea.',
+    draw: (c) => `
+      <rect x="18" y="18" width="72" height="72" fill="${c.bg}"/>
+      ${band(c, 64)}
+      ${EURO(74.5, 55.5, 30, c.ink)}`,
+    notes: [
+      ['Pro', 'Il segno più chiaro dei tre, leggibile anche piccolissimo.'],
+      ['Contro', 'L\u2019euro grande pesa più della fascia: l\u2019occhio va prima lì.'],
+    ],
+  },
+  {
+    key: 'A3',
+    name: 'A3 · Moneta-fermata',
+    idea: 'La fascia finisce in un anello con l\u2019euro, come le stazioni sulle mappe della metro: moneta e capolinea insieme.',
+    draw: (c) => `
+      <rect x="18" y="18" width="72" height="72" fill="${c.bg}"/>
+      ${band(c, 66)}
+      <circle cx="73" cy="55" r="11" fill="${c.bg}" stroke="${c.ink}" stroke-width="3.6"/>
+      ${EURO(73, 55.5, 13.5, c.ink)}`,
+    notes: [
+      ['Pro', 'Il più fedele al linguaggio della metro: la fermata finale è una moneta.'],
+      ['Contro', 'L\u2019anello è più leggero della moneta piena: da lontano conta meno.'],
+    ],
+  },
+];
+
+// The mark grows to fill Android's safe zone; the ground stays the full tile.
+const svg = (idea, palette, size) =>
+  `<svg width="${size}" height="${size}" viewBox="18 18 72 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${idea.name}"><rect x="18" y="18" width="72" height="72" fill="${palette.bg}"/><g transform="translate(54 54) scale(1.03) translate(-55 -52)">${idea.draw(palette)}</g></svg>`;
+
+document.getElementById('ideas').innerHTML = IDEAS.map((idea) => `
+  <section>
+    <h2>${idea.name}</h2>
+    <p class="idea">${idea.idea}</p>
+    <div class="grid">
+      <div class="cell"><div class="squircle">${svg(idea, LIGHT, 192)}</div><div class="cap">Chiaro, quadrato arrotondato</div></div>
+      <div class="cell"><div class="circle">${svg(idea, DARK, 192)}</div><div class="cap">Scuro, cerchio</div></div>
+      <div class="cell"><div class="squircle">${svg(idea, MONO, 192)}</div><div class="cap">A un colore (icone a tema)</div></div>
+      <div class="cell">
+        <div class="wall light">
+          ${[48, 56, 72].map((s) => `<div class="app"><div class="circle">${svg(idea, LIGHT, s)}</div>${s === 56 ? 'Capolinea' : ''}</div>`).join('')}
+        </div>
+        <div class="cap">Sulla schermata Home: 48, 56 e 72 px</div>
+      </div>
+      <div class="cell">
+        <div class="wall dark">
+          ${[48, 56, 72].map((s) => `<div class="app"><div class="squircle">${svg(idea, DARK, s)}</div>${s === 56 ? 'Capolinea' : ''}</div>`).join('')}
+        </div>
+        <div class="cap">Sfondo scuro, tema scuro</div>
+      </div>
+    </div>
+    <div class="grid" style="margin-top:18px">
+      <div class="lockup light"><div class="squircle">${svg(idea, LIGHT, 56)}</div><div class="word">Capolinea<span class="term"></span></div></div>
+      <div class="lockup dark"><div class="squircle">${svg(idea, DARK, 56)}</div><div class="word">Capolinea<span class="term"></span></div></div>
+    </div>
+    <div class="notes">${idea.notes.map(([t, p]) => `<div><strong>${t}</strong><p>${p}</p></div>`).join('')}</div>
+  </section>`).join('');
+</script>
+</body>
+</html>

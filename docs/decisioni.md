@@ -129,3 +129,9 @@ Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
 - Linee delle categorie: niente più tacca del ritmo costante, che contraddiceva l'avviso; l'arrivo previsto è un tratteggio come nella fascia del mese, e se supera il budget compare il capolinea. L'anello «oggi» della fascia resta il ritmo costante.
 - La fascia del mese si muove quando il foglio di inserimento si è chiuso (Home e Budget tengono i valori finché sono coperti, poi 300 ms): dopo una serie di «Un'altra» si vede un solo spostamento. Le altre animazioni proposte (obiettivo che si riempie, PIN che scuote, rullo del totale, linea dell'onboarding) restano fuori.
 - Home vuota: se il primo avvio ha impostato un budget, la fascia c'è già, vuota e col capolinea. Il + si indica una volta sola.
+
+## 09/10/2026: nome e logo
+
+- Nome: **Capolinea**, perché il budget nell'app è il capolinea. Scartati per somiglianze o significati: Linea (rete crypto omonima), Budging (sembra un errore di «budgeting» e ci sono Budgy, Budgey, Budg), Formica (marchio di laminati), Avanzo (banca Avanza). Pacchetto `io.github.lorenzolubrano.capolinea`, scelto prima del primo APK perché cambiarlo dopo obbliga a reinstallare.
+- Logo: la fascia del mese che finisce in una moneta con l'euro (scelta tra la fascia con la barra, una «C» da mappa della metro, l'euro con le barre a linee, due portacarte, e tre finali della fascia). La barra verticale del capolinea poteva far pensare a una batteria e non diceva «soldi».
+- I file esportati si chiamano `capolinea-movimenti-AAAA-MM-GG.csv` e `capolinea-backup-AAAA-MM-GG.json`; il formato interno del backup resta `app-spese-backup`, così i backup già fatti si ripristinano.

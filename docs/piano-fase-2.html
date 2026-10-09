@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capolinea, fase 2</title>
+<style>
+  :root {
+    --bg: #FAFAF8; --surface: #FFFFFF; --ink: #111111; --muted: #5F5F5B; --line: #E8E7E2;
+    --accent: #1C5DAE; --warn: #8F5A00; --warn-bg: #FFF4DF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0D0D0E; --surface: #17171A; --ink: #F4F4F1; --muted: #A3A39E; --line: #26262A;
+      --accent: #4A86DA; --warn: #F2B54A; --warn-bg: #2A2110;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.4px; }
+  h2 { font-size: 20px; margin: 40px 0 10px; padding-top: 14px; border-top: 2px solid var(--ink); }
+  h3 { font-size: 16px; margin: 22px 0 6px; }
+  p, li { color: var(--ink); }
+  .lead { color: var(--muted); margin: 0 0 18px; }
+  .meta { color: var(--muted); font-size: 14px; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code { font: 14px/1.4 ui-monospace, Consolas, monospace; background: var(--line); padding: 1px 5px; border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 8px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; color: var(--muted); font-size: 13px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
+  .card h3 { margin-top: 0; }
+  .rec { color: var(--accent); font-weight: 600; }
+  .warn { background: var(--warn-bg); color: var(--ink); border-left: 4px solid var(--warn); padding: 10px 14px; border-radius: 8px; margin: 12px 0; }
+  .stop { font-weight: 700; }
+  .wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Capolinea · piano della fase 2</h1>
+  <p class="lead">Dati veri sul telefono: l'app si usa ogni giorno, i dati restano dopo la chiusura, sono protetti e reggono anni di movimenti. Nessun server, nessun costo.</p>
+  <p class="meta">09/10/2026. Scelte di Lorenzo: D1 APK Android firmato · D2 nome <strong>Capolinea</strong>, pacchetto <code>io.github.lorenzolubrano.capolinea</code>, logo fatto · D3 database cifrato con l’APK · D4 notifiche come proposte.</p>
+
+  <h2>1. Cosa cambia per te</h2>
+  <ul>
+    <li><strong>I dati restano.</strong> Oggi, chiudendo l'app, si perde tutto; dalla fase 2 restano sul telefono.</li>
+    <li><strong>Blocco e impostazioni restano</strong>: PIN, privacy, tema, regole delle notifiche.</li>
+    <li><strong>Notifiche vere, solo locali</strong>: abbonamenti in arrivo, budget vicino al capolinea.</li>
+    <li><strong>Veloce anche con anni di dati</strong>: provata con 5 anni di movimenti finti.</li>
+    <li><strong>Le schermate non cambiano.</strong> Il prototipo è già diviso per strati: cambia solo lo strato dei dati.</li>
+  </ul>
+
+  <h2>2. Decisioni che servono a te</h2>
+
+  <div class="card">
+    <h3>D1 · Come la installi per l'uso di tutti i giorni</h3>
+    <p>Expo Go va bene per provare, ma vuole il PC acceso con il server: non è un'app vera.</p>
+    <ul>
+      <li><strong>A. APK Android firmato, come Portafuori.</strong> Gratis, compilato in locale con gli strumenti che hai già, installato sul S24. <span class="rec">Consigliata.</span></li>
+      <li><strong>B. Restare su Expo Go</strong> per tutta la fase 2 e decidere dopo.</li>
+    </ul>
+    <p class="meta">iPad: senza un Mac e senza l'account sviluppatore Apple (99 € l'anno) non si installa in modo stabile. Lo lascerei per dopo, salvo tue idee diverse.</p>
+  </div>
+
+  <div class="card">
+    <h3>D2 · Nome e licenza, prima della prima installazione vera</h3>
+    <p>Con l'APK il nome entra nell'identificativo del pacchetto. Cambiarlo dopo significa reinstallare: è successo con Portafuori. Il nome va quindi scelto prima del passo 6.</p>
+    <p class="meta">La licenza serve solo se il repository diventa pubblico.</p>
+  </div>
+
+  <div class="card">
+    <h3>D3 · Cifratura del database</h3>
+    <ul>
+      <li><strong>A. Database normale, protetto dal telefono.</strong>
+        <ul>
+          <li>Il telefono cifra già la memoria e ogni app vede solo i suoi file.</li>
+          <li>Si aggiungono il PIN dell'app e l'esclusione dal backup di Google.</li>
+          <li>Funziona anche in Expo Go.</li>
+        </ul>
+      </li>
+      <li><strong>B. Database cifrato (SQLCipher)</strong>, con la chiave nell'archivio sicuro del telefono.
+        <ul>
+          <li>Protegge anche da copie del file e da telefoni con permessi di root.</li>
+          <li>Non funziona in Expo Go: serve l'APK (D1-A).</li>
+        </ul>
+      </li>
+    </ul>
+    <p><span class="rec">Consiglio:</span> A finché si prova in Expo Go, B insieme all'APK. Il codice è scritto fin dall'inizio per passare a B senza rifare niente.</p>
+  </div>
+
+  <div class="card">
+    <h3>D4 · Quali notifiche</h3>
+    <p>Le regole esistono già nelle impostazioni del prototipo. Proposta:</p>
+    <ul>
+      <li>abbonamento in addebito domani;</li>
+      <li>budget vicino al capolinea (dalla previsione);</li>
+      <li>promemoria serale «hai segnato le spese di oggi?», spento di serie.</li>
+    </ul>
+    <p>Nelle notifiche nessun importo quando la privacy è attiva.</p>
+  </div>
+
+  <h2>3. Passi e fermate</h2>
+  <ol>
+    <li><strong>Base dati.</strong> Tabelle, aggiornamenti dello schema (migrazioni), test. Ogni migrazione fa prima una copia del database.</li>
+    <li><strong>Lo strato dei dati passa a SQLite.</strong> Stesse funzioni di oggi, provate con gli stessi test. I dati di esempio restano nel pannello prototipo, solo in sviluppo.</li>
+    <li><strong>Impostazioni e sicurezza persistenti.</strong>
+      <ul>
+        <li>Impronta del PIN (hash con sale) nell'archivio sicuro, solo su questo telefono.</li>
+        <li>Blocco anche all'avvio da zero.</li>
+        <li>Impostazioni salvate.</li>
+      </ul>
+    </li>
+    <li><strong>Prestazioni.</strong> 5 anni di movimenti finti; misuro avvio, Home e Movimenti; liste lunghe con FlashList; letture per periodo invece di tutto insieme, se serve.</li>
+    <li><strong>Notifiche locali</strong> secondo D4.</li>
+  </ol>
+  <p class="stop">Fermata A: prova sul S24 con Expo Go. Aggiungi, chiudi, riapri: i dati restano.</p>
+  <ol start="6">
+    <li><strong>APK Android</strong>, se D1 = A.
+      <ul>
+        <li>Build firmata in locale.</li>
+        <li>Database cifrato se D3 = B.</li>
+        <li>Esclusione dal backup di Google.</li>
+        <li>Icona e nome scelti (D2).</li>
+      </ul>
+    </li>
+  </ol>
+  <p class="stop">Fermata B: una settimana d'uso vero sul S24.</p>
+  <ol start="7">
+    <li><strong>Verifica finale:</strong> test, revisione del codice, controllo di sicurezza, README aggiornato.</li>
+  </ol>
+
+  <h2>4. Come è fatto (per chi legge il codice)</h2>
+  <div class="wrap">
+  <table>
+    <tr><th>Parte</th><th>Scelta</th><th>Perché</th></tr>
+    <tr><td>Database</td><td><code>expo-sqlite</code> (incluso in Expo Go)</td><td>Libreria ufficiale di Expo. Transazioni e query preparate; migrazioni con <code>PRAGMA user_version</code> in <code>SQLiteProvider onInit</code>.</td></tr>
+    <tr><td>Strato dati</td><td>Nuova implementazione di <code>Repositories</code> (<code>src/data/repositories.ts</code>)</td><td>Le schermate dipendono solo da quell'interfaccia: nessuna schermata cambia.</td></tr>
+    <tr><td>Test del SQL</td><td>Stesse prove di contratto contro la memoria e contro SQLite. In Jest con il SQLite già incluso in Node (<code>node:sqlite</code>): nessuna libreria in più.</td><td><code>expo-sqlite</code> non gira in Node; così il SQL vero è provato a ogni modifica. Sul telefono resta una prova a mano alla Fermata A.</td></tr>
+    <tr><td>Impostazioni</td><td><code>expo-sqlite/kv-store</code></td><td>Nessuna libreria in più; letture sincrone all'avvio.</td></tr>
+    <tr><td>PIN e chiavi</td><td><code>expo-secure-store</code>, <code>WHEN_UNLOCKED_THIS_DEVICE_ONLY</code></td><td>Mai nei backup, mai su un altro telefono.</td></tr>
+    <tr><td>Liste lunghe</td><td><code>@shopify/flash-list</code> (incluso in Expo Go), solo se le misure lo chiedono</td><td>Non si aggiungono librerie senza un numero che le giustifichi.</td></tr>
+    <tr><td>Dati</td><td>Importi in centesimi interi, date come testo <code>AAAA-MM-GG</code>, eliminazioni morbide con <code>updatedAt</code></td><td>Già così nel prototipo; pronti per una sincronizzazione futura.</td></tr>
+  </table>
+  </div>
+
+  <h2>5. Fuori dalla fase 2</h2>
+  <p>Sincronizzazione e Supabase (fase 3, facoltativa), banche e PSD2, lettura degli scontrini, IA, cambi di valuta, store, iPad stabile.</p>
+
+  <h2>6. Rischi</h2>
+  <div class="wrap">
+  <table>
+    <tr><th>Rischio</th><th>Cosa faccio</th></tr>
+    <tr><td>Una migrazione sbagliata rovina i dati</td><td>Copia del database prima di ogni migrazione; ogni migrazione ha un test da un database vecchio; il backup JSON resta sempre disponibile.</td></tr>
+    <tr><td>Il backup automatico di Android porta i dati su Google Drive</td><td>Esclusione del database dal backup nell'APK. In Expo Go non si può controllare, quindi alla Fermata A solo dati di prova.</td></tr>
+    <tr><td>Cambiare nome dopo l'installazione</td><td>Nome deciso prima del passo 6 (D2).</td></tr>
+    <tr><td>Con anni di dati l'avvio rallenta</td><td>Misure al passo 4 prima di ottimizzare; letture per periodo pronte nell'interfaccia.</td></tr>
+    <tr><td>Fuso orario e cambio d'ora</td><td>Le date restano giorni di calendario locali, come nel prototipo; test sui cambi d'ora.</td></tr>
+  </table>
+  </div>
+
+  <h2>7. Come lavoro</h2>
+  <ul>
+    <li>Test prima del codice (TDD) per base dati, migrazioni e strato dati.</li>
+    <li>Commit per passo.</li>
+    <li>Lint, controllo dei tipi e test sempre puliti.</li>
+    <li>Nessun segreto nel codice.</li>
+  </ul>
+  <p>La fase 2 non cambia l'aspetto dell'app. Per l'interfaccia resta la skill impeccable, usata solo se tocchiamo una schermata (per esempio la richiesta del permesso per le notifiche). Nessuna skill nuova da installare.</p>
+</main>
+</body>
+</html>

@@ -822,7 +822,7 @@ export const it = {
   notificationSettings: {
     title: 'Notifiche',
     preview: 'Così arriva una notifica',
-    previewApp: 'Spese',
+    previewApp: 'Capolinea',
     now: 'ora',
     groups: { budget: 'Budget', subscriptions: 'Abbonamenti', spending: 'Spese', summaries: 'Riepiloghi', goals: 'Obiettivi' },
     rules: {
@@ -939,7 +939,7 @@ export const it = {
   info: {
     title: 'Info',
     name: 'Nome',
-    nameValue: 'app-spese (provvisorio)',
+    nameValue: 'Capolinea',
     version: 'Versione',
     phase: 'Fase',
     phaseValue: '1, prototipo',

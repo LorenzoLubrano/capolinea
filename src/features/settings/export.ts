@@ -61,5 +61,5 @@ export function buildBackup(snapshot: Snapshot, exportedAt: string): string {
 }
 
 export function exportFileName(kind: 'csv' | 'backup', date: LocalDate): string {
-  return kind === 'csv' ? `spese-movimenti-${date}.csv` : `spese-backup-${date}.json`;
+  return kind === 'csv' ? `capolinea-movimenti-${date}.csv` : `capolinea-backup-${date}.json`;
 }

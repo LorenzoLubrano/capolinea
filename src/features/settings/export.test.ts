@@ -45,7 +45,7 @@ describe('buildBackup', () => {
 
 describe('exportFileName', () => {
   it('dates the file so exports never overwrite each other', () => {
-    expect(exportFileName('csv', '2026-10-24')).toBe('spese-movimenti-2026-10-24.csv');
-    expect(exportFileName('backup', '2026-10-24')).toBe('spese-backup-2026-10-24.json');
+    expect(exportFileName('csv', '2026-10-24')).toBe('capolinea-movimenti-2026-10-24.csv');
+    expect(exportFileName('backup', '2026-10-24')).toBe('capolinea-backup-2026-10-24.json');
   });
 });

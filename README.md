@@ -1,4 +1,6 @@
-# App spese
+# Capolinea
+
+<img src="assets/brand/capolinea-icon.svg" alt="" width="96">
 
 App personale per tenere le spese, per iOS e Android. I dati restano sul telefono, l'app non ha costi ricorrenti e la privacy è attiva di serie.
 

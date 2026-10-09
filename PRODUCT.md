@@ -63,7 +63,7 @@ Regole decise:
 - trasferimenti mai contati come spesa; rimborsi riducono la spesa della categoria originale;
 - confronto col mese precedente allo stesso giorno del mese.
 
-Ancora da decidere: nome dell'app (candidati Stilla, Sereno, Kivo), licenza del codice, cifratura dei dati sincronizzati.
+Nome: **Capolinea** (scelto il 09/10/2026), pacchetto `io.github.lorenzolubrano.capolinea`. Ancora da decidere: licenza del codice, cifratura dei dati sincronizzati.
 
 ## Brand Commitments
 

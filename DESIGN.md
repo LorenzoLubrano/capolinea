@@ -1,5 +1,5 @@
 ---
-name: app-spese
+name: Capolinea
 description: Spese personali come una linea della metropolitana di Milano; il mese è una fascia che si percorre, il budget è il capolinea.
 colors:
   background: "#FAFAF8"
@@ -249,7 +249,7 @@ components:
     size: "76px"
 ---
 
-# Design System: app-spese
+# Design System: Capolinea
 
 <!-- Scritto dal prototipo della fase 1 (08/10/2026). Fonte dei token: src/theme/tokens.ts e src/theme/colors.ts. Se il codice cambia, il codice vince: si aggiorna questo file. -->
 
@@ -444,3 +444,12 @@ Da due a quattro viste alla pari della stessa schermata. Binario `surface-muted`
 - **Don't** usare gradienti su superfici, pulsanti o card (l'unico gradiente è l'alone tenue dello sfondo Luce), né neon, estetica cyberpunk o da cruscotto crypto, card generiche stile Bootstrap o un aspetto da pannello di amministrazione.
 - **Don't** mostrare importi nella decorazione di sfondo o sulla schermata di blocco.
 - **Don't** far partire più di una vibrazione per azione, né animazioni in ciclo sui contenuti (la sola deriva continua è quella degli aloni di Luce, ferma fuori dalla Home e con «Riduci animazioni»).
+
+## Logo
+
+Il segno di Capolinea è la fascia del mese che finisce in una moneta: tre linee di categoria (`line-blue`, `line-green`, `line-orange`) sul binario, l'anello «oggi» con il suo stelo e, al posto della barra del capolinea, una moneta in `ink` con l'euro ritagliato nel colore del fondo. Dice insieme «budget» (la fascia) e «soldi» (la moneta).
+
+- **Sorgenti:** `assets/brand/` (SVG sulla griglia 108 delle icone adattive di Android, segno dentro la zona sicura). L'euro è il glifo di Archivo ExtraBold convertito in tracciato: l'icona non dipende da un carattere installato.
+- **Varianti:** chiara (fondo `background`), scura (fondo `background-dark`, linee schiarite), a un colore per le icone a tema di Android 13+ (le separazioni e l'euro sono vuoti, il binario al 38%).
+- **File dell'app:** `assets/images/icon.png`, `android-icon-foreground.png` / `-background.png` / `-monochrome.png`, `splash-icon.png` e `splash-icon-dark.png`, `favicon.png`, generati dagli SVG.
+- **Non fare:** niente quadrato rosso con la «M» o altri segni dei marchi della metropolitana di Milano: Capolinea ne riprende il linguaggio, mai il marchio. Niente sfondi sfumati dietro il segno.
