@@ -18,7 +18,7 @@ import { useToast } from '@/state/toast';
 import { useTransactionFilters } from '@/state/transaction-filters';
 import { spacing } from '@/theme';
 
-const DATASETS: Exclude<DatasetKind, 'empty'>[] = ['full', 'noIncome', 'edge'];
+const DATASETS: Exclude<DatasetKind, 'empty'>[] = ['full', 'noIncome', 'edge', 'years'];
 const DATES: FakeDate[] = ['pinned', 'monthStart', 'monthEnd', 'real'];
 const SYNC_STATES: SyncStatus[] = ['off', 'on', 'syncing', 'offline', 'error', 'conflict'];
 const dayOf = (date: string) => fullDate(date).replace(/^\S+ /, '');

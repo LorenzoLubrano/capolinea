@@ -126,12 +126,13 @@ function price(rand: () => number, min: number, max: number): number {
   return Math.round(Math.floor(euros) * 100 + cents);
 }
 
-export function createDataset(today: LocalDate = PINNED_TODAY): Dataset {
+/** The example from `from` (August 2026 by default) to `today`; a far `from` gives years of data. */
+export function createDataset(today: LocalDate = PINNED_TODAY, from: LocalDate = START): Dataset {
   const rand = prng(20261024);
   const drafts: Draft[] = [];
   const add = (draft: Draft) => drafts.push(draft);
 
-  for (let date = START; date <= today; date = addDays(date, 1)) {
+  for (let date = from; date <= today; date = addDays(date, 1)) {
     const day = dayOfMonth(date);
     const wd = weekday(date);
     const workday = wd >= 1 && wd <= 5;
@@ -199,7 +200,7 @@ export function createDataset(today: LocalDate = PINNED_TODAY): Dataset {
     .map((draft) => ({ ...meta, tags: [], isRecurring: false, currency: 'EUR', ...draft, id: `tx-${(++n).toString().padStart(4, '0')}` }));
 
   // Subscription charges come from the real generator, so the prototype exercises it.
-  const subscriptions = SUBSCRIPTIONS.map((s) => ({ ...s, nextBillingDate: firstOnOrAfter(s, START) }));
+  const subscriptions = SUBSCRIPTIONS.map((s) => ({ ...s, nextBillingDate: firstOnOrAfter(s, from) }));
   const generated = generateDueCharges(subscriptions, [], today, { makeId: () => `tx-${(++n).toString().padStart(4, '0')}`, now: STAMP });
 
   return {

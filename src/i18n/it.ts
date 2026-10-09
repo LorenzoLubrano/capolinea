@@ -963,6 +963,7 @@ export const it = {
       full: { title: 'Pieni', hint: 'Da agosto a oggi: spese, entrate, abbonamenti e obiettivi.', done: 'Dati pieni caricati' },
       noIncome: { title: 'Senza entrate', hint: 'Solo spese, niente stipendio. I saldi di oggi restano gli stessi.', done: 'Dati senza entrate caricati' },
       edge: { title: 'Casi limite', hint: 'Nomi lunghissimi, importi enormi e da un centesimo, budget sforati, venti movimenti oggi.', done: 'Casi limite caricati' },
+      years: { title: 'Anni di dati', hint: 'Quindici anni di movimenti, circa novemila: per misurare la velocità.', done: 'Anni di dati caricati' },
     },
     loaded: (what: string, day: string) => `${what}. Oggi è ${day}.`,
     today: 'Data di oggi',

@@ -164,3 +164,9 @@ Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
 - Con il PIN l'app parte bloccata: la schermata iniziale resta finché la pagina di blocco non copre l'app, che compare senza dissolvenza; nessun dato si intravede.
 - Sul telefono si parte dal primo avvio; l'anteprima web resta sui dati di esempio, con impostazioni e segreti solo per la sessione. Nei test Jest il modulo del telefono è sostituito da quello in memoria.
 
+## 09/10/2026: fase 2, passo 4 (prestazioni)
+
+- Misura in Node con il database vero (`src/data/sqlite/performance.test.ts`): 5 anni al ritmo dei dati di esempio sono 3.060 movimenti (lettura 29 ms); 15 anni, quanti ne fa in 5 anni chi segna tutto, sono 9.006 (scrittura 671 ms, lettura 90 ms, Home, Budget, Analisi e Movimenti tra 4 e 10 ms ciascuna). Il test fallisce solo se qualcosa peggiora di molto.
+- Per ora niente letture per periodo e niente FlashList: Movimenti usa già una lista virtualizzata e i numeri non le chiedono. Si decide con la misura sul telefono, che in Node non si può fare (Hermes e una CPU mobile sono più lenti).
+- Per quella misura, solo in sviluppo: «Anni di dati» nel pannello prototipo (15 anni, circa 9.000 movimenti) e il tempo di ogni chiamata ai dati nel terminale di Metro (`[dati] snapshot … ms, … movimenti`).
+

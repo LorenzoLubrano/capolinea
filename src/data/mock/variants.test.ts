@@ -116,3 +116,18 @@ describe('prototypeDataset', () => {
     expect(prototypeDataset('empty', '2026-10-01')).toEqual(createEmptyDataset('2026-10-01'));
   });
 });
+
+describe('years of example data', () => {
+  const years = prototypeDataset('years', PINNED_TODAY);
+
+  it('goes back fifteen years with about nine thousand movements, to measure the speed', () => {
+    expect(years.transactions.length).toBeGreaterThan(9000);
+    expect(years.transactions[0].date.startsWith('2011-10')).toBe(true);
+    expect(years.transactions.every((t) => t.date <= PINNED_TODAY)).toBe(true);
+  });
+
+  it('passes the same checks as a restored backup', () => {
+    expect(parseBackup(buildBackup(years, '2026-10-24T09:00:00Z')).ok).toBe(true);
+  });
+});
+

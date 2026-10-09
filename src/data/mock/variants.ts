@@ -1,4 +1,4 @@
-import { addDays, monthEnd, monthStart, toLocalDate } from '@/domain/dates';
+import { addDays, addMonthsClamped, monthEnd, monthStart, toLocalDate } from '@/domain/dates';
 import { splitEvenly } from '@/domain/splits';
 import { spendingBetween } from '@/domain/spending';
 import { generateDueCharges } from '@/domain/subscriptions';
@@ -9,10 +9,10 @@ import { createDataset, PINNED_TODAY, type Dataset } from './seed';
 
 /**
  * The data the prototype panel can load: the full example, the same without income, extreme values
- * to break the layout, or a first launch. Synthetic and deterministic, like the example itself.
+ * to break the layout, fifteen years of the example to measure the speed, or a first launch. Synthetic and deterministic, like the example itself.
  */
 
-export type DatasetKind = 'full' | 'noIncome' | 'edge' | 'empty';
+export type DatasetKind = 'full' | 'noIncome' | 'edge' | 'years' | 'empty';
 
 /** The prototype's "today": pinned in October 2026, at either end of that month, or the real one. */
 export type FakeDate = 'pinned' | 'monthStart' | 'monthEnd' | 'real';
@@ -182,6 +182,7 @@ export function createEdgeDataset(today: LocalDate): Dataset {
 export function prototypeDataset(kind: DatasetKind, today: LocalDate): Dataset {
   if (kind === 'empty') return createEmptyDataset(today);
   if (kind === 'edge') return createEdgeDataset(today);
+  if (kind === 'years') return createDataset(today, addMonthsClamped(today, -15 * 12));
   const full = createDataset(today);
   return kind === 'noIncome' ? withoutIncome(full) : full;
 }

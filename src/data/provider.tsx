@@ -5,6 +5,7 @@ import { AppState } from 'react-native';
 import { AppDatabase } from './app-database';
 import { readOnAnotherDay } from './freshness';
 import { withFaults, type Faults } from './prototype-faults';
+import { withTimings } from './prototype-timings';
 import type { Repositories } from './repositories';
 
 const RepositoriesContext = createContext<Repositories | null>(null);
@@ -23,7 +24,11 @@ export function DataProvider({ children, repositories, faults }: { children: Rea
 }
 
 function Wired({ children, base, faults }: { children: ReactNode; base: Repositories; faults?: () => Faults }) {
-  const [repos] = useState(() => (faults ? withFaults(base, faults) : base));
+  const [repos] = useState(() => {
+    // Development: the speed of every call in the Metro terminal, simulated delays left out.
+    const timed = __DEV__ ? withTimings(base) : base;
+    return faults ? withFaults(timed, faults) : timed;
+  });
   const [client] = useState(
     () => new QueryClient({ defaultOptions: { queries: { staleTime: Infinity, retry: 1 } } }),
   );
