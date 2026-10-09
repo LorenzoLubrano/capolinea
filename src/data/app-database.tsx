@@ -11,9 +11,11 @@ import { spacing, useTheme } from '@/theme';
 
 import type { Repositories } from './repositories';
 import { createSqliteRepositories, initialiseDatabase } from './sqlite/repositories';
+import { oneConnectionAtATime } from './sqlite/one-connection';
 import { copyDatabaseTo } from './sqlite/schema';
 
 const DATABASE = 'capolinea.db';
+const connections = oneConnectionAtATime(() => openDatabaseAsync(DATABASE));
 
 /** Today on the phone's clock; in development the prototype panel can move it. */
 const today = () => (__DEV__ && usePrototype.getState().today) || toLocalDate(new Date());
@@ -38,7 +40,7 @@ export function AppDatabase({ children }: { children: (repos: Repositories) => R
 
   useEffect(() => {
     let cancelled = false;
-    const opened = openDatabaseAsync(DATABASE);
+    const opened = connections.open();
     opened
       .then(async (db) => {
         await openAndPrepare(db);
@@ -50,7 +52,7 @@ export function AppDatabase({ children }: { children: (repos: Repositories) => R
       });
     return () => {
       cancelled = true;
-      opened.then((db) => db.closeAsync()).catch(() => undefined);
+      connections.close(opened);
     };
   }, [attempt]);
 
