@@ -3,7 +3,7 @@
 import { cancelAllScheduledNotificationsAsync } from 'expo-notifications/build/cancelAllScheduledNotificationsAsync';
 import { deleteNotificationChannelAsync } from 'expo-notifications/build/deleteNotificationChannelAsync';
 import { dismissAllNotificationsAsync } from 'expo-notifications/build/dismissAllNotificationsAsync';
-import { AndroidImportance, AndroidNotificationVisibility } from 'expo-notifications/build/NotificationChannelManager.types';
+import { AndroidImportance } from 'expo-notifications/build/NotificationChannelManager.types';
 import { getPermissionsAsync, requestPermissionsAsync } from 'expo-notifications/build/NotificationPermissions';
 import { SchedulableTriggerInputTypes } from 'expo-notifications/build/Notifications.types';
 import { setNotificationHandler } from 'expo-notifications/build/NotificationsHandler';
@@ -15,8 +15,10 @@ import { Linking, Platform } from 'react-native';
 import type { NotificationDevice } from '@/features/notifications/sync';
 import { it } from '@/i18n/it';
 
-// A channel's settings cannot change once created: the first one («avvisi») showed its text on the
-// lock screen, so it gave way to this one.
+// The channel of the installed app. An earlier build made «avvisi»: it is deleted, and this id stays.
+// What shows on the lock screen is the phone's choice, not the app's: Android ignores a channel's
+// lock screen visibility set by the app. The notifications are private, so a phone set to hide
+// sensitive content shows only that Capolinea wrote.
 const CHANNEL = 'avvisi-privati';
 const OLD_CHANNELS = ['avvisi'];
 // Expo Go cannot create channels (a native NullPointerException) and has its own: there the app
@@ -34,13 +36,8 @@ let channel: Promise<unknown> | null = null;
 /** Android shows no permission prompt, and no notification, before a channel exists. */
 function ensureChannel() {
   if (!OWN_CHANNEL) return Promise.resolve();
-  // On a locked phone the notification says only that Capolinea wrote, not what.
   channel ??= Promise.all(OLD_CHANNELS.map((id) => deleteNotificationChannelAsync(id))).then(() =>
-    setNotificationChannelAsync(CHANNEL, {
-      name: it.notificationSettings.channel,
-      importance: AndroidImportance.DEFAULT,
-      lockscreenVisibility: AndroidNotificationVisibility.PRIVATE,
-    }),
+    setNotificationChannelAsync(CHANNEL, { name: it.notificationSettings.channel, importance: AndroidImportance.DEFAULT }),
   );
   return channel;
 }

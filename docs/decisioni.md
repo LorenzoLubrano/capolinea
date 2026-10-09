@@ -227,7 +227,7 @@ Revisione del codice e controllo di sicurezza fatti da due agenti separati, poi 
   - Se il controllo del PIN dà errore, il tastierino resta usabile e il tentativo non conta.
 - **Biometria:** solo quella di classe forte. Su Android lo sblocco col volto via fotocamera spesso è debole e si inganna con una foto: sul S24 resta l'impronta.
 - **Notifiche:**
-  - Nuovo canale «Avvisi»: sul telefono bloccato mostra solo che ha scritto Capolinea. Le impostazioni di un canale non cambiano dopo la creazione, quindi il vecchio canale è stato cancellato.
+  - Sul telefono bloccato decide il telefono, non l'app: Android ignora la visibilità sulla schermata di blocco che un'app dà al suo canale (verificato sul S24). Le notifiche sono private, quindi con «Nascondi contenuto» attivo nelle impostazioni del telefono mostrano solo che ha scritto Capolinea. Il canale ha cambiato identificativo (da `avvisi` ad `avvisi-privati`) per un tentativo che non ha funzionato; il vecchio è cancellato.
   - Le cifre nelle notifiche hanno un'impostazione loro, «Mostra le cifre» in Impostazioni › Notifiche, spenta di serie (scelta di Lorenzo): l'occhio della Home non le cambia più. Spegnendola si tolgono le notifiche già mostrate.
   - «Elimina dati» cancella le notifiche programmate e quelle mostrate.
   - Una notifica che il telefono non riesce a mostrare si riprova al controllo successivo.
