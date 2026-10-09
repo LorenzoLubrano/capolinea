@@ -195,3 +195,10 @@ Fatte da Claude su richiesta di Lorenzo, sull'emulatore `test36` (Android 16, Ex
 
 - Il flash segnalato da Lorenzo, ripreso fotogramma per fotogramma: a ogni ritorno la schermata che si chiudeva lasciava 1-2 fotogrammi bianchi pieni, cioè lo sfondo della finestra che non seguiva il tema scuro. Ora lo sfondo della finestra prende il colore del tema (expo-system-ui), anche quando lo si cambia in Aspetto.
 - Schermate spinte e passi del primo avvio su Android come su iPhone (`ios_from_right`): la nuova entra da destra e quella sotto scivola un po' a sinistra; tornando, la stessa strada al contrario. La transizione di Android 14+ toglieva la vecchia schermata in 83 ms. Su iPhone resta lo scorrimento nativo; con «Riduci animazioni» resta la dissolvenza.
+
+## 09/10/2026: Fermata A sul S24 (Expo Go 57.0.9, Android 16)
+
+- Impronta: all'avvio la chiede subito senza mostrare la Home; annullandola resta il PIN.
+- Tempi con 8.970 movimenti in sviluppo: lettura dei dati circa 330 ms, ripristino 2,1 s, e Lorenzo sentiva attese. Con il server in modalità produzione (`--no-dev --minify`) «molto più veloce»: era il peso dello sviluppo. Letture per periodo e FlashList restano non necessarie; la misura definitiva sarà sull'APK.
+- Notifiche programmate: un solo allarme (riepilogo del 1/11 alle 9), giusto con le regole di default e senza abbonamenti. Android lo manda entro un'ora perché Expo Go non ha l'allarme esatto: da decidere col passo 6.
+- Corretto: «database is locked» riaprendo il database mentre la connessione precedente si chiudeva (dopo un ricaricamento o «Riprova»): ora una connessione alla volta.
