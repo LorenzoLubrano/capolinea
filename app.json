@@ -22,6 +22,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
+      "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
       "package": "io.github.lorenzolubrano.capolinea"
     },
     "web": {
@@ -49,8 +55,26 @@
           "faceIDPermission": "Serve per sbloccare l'app con Face ID."
         }
       ],
-      "expo-sqlite",
-      "expo-secure-store"
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png"
+        }
+      ],
+      "./plugins/with-no-backup",
+      "./plugins/with-offline-release"
     ],
     "experiments": {
       "typedRoutes": true,

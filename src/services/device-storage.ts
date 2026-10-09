@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import Storage from 'expo-sqlite/kv-store';
 
-import type { SecretStore, SyncStorage } from './device-storage.shared';
+import { DATABASE_KEY, type SecretStore, type SyncStorage } from './device-storage.shared';
 
 export * from './device-storage.shared';
 
@@ -26,4 +26,10 @@ export const secrets: SecretStore = {
     }
   },
   set: (key, value) => SecureStore.setItem(key, value, ONLY_THIS_PHONE),
+};
+
+/** The database key, read without the fallback above: a key read as «none» would be replaced. */
+export const databaseKeyStore = {
+  get: () => SecureStore.getItem(DATABASE_KEY, ONLY_THIS_PHONE),
+  set: (key: string) => SecureStore.setItem(DATABASE_KEY, key, ONLY_THIS_PHONE),
 };
