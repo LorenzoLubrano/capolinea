@@ -2,9 +2,22 @@
 
 <img src="assets/brand/capolinea-icon.svg" alt="" width="96">
 
-App personale per tenere le spese, per iOS e Android. I dati restano sul telefono, l'app non ha costi ricorrenti e la privacy è attiva di serie.
+**Le tue spese, linea per linea.**
 
-> **Stato: fase 1, prototipo navigabile.** Tutte le schermate funzionano con dati di esempio che vivono in memoria. Chiudendo l'app i dati si perdono. Il database sul telefono (SQLite) e la sincronizzazione facoltativa arrivano nella fase 2.
+App personale per tenere le spese. I dati restano sul telefono, cifrati: niente account, niente server, niente pubblicità. La privacy è attiva di serie.
+
+*In English: Capolinea is an offline personal finance tracker for Android, in Italian. Your data stays on the phone in an encrypted database; the app has no account, no server and no network permission. Licensed under GPL-3.0.*
+
+> **Stato: fase 2, in uso tutti i giorni su Android.** Su iPhone e iPad si prova con Expo Go, ma non c'è ancora un'installazione stabile.
+
+<p>
+<img src="docs/img/home.png" alt="Home: speso a ottobre 1.292,83 euro, la fascia del mese verso il capolinea di 1.600 euro, saldo totale e le linee delle categorie" width="200">
+<img src="docs/img/movimenti.png" alt="Movimenti: ricerca, filtri e le spese divise per giorno come fermate" width="200">
+<img src="docs/img/budget.png" alt="Budget: budget di ottobre e una linea per categoria con quanto resta" width="200">
+<img src="docs/img/analisi.png" alt="Analisi: quanto spendo rispetto al solito, confronto con i mesi precedenti e dove vanno i soldi" width="200">
+</p>
+
+*Schermate con i dati di esempio dell'anteprima.*
 
 La direzione visiva si chiama **Linea** e riprende la metropolitana di Milano:
 
@@ -13,51 +26,110 @@ La direzione visiva si chiama **Linea** e riprende la metropolitana di Milano:
 - il budget è il capolinea;
 - il rosso compare solo oltre il capolinea.
 
-Il sistema visivo è descritto in [DESIGN.md](DESIGN.md), il prodotto in [PRODUCT.md](PRODUCT.md) e le decisioni prese in [docs/decisioni.md](docs/decisioni.md).
+## Cosa fa
 
-## Cosa serve
+- **Spese, entrate, giroconti e rimborsi**, con categorie, conti e note.
+- **Budget del mese** per categoria, con la previsione di dove arrivi a fine mese.
+- **Abbonamenti** che si segnano da soli il giorno dell'addebito.
+- **Spese condivise:** dividi una spesa e tieni il conto di chi deve cosa.
+- **Obiettivi di risparmio** con i versamenti.
+- **Analisi** per settimana, mese e anno, per categoria e per esercente.
+- **Notifiche locali:** addebiti in arrivo, budget quasi finito o superato, riepiloghi. Con la privacy attiva non mostrano cifre.
+- **Esportazione** in CSV e **backup completo** in JSON, da ripristinare su un altro telefono.
 
-- Node.js in versione LTS (provato con la 24).
-- Sul telefono **Expo Go per l'SDK 57**: [Android](https://play.google.com/store/apps/details?id=host.exp.exponent) o [iOS/iPadOS](https://apps.apple.com/app/expo-go/id982107779). Il prototipo usa solo i moduli già inclusi in Expo Go, quindi non serve una build di sviluppo.
+## Installarla su Android
 
-## Avvio
+1. Scarica `capolinea-<versione>.apk` dalle [Release](https://github.com/LorenzoLubrano/capolinea/releases).
+2. Controlla che il file sia quello pubblicato: la sua impronta SHA-256 è scritta nella release.
+   - Windows: `certutil -hashfile capolinea-1.0.0.apk SHA256`
+   - macOS e Linux: `sha256sum capolinea-1.0.0.apk`
+3. Apri il file sul telefono e consenti l'installazione da questa fonte.
+
+L'APK è firmato con un certificato la cui impronta SHA-256 è
+`a4d11f2eeb45c8d5386b3d8a5ab4114f622fd7f9b81dbbd68c750ffe5f3afb77`.
+Gli aggiornamenti si installano sopra solo se sono firmati con lo stesso certificato, e così i dati restano.
+
+**Cambiare telefono:** i dati non vanno nel backup di Google e non passano al telefono nuovo da soli, perché la chiave del database resta sul telefono vecchio. Usa **Profilo › Esporta e backup › Backup completo** e, sul telefono nuovo, **Ripristina da un backup** al primo avvio.
+
+## Privacy e sicurezza
+
+- **Nessuna rete:** l'APK non ha il permesso di usare internet, quindi è Android stesso a impedire che i dati escano.
+- **Database cifrato** con SQLCipher. La chiave è fatta di 32 byte casuali, sta nell'archivio sicuro del telefono e non lo lascia mai.
+- **Niente backup automatici:** il backup su Google Drive e il passaggio a un telefono nuovo sono esclusi.
+- **PIN:**
+  - è salvato come hash SHA-256 con sale, nell'archivio sicuro;
+  - dal quinto tentativo sbagliato l'attesa cresce, da 30 secondi fino a 15 minuti, anche se chiudi l'app;
+  - si può sbloccare anche con volto o impronta.
+- **Modalità privacy:** nasconde gli importi, anche a TalkBack e VoiceOver e nelle notifiche.
+- **Copri l'anteprima:** l'app appare vuota nel multitasking e blocca le catture di schermo.
+- **Esportazioni:** il CSV e il backup si condividono e la copia temporanea si cancella all'avvio successivo. Un backup viene controllato campo per campo prima di ripristinarlo.
+- **Permessi:**
+  - impronta;
+  - notifiche, con il ripristino degli allarmi dopo il riavvio;
+  - vibrazione;
+  - il rilevamento delle catture di schermo, che serve a «Copri l'anteprima».
+
+  Niente rete, archivio, foto, posizione o contatti.
+- **Segreti:** nessuna chiave né credenziale nel codice.
+
+Per segnalare un problema di sicurezza vedi [SECURITY.md](SECURITY.md).
+
+## Sviluppo
+
+Serve Node.js in versione LTS (provato con la 24).
 
 ```bash
 npm install
-npx expo start
-```
-
-- **Telefono:** inquadra il codice QR con Expo Go (su iOS con la Fotocamera). Il computer e il telefono devono essere sulla stessa rete.
-- **Browser:** premi `w`, oppure avvia con `npx expo start --web`. È comodo per guardare le schermate, ma alcune cose esistono solo sul telefono:
-  - l'avviso «Scartare quello che hai scritto?»;
-  - la biometria;
-  - le vibrazioni;
-  - il vetro dei fogli.
-- **Emulatore Android:** premi `a` con un emulatore acceso.
-
-Al primo avvio i dati di esempio sono fissati al **24 ottobre 2026**, così ogni schermata ha qualcosa da mostrare.
-
-## Pannello prototipo
-
-Solo nelle build di sviluppo, da **Profilo › Info › Pannello prototipo**:
-
-- **Dati di esempio:** pieni, senza entrate, oppure casi limite (nomi lunghissimi, importi enormi, budget sforati, rimborsi più grandi della spesa).
-- **Data di oggi:** 24 ottobre, 1 ottobre, 31 ottobre oppure la data vera.
-- **Lentezza ed errori:** ogni lettura aspetta 2 secondi, oppure le letture falliscono, per vedere il caricamento e gli errori.
-- **Stati della sincronizzazione** simulati.
-- **Rivedi il primo avvio:** riporta all'onboarding con i dati vuoti.
-
-In una build di rilascio il pannello non esiste.
-
-## Comandi
-
-```bash
+npx expo start        # poi Expo Go per l'SDK 57 sul telefono, oppure «w» per il browser
 npm test              # test (Jest)
 npm run typecheck     # TypeScript
 npm run lint          # ESLint
 ```
 
-Per aggiungere una libreria usa `npx expo install <pacchetto>`, che sceglie la versione adatta all'SDK.
+- **Expo Go:** va bene per provare, ma lì il database **non è cifrato** (Expo Go non include SQLCipher): usalo solo con dati di prova.
+- **Browser:** utile per guardare le schermate; i dati restano in memoria e alcune cose esistono solo sul telefono, come la biometria, le notifiche e le vibrazioni.
+- **Librerie:** si aggiungono con `npx expo install <pacchetto>`, che sceglie la versione adatta all'SDK.
+
+### Pannello prototipo
+
+Solo nelle build di sviluppo, da **Profilo › Info › Pannello prototipo**:
+
+- **Dati di esempio:** pieni, senza entrate, casi limite, oppure quindici anni di movimenti per misurare la velocità.
+- **Data di oggi:** una data finta, per provare inizio e fine mese.
+- **Lentezza ed errori:** letture lente o che falliscono.
+- **Rivedi il primo avvio.**
+
+In una build di rilascio il pannello non esiste.
+
+### Compilare l'APK
+
+Serve, oltre a Node:
+
+- JDK 21;
+- Android SDK con build-tools 36. NDK e CMake li scarica Gradle al primo giro.
+
+La firma usa una chiave tua, fuori dal progetto: per impostazione predefinita in `~/.android-keys`, oppure nella cartella indicata da `ANDROID_KEYS`. Lì serve un `keystore.properties` così:
+
+```properties
+storeFile=la-tua-chiave.jks
+storePassword=...
+keyAlias=...
+keyPassword=...
+```
+
+Poi:
+
+```bash
+bash scripts/build-apk.sh
+```
+
+Lo script:
+1. rigenera la cartella `android/` (non va modificata a mano);
+2. compila per arm64;
+3. firma con la tua chiave;
+4. scrive `dist/capolinea-<versione>.apk` con la sua impronta.
+
+Le password arrivano al firmatario dall'ambiente, non dalla riga di comando.
 
 ## Com'è fatto
 
@@ -67,30 +139,26 @@ Per aggiungere una libreria usa `npx expo install <pacchetto>`, che sceglie la v
   - Expo Router per la navigazione;
   - Reanimated 4 per le animazioni;
   - TanStack Query per i dati e zustand per lo stato.
+- **Dati:**
+  - expo-sqlite con SQLCipher;
+  - migrazioni con `PRAGMA user_version`, ognuna preceduta da una copia cifrata del database.
+  - Gli stessi test di contratto girano sul database in memoria e su SQLite (`node:sqlite` in Jest).
 - **Importi:** sempre in centesimi interi, mai in virgola mobile.
 - **Testi:** tutti in [src/i18n/it.ts](src/i18n/it.ts).
 
 | Cartella | Cosa contiene |
 |---|---|
 | `src/app/` | Le rotte: ogni file è una schermata, i `_layout.tsx` sono i navigatori |
-| `src/domain/` | Logica pura e testata: date, importi, budget e previsione, abbonamenti, divisioni, obiettivi, analisi |
-| `src/data/` | Repository in memoria, dati di esempio e varianti, query di TanStack |
-| `src/features/` | Le schermate, divise per area: home, add, transactions, budget, analytics, money, settings, onboarding, security |
+| `src/domain/` | Logica pura e testata: date, importi, budget e previsione, abbonamenti, divisioni, obiettivi, analisi, blocco |
+| `src/data/` | Repository (SQLite sul telefono, memoria sul web), schema e migrazioni, cifratura, dati di esempio |
+| `src/features/` | Le schermate, divise per area: home, add, transactions, budget, analytics, money, settings, onboarding, security, notifications |
 | `src/components/` | Componenti condivisi: linee, fermate, cifre, chip, fogli, avvisi |
 | `src/theme/` | Token di colore, tipografia, spaziatura, movimento |
-| `src/services/` | Formati, accessibilità, aptica, sicurezza, file |
-| `src/state/` | Stato dell'app (impostazioni, blocco, filtri, avvisi) |
+| `src/services/` | Archivio del telefono, notifiche, formati, accessibilità, sicurezza, file |
+| `src/state/` | Stato dell'app: impostazioni, blocco, filtri |
+| `plugins/` | Plugin di configurazione Android: niente backup, niente rete nella build di rilascio |
 
-## Privacy e sicurezza
-
-- **Account, rete e tracciamento:** nella fase 1 non ci sono. I dati non lasciano il telefono.
-- **Modalità privacy:** nasconde gli importi anche a VoiceOver e TalkBack.
-- **PIN:**
-  - è salvato come hash SHA-256 con sale;
-  - dopo 4 tentativi sbagliati l'attesa cresce;
-  - si può sbloccare anche con volto o impronta.
-- **Esportazioni:** il CSV e il backup si condividono; la copia temporanea si cancella all'avvio successivo. Prima di ripristinarlo, un backup viene controllato campo per campo.
-- **Segreti:** nessuna chiave né credenziale nel codice.
+Il sistema visivo è descritto in [DESIGN.md](DESIGN.md), il prodotto in [PRODUCT.md](PRODUCT.md) e le decisioni prese in [docs/decisioni.md](docs/decisioni.md).
 
 ## Licenza
 
