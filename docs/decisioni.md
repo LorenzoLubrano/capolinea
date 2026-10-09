@@ -228,7 +228,7 @@ Revisione del codice e controllo di sicurezza fatti da due agenti separati, poi 
 - **Biometria:** solo quella di classe forte. Su Android lo sblocco col volto via fotocamera spesso è debole e si inganna con una foto: sul S24 resta l'impronta.
 - **Notifiche:**
   - Nuovo canale «Avvisi»: sul telefono bloccato mostra solo che ha scritto Capolinea. Le impostazioni di un canale non cambiano dopo la creazione, quindi il vecchio canale è stato cancellato.
-  - Accendendo la privacy si tolgono le notifiche già mostrate.
+  - Le cifre nelle notifiche hanno un'impostazione loro, «Mostra le cifre» in Impostazioni › Notifiche, spenta di serie (scelta di Lorenzo): l'occhio della Home non le cambia più. Spegnendola si tolgono le notifiche già mostrate.
   - «Elimina dati» cancella le notifiche programmate e quelle mostrate.
   - Una notifica che il telefono non riesce a mostrare si riprova al controllo successivo.
 - **Dati cancellati:**
@@ -242,4 +242,3 @@ Revisione del codice e controllo di sicurezza fatti da due agenti separati, poi 
 Rimandati, con il motivo:
 - Le esportazioni restano nella cache fino all'avvio successivo: cancellarle prima può rompere un allegato non ancora inviato.
 - I movimenti eliminati restano nel database (cifrato) per Annulla e per una futura sincronizzazione.
-- Una privacy delle notifiche separata dall'occhio della Home: da decidere con Lorenzo.

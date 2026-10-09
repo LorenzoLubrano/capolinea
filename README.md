@@ -62,7 +62,8 @@ Gli aggiornamenti si installano sopra solo se sono firmati con lo stesso certifi
   - si può sbloccare anche con volto o impronta, solo se il telefono li considera sicuri (su Android spesso solo l'impronta);
   - è il blocco dell'app, non la cifratura dei dati: non usare lo stesso PIN del telefono o della carta.
 - **Link dall'esterno:** l'app non apre nessuna schermata da un link `capolinea://`, così nessuno passa oltre il blocco.
-- **Modalità privacy:** nasconde gli importi, anche a TalkBack e VoiceOver e nelle notifiche. Sul telefono bloccato le notifiche dicono solo che ha scritto Capolinea, non cosa.
+- **Modalità privacy:** nasconde gli importi, anche a TalkBack e VoiceOver.
+- **Notifiche:** senza cifre, a meno che tu non scelga «Mostra le cifre» in Impostazioni › Notifiche. Sul telefono bloccato dicono solo che ha scritto Capolinea, non cosa.
 - **Copri l'anteprima:** l'app appare vuota nel multitasking e blocca le catture di schermo.
 - **Esportazioni:** il CSV e il backup si condividono e la copia temporanea si cancella all'avvio successivo. Un backup viene controllato campo per campo prima di ripristinarlo.
 - **Permessi:**

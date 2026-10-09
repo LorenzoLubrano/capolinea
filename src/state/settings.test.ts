@@ -80,6 +80,19 @@ describe('settings', () => {
     expect(launch().getState().notifications).toEqual({ ...DEFAULT_NOTIFICATIONS, budgetNear: false });
   });
 
+  it('shows no figure in notifications unless chosen, also after an update', () => {
+    const { storage, launch } = phone();
+    expect(launch().getState().notifications.showAmounts).toBe(false);
+
+    launch().getState().setNotifications({ budgetNear: false });
+    const [key, saved] = Object.entries(storage.entries())[0];
+    const older = JSON.parse(saved);
+    delete older.state.notifications.showAmounts;
+    storage.setItem(key, JSON.stringify(older));
+
+    expect(launch().getState().notifications.showAmounts).toBe(false);
+  });
+
   it('works without storage, as in the web preview', () => {
     const store = createSettingsStore({ storage: null, secrets: memorySecrets(), onboardedByDefault: true });
     store.getState().setPin(PIN);

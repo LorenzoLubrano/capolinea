@@ -33,6 +33,8 @@ export interface NotificationRules {
   monthlySummary: boolean;
   eveningReminder: boolean;
   goals: boolean;
+  /** Amounts and percentages in the notifications: off unless chosen, whatever the eye in Home says. */
+  showAmounts: boolean;
 }
 
 export const DEFAULT_NOTIFICATIONS: NotificationRules = {
@@ -48,6 +50,7 @@ export const DEFAULT_NOTIFICATIONS: NotificationRules = {
   monthlySummary: true,
   eveningReminder: false,
   goals: true,
+  showAmounts: false,
 };
 
 interface SettingsState {

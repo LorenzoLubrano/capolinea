@@ -21,7 +21,7 @@ const ORDER: NotificationRule[] = ['budgetNear', 'budgetOver', 'subscriptionSoon
 /** A notification drawn like the phone shows it, so the user sees what a rule would send. */
 function NotificationPreview({ rule }: { rule: NotificationRule }) {
   const { colors } = useTheme();
-  const masked = useSettings((s) => s.privacy);
+  const masked = useSettings((s) => !s.notifications.showAmounts);
   const threshold = useSettings((s) => s.notifications.budgetNearThreshold);
   const { title, body } = notificationPreview(rule, { masked, threshold });
   return (
@@ -119,6 +119,15 @@ export function NotificationsScreen() {
     <Screen variant="stack">
       <View style={{ gap: spacing.xl }}>
         <PermissionRow />
+        <SettingsGroup>
+          <SettingsSwitchRow
+            icon="Eye"
+            title={it.notificationSettings.showAmounts}
+            hint={it.notificationSettings.showAmountsHint}
+            value={rules.showAmounts}
+            onValueChange={(showAmounts) => set({ showAmounts })}
+          />
+        </SettingsGroup>
         <NotificationPreview rule={first} />
         <SettingsGroup title={it.notificationSettings.groups.budget}>
           {row(

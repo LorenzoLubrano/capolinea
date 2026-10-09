@@ -26,7 +26,8 @@ export const usePermissionChange = create<{ count: number; changed: () => void }
 export function NotificationsPlanner() {
   const { data } = useSnapshot();
   const rules = useSettings((s) => s.notifications);
-  const privacy = useSettings((s) => s.privacy);
+  // Figures only when chosen in Impostazioni › Notifiche; the eye in Home does not change them.
+  const privacy = !rules.showAmounts;
   const onboarded = useSettings((s) => s.onboarded);
   const permission = usePermissionChange((s) => s.count);
 
@@ -40,7 +41,7 @@ export function NotificationsPlanner() {
     enqueue(() => syncNotifications(data, rules, { privacy, now: new Date() }, notificationDevice, noticeLog));
   }, [data, rules, privacy, onboarded, permission]);
 
-  // Privacy turned on: notifications already shown may carry amounts.
+  // Figures turned off: notifications already shown may carry amounts.
   const wasPrivate = useRef(privacy);
   useEffect(() => {
     if (privacy && !wasPrivate.current) enqueue(() => notificationDevice.dismissShown());
