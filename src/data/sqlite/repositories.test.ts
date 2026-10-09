@@ -72,3 +72,22 @@ describe('SQLite repositories: the database', () => {
     expect((await repos.snapshot()).today).toBe('2026-12-01');
   });
 });
+
+describe('SQLite repositories: speed', () => {
+  it('writes a large backup in batches, not one statement per record', async () => {
+    const db = openTestDatabase();
+    await initialiseDatabase(db, { backup: jest.fn() });
+    let statements = 0;
+    const counted = { ...db, runAsync: (source: string, params: (string | number | null)[]) => ((statements += 1), db.runAsync(source, params)) };
+    const repos = createSqliteRepositories(counted, { today: () => '2026-10-24', newId: randomUUID });
+    const years = createDataset('2026-10-24', '2011-10-25');
+
+    await repos.replaceAll(years);
+
+    expect(years.transactions.length).toBeGreaterThan(9000);
+    // Each statement is a trip to the native driver: on the phone, one per record took 16 s.
+    expect(statements).toBeLessThan(400);
+    expect((await repos.snapshot()).transactions).toEqual(years.transactions);
+  });
+});
+

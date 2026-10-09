@@ -33,19 +33,39 @@ async function upsert(db: SqlDatabase, table: Table, row: DbRow) {
   );
 }
 
+/** Bound values per statement: the lowest limit SQLite ever had, so any build takes it. */
+const MAX_VALUES = 999;
+
+/**
+ * Writes many records of one table with few statements: each statement is a trip to the native
+ * driver, and one per record made a restore of years of data take many seconds on the phone.
+ */
+async function upsertMany(db: SqlDatabase, table: Table, rows: DbRow[]) {
+  if (!rows.length) return;
+  const columns = Object.keys(rows[0]);
+  const perStatement = Math.max(1, Math.floor(MAX_VALUES / columns.length));
+  const tuple = `(${columns.map(() => '?').join(', ')})`;
+  const updates = columns.filter((column) => column !== 'id').map((column) => `${column} = excluded.${column}`);
+  for (let start = 0; start < rows.length; start += perStatement) {
+    const chunk = rows.slice(start, start + perStatement);
+    await db.runAsync(
+      `INSERT INTO ${table} (${columns.join(', ')}) VALUES ${chunk.map(() => tuple).join(', ')} ON CONFLICT (id) DO UPDATE SET ${updates.join(', ')}`,
+      chunk.flatMap((row) => columns.map((column) => row[column])),
+    );
+  }
+}
+
 /** Adds every record of `data`; the database must not hold any of them yet. */
 async function insertAll(db: SqlDatabase, data: Snapshot) {
   await db.runAsync("INSERT INTO meta (key, value) VALUES ('currency', ?)", [data.currency]);
-  for (const person of data.people) await upsert(db, 'people', rows.personRow(person));
-  for (const account of data.accounts) await upsert(db, 'accounts', rows.accountRow(account));
-  for (const category of data.categories) await upsert(db, 'categories', rows.categoryRow(category));
-  for (const subscription of data.subscriptions) await upsert(db, 'subscriptions', rows.subscriptionRow(subscription));
-  for (const tx of data.transactions) await upsert(db, 'transactions', rows.transactionRow(tx));
-  for (const budget of data.budgets) await upsert(db, 'budgets', rows.budgetRow(budget));
-  for (const goal of data.goals) {
-    await upsert(db, 'goals', rows.goalRow(goal));
-    for (const contribution of goal.contributions) await upsert(db, 'goal_contributions', rows.contributionRow(goal.id, contribution));
-  }
+  await upsertMany(db, 'people', data.people.map(rows.personRow));
+  await upsertMany(db, 'accounts', data.accounts.map(rows.accountRow));
+  await upsertMany(db, 'categories', data.categories.map(rows.categoryRow));
+  await upsertMany(db, 'subscriptions', data.subscriptions.map(rows.subscriptionRow));
+  await upsertMany(db, 'transactions', data.transactions.map(rows.transactionRow));
+  await upsertMany(db, 'budgets', data.budgets.map(rows.budgetRow));
+  await upsertMany(db, 'goals', data.goals.map(rows.goalRow));
+  await upsertMany(db, 'goal_contributions', data.goals.flatMap((goal) => goal.contributions.map((c) => rows.contributionRow(goal.id, c))));
 }
 
 /**

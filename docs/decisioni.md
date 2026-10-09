@@ -181,3 +181,12 @@ Scelte di Lorenzo: il permesso si chiede alla fine del primo avvio; funzionano t
 - Con la privacy attiva nessuna cifra, neanche nelle percentuali. Gli esempi in Impostazioni › Notifiche usano gli stessi testi dei messaggi veri; la lettera dell'anteprima è ora «C».
 - Canale Android «Avvisi», importanza normale, senza suono. Le notifiche si vedono anche ad app aperta. L'icona delle notifiche e il plugin di expo-notifications arrivano con l'APK (passo 6); in Expo Go c'è l'icona di Expo.
 
+## 09/10/2026: prove sull'emulatore Android (Expo Go)
+
+Fatte da Claude su richiesta di Lorenzo, sull'emulatore `test36` (Android 16, Expo Go 57.0.9).
+
+- Funziona: primo avvio, dati e impostazioni che restano dopo la chiusura, PIN all'avvio senza che si veda la Home, tentativi sbagliati e attesa che restano dopo la chiusura, permesso delle notifiche, notifica immediata «Budget quasi finito» con le cifre e «Budget superato» senza cifre con la privacy, nessuna notifica doppia dopo la riapertura, «Copri l'anteprima» che blocca le schermate.
+- Corretto: l'import di expo-notifications dalla radice bloccava l'app in Expo Go; il canale «Avvisi» non si crea in Expo Go; per un istante si vedeva la Home prima del blocco; l'avviso giallo di LogBox copriva l'ultima riga dei tastierini (in sviluppo); un testo di Sicurezza diceva ancora che il PIN vive solo in memoria.
+- Prestazioni con 8.970 movimenti: lettura 300-400 ms sull'emulatore; il ripristino passava da 15,9 s a 1,25 s scrivendo a blocchi (un'istruzione per più righe, al massimo 999 valori). La memoria dell'app in sviluppo (circa 700 MB) è la stessa con 166 o 9.000 movimenti: è il peso di Expo Go in sviluppo, non dei dati.
+- Da provare sul telefono vero: impronta e volto, i tempi veri, le notifiche programmate all'ora giusta.
+
