@@ -156,3 +156,11 @@ Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
 - «Oggi» viene dall'orologio del telefono, mai dai dati ripristinati. Tornando nell'app in un altro giorno, i dati si rileggono.
 - L'anteprima web (solo sviluppo) resta sulla memoria con i dati di esempio: expo-sqlite non entra nel pacchetto web. Sul telefono, in sviluppo, si parte dal database vuoto; il pannello prototipo carica i dati di esempio e, se serve, sposta «oggi».
 
+## 09/10/2026: fase 2, passo 3 (impostazioni e sicurezza persistenti)
+
+- Le impostazioni (tema, privacy, sfondo, blocco automatico, notifiche, primo avvio fatto) restano in `expo-sqlite/kv-store`, letto in modo sincrono: sono già lì al primo fotogramma. Una regola di notifica aggiunta in una versione futura prende il suo valore di serie.
+- Il PIN (impronta con sale) e il conteggio dei tentativi sbagliati stanno in `expo-secure-store`, `WHEN_UNLOCKED_THIS_DEVICE_ONLY`: mai nei backup, mai su un altro telefono, mai nel file delle impostazioni. Chiudere l'app non regala tentativi nuovi.
+- Un'installazione nuova dimentica i segreti lasciati da una precedente (su iOS il portachiavi può sopravvivere alla disinstallazione).
+- Con il PIN l'app parte bloccata: la schermata iniziale resta finché la pagina di blocco non copre l'app, che compare senza dissolvenza; nessun dato si intravede.
+- Sul telefono si parte dal primo avvio; l'anteprima web resta sui dati di esempio, con impostazioni e segreti solo per la sessione. Nei test Jest il modulo del telefono è sostituito da quello in memoria.
+

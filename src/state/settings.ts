@@ -1,6 +1,9 @@
-import { create } from 'zustand';
+import { Platform } from 'react-native';
+import { create, type StateCreator } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import type { AutoLock } from '@/domain/lock';
+import { SECRET_KEYS, secrets, settingsStorage, type SecretStore, type SyncStorage } from '@/services/device-storage';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
@@ -79,32 +82,95 @@ interface SettingsState {
   setOnboarded: (onboarded: boolean) => void;
 }
 
+/** What survives a restart in the settings file. The PIN is not here: it lives in the secure store. */
+type Persisted = Pick<
+  SettingsState,
+  'privacy' | 'themeMode' | 'homeBackdrop' | 'biometrics' | 'autoLock' | 'startHidden' | 'coverInSwitcher' | 'notifications' | 'onboarded'
+>;
+
+const SETTINGS_KEY = 'capolinea.settings';
+
+const isPinRecord = (value: unknown): value is PinRecord =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as PinRecord).hash === 'string' &&
+  typeof (value as PinRecord).salt === 'string' &&
+  typeof (value as PinRecord).length === 'number';
+
+function readPin(store: SecretStore): PinRecord | null {
+  try {
+    const value: unknown = JSON.parse(store.get(SECRET_KEYS.pin) ?? 'null');
+    return isPinRecord(value) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * UI preferences. Financial data never lives here: it comes from the repositories.
- * Phase 1 keeps them in memory; phase 2 moves the PIN to SecureStore and the rest to the database.
+ * Settings are kept in `storage` (none: only for the session); the PIN record in `secrets`.
  */
-export const useSettings = create<SettingsState>((set) => ({
-  privacy: false,
-  themeMode: 'system',
-  homeBackdrop: 'map',
-  pin: null,
-  biometrics: false,
-  autoLock: '1m',
-  startHidden: false,
-  coverInSwitcher: true,
-  notifications: DEFAULT_NOTIFICATIONS,
-  // The prototype opens on the example data, as if the onboarding were done.
-  onboarded: true,
-  togglePrivacy: () => set((state) => ({ privacy: !state.privacy })),
-  setPrivacy: (privacy) => set({ privacy }),
-  setThemeMode: (themeMode) => set({ themeMode }),
-  setHomeBackdrop: (homeBackdrop) => set({ homeBackdrop }),
-  setPin: (pin) => set(pin ? { pin } : { pin: null, biometrics: false }),
-  setBiometrics: (biometrics) => set({ biometrics }),
-  setAutoLock: (autoLock) => set({ autoLock }),
-  setStartHidden: (startHidden) => set({ startHidden }),
-  setCoverInSwitcher: (coverInSwitcher) => set({ coverInSwitcher }),
-  setNotifications: (changes) => set((state) => ({ notifications: { ...state.notifications, ...changes } })),
-  resetSecurity: () => set({ pin: null, biometrics: false, autoLock: '1m', startHidden: false }),
-  setOnboarded: (onboarded) => set({ onboarded }),
-}));
+export function createSettingsStore({ storage, secrets: store, onboardedByDefault }: { storage: SyncStorage | null; secrets: SecretStore; onboardedByDefault: boolean }) {
+  // A new install has no settings yet: secrets still in the iOS keychain belong to an earlier one.
+  if (storage && storage.getItem(SETTINGS_KEY) === null) for (const key of Object.values(SECRET_KEYS)) store.set(key, 'null');
+  const savePin = (pin: PinRecord | null) => store.set(SECRET_KEYS.pin, JSON.stringify(pin));
+
+  const settings: StateCreator<SettingsState> = (set) => ({
+    privacy: false,
+    themeMode: 'system',
+    homeBackdrop: 'map',
+    pin: readPin(store),
+    biometrics: false,
+    autoLock: '1m',
+    startHidden: false,
+    coverInSwitcher: true,
+    notifications: DEFAULT_NOTIFICATIONS,
+    onboarded: onboardedByDefault,
+    togglePrivacy: () => set((state) => ({ privacy: !state.privacy })),
+    setPrivacy: (privacy) => set({ privacy }),
+    setThemeMode: (themeMode) => set({ themeMode }),
+    setHomeBackdrop: (homeBackdrop) => set({ homeBackdrop }),
+    setPin: (pin) => {
+      savePin(pin);
+      set(pin ? { pin } : { pin: null, biometrics: false });
+    },
+    setBiometrics: (biometrics) => set({ biometrics }),
+    setAutoLock: (autoLock) => set({ autoLock }),
+    setStartHidden: (startHidden) => set({ startHidden }),
+    setCoverInSwitcher: (coverInSwitcher) => set({ coverInSwitcher }),
+    setNotifications: (changes) => set((state) => ({ notifications: { ...state.notifications, ...changes } })),
+    resetSecurity: () => {
+      savePin(null);
+      set({ pin: null, biometrics: false, autoLock: '1m', startHidden: false });
+    },
+    setOnboarded: (onboarded) => set({ onboarded }),
+  });
+
+  if (!storage) return create<SettingsState>()(settings);
+  return create<SettingsState>()(
+    persist(settings, {
+      name: SETTINGS_KEY,
+      version: 1,
+      storage: createJSONStorage(() => storage),
+      partialize: (state): Persisted => ({
+        privacy: state.privacy,
+        themeMode: state.themeMode,
+        homeBackdrop: state.homeBackdrop,
+        biometrics: state.biometrics,
+        autoLock: state.autoLock,
+        startHidden: state.startHidden,
+        coverInSwitcher: state.coverInSwitcher,
+        notifications: state.notifications,
+        onboarded: state.onboarded,
+      }),
+      // A rule added by a later version is missing from older settings: it takes its default.
+      merge: (saved, current) => {
+        const old = (saved ?? {}) as Partial<Persisted>;
+        return { ...current, ...old, notifications: { ...current.notifications, ...old.notifications } };
+      },
+    }),
+  );
+}
+
+/** The web preview opens on the example data, as if the onboarding were done; the phone on its own. */
+export const useSettings = createSettingsStore({ storage: settingsStorage, secrets, onboardedByDefault: Platform.OS === 'web' });

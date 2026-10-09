@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { AppState, BackHandler, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -57,6 +58,10 @@ export function LockScreen() {
   const startHidden = useSettings((s) => s.startHidden);
   const setPrivacy = useSettings((s) => s.setPrivacy);
   const { failedAttempts, lockedOutUntil, fail, unlock } = useLock();
+  // Locked since the start: the splash screen stayed up until this screen covered the app.
+  useEffect(() => {
+    if (useLock.getState().coldStart) SplashScreen.hideAsync();
+  }, []);
   const { data: kind = null } = useQuery({ queryKey: ['biometric-support'], queryFn: biometricSupport, staleTime: Infinity });
   const [digits, setDigits] = useState('');
   const [error, setError] = useState<string | null>(null);

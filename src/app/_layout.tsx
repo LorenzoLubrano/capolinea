@@ -21,6 +21,7 @@ import { it } from '@/i18n/it';
 import { useReduceMotion } from '@/services/a11y';
 import { useAppSwitcherCover } from '@/services/security';
 import { clearExports } from '@/services/share-file';
+import { useLock } from '@/state/lock';
 import { prototypeFaults } from '@/state/prototype';
 import { useSettings } from '@/state/settings';
 import { fonts, radius, useTheme } from '@/theme';
@@ -32,11 +33,13 @@ function AppStack() {
   useAppSwitcherCover(useSettings((s) => s.coverInSwitcher));
   const onboarded = useSettings((s) => s.onboarded);
   const reduceMotion = useReduceMotion();
+  // Started with a PIN: the lock screen comes up at once, the splash screen covering until then.
+  const coldStart = useLock((s) => s.coldStart);
   // Exports left from the last session are deleted: the app keeps no copy of the data.
   useEffect(() => clearExports(), []);
-  // Rendered once the fonts are loaded and the database is open.
+  // Rendered once the fonts are loaded and the database is open. Locked, the lock screen hides it.
   useEffect(() => {
-    SplashScreen.hideAsync();
+    if (!useLock.getState().coldStart) SplashScreen.hideAsync();
   }, []);
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const navigationTheme = {
@@ -117,7 +120,7 @@ function AppStack() {
         <Stack.Screen name="settings/pin" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="restore" options={{ ...pushed, title: it.restore.title }} />
         {/* Above everything, sheets included; no gesture, no animation to peek behind it. */}
-        <Stack.Screen name="lock" options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: 'fade' }} />
+        <Stack.Screen name="lock" options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: coldStart ? 'none' : 'fade' }} />
       </Stack>
       <ToastHost />
       <LockGate />

@@ -21,6 +21,7 @@
     "expo-local-authentication": "~57.0.3",
     "expo-router": "~57.0.25",
     "expo-screen-capture": "~57.0.4",
+    "expo-secure-store": "~57.0.4",
     "expo-sharing": "~57.0.22",
     "expo-splash-screen": "~57.0.9",
     "expo-sqlite": "~57.0.4",
@@ -61,7 +62,10 @@
     "test": "jest"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "moduleNameMapper": {
+      "^@/services/device-storage$": "<rootDir>/src/services/device-storage.web.ts"
+    }
   },
   "private": true
 }
