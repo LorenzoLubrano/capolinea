@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { randomUUID } from 'node:crypto';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -59,6 +59,27 @@ describe('SQLite repositories: the database', () => {
       expect(await second.repos.snapshot()).toEqual(before);
       expect(before.transactions).toEqual([coffee]);
       second.db.close();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('leaves no trace of replaced data in the database files', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'capolinea-'));
+    try {
+      const file = join(dir, 'capolinea.db');
+      const { db, repos } = await openRepositories('2026-10-09', file);
+      await repos.addPerson('Segretissimo Rossi');
+
+      await repos.replaceAll(createEmptyDataset('2026-10-09'));
+
+      const bytes = ['', '-wal']
+        .map((suffix) => join(dir, `capolinea.db${suffix}`))
+        .filter((path) => existsSync(path))
+        .map((path) => readFileSync(path).toString('latin1'))
+        .join('');
+      expect(bytes).not.toContain('Segretissimo');
+      db.close();
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

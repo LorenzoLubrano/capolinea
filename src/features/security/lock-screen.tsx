@@ -129,8 +129,17 @@ export function LockScreen() {
     setError(null);
     if (value.length < pin.length) return;
     setChecking(true);
-    const ok = await checkPin(value, pin);
-    setChecking(false);
+    let ok: boolean;
+    try {
+      ok = await checkPin(value, pin);
+    } catch {
+      // The phone could not compute the check: not a wrong PIN, and the pad stays usable.
+      setDigits('');
+      setError(it.lock.checkFailed);
+      return;
+    } finally {
+      setChecking(false);
+    }
     if (ok) return done();
     haptics.warning();
     const at = Date.now();

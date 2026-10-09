@@ -327,6 +327,8 @@ export function createSqliteRepositories(db: SqlDatabase, { today, newId }: Sqli
         for (const table of TABLES) await db.runAsync(`DELETE FROM ${table}`, []);
         await insertAll(db, data);
       });
+      // Deleting the data or restoring a backup: the old pages leave the write-ahead log too.
+      await db.execAsync('PRAGMA wal_checkpoint(TRUNCATE)');
     },
   };
 

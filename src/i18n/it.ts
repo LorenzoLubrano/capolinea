@@ -739,6 +739,7 @@ export const it = {
     prompt: "Sblocca l'app",
     wrong: (left: number) => (left > 0 ? `PIN sbagliato. Ancora ${left} ${left === 1 ? 'tentativo' : 'tentativi'} prima di una pausa.` : 'PIN sbagliato.'),
     wait: (time: string) => `Troppi tentativi. Riprova tra ${time}.`,
+    checkFailed: 'Non riesco a controllare il PIN. Riprova.',
     now: 'Blocca adesso',
     nowHint: 'Per passare il telefono a qualcuno.',
   },

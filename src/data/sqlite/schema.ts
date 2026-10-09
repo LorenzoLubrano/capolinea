@@ -162,7 +162,8 @@ export const MIGRATIONS: Migration[] = [{ version: 1, up: (db) => db.execAsync(V
  * Settings go first because SQLite ignores `foreign_keys` inside a transaction.
  */
 export async function prepareDatabase(db: SqlDatabase, options: MigrateOptions) {
-  await db.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+  // secure_delete: what is deleted is overwritten, not just marked free in the file.
+  await db.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA secure_delete = ON;');
   return runMigrations(db, MIGRATIONS, options);
 }
 

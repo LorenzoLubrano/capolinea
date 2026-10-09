@@ -35,8 +35,9 @@ export async function syncNotifications(
   log: NoticeLog,
 ): Promise<void> {
   const { send, seen } = noticesToSend(currentNotices(snapshot, rules, { privacy, now }), log.read(), rules);
-  log.write(seen);
-  if (!(await device.allowed())) return;
-  await device.replaceScheduled(planNotifications(snapshot, rules, { privacy, now }).slice(0, MAX_SCHEDULED));
+  if (!(await device.allowed())) return log.write(seen);
+  // Noted only once shown: a notice the phone failed to show goes out at the next check.
   if (send.length) await device.present(send);
+  log.write(seen);
+  await device.replaceScheduled(planNotifications(snapshot, rules, { privacy, now }).slice(0, MAX_SCHEDULED));
 }

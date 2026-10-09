@@ -12,15 +12,19 @@ export JAVA_HOME="${JAVA_HOME:-$LOCALAPPDATA/Programs/jdk-21}"
 export PATH="$JAVA_HOME/bin:$PATH"
 APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner.bat"
 
-prop() { grep -E "^$1=" "$PROPS" | head -1 | cut -d= -f2- | tr -d '\r'; }
+prop() {
+  local value
+  value=$(grep -E "^$1=" "$PROPS" | head -1 | cut -d= -f2- | tr -d '\r' || true)
+  [ -n "$value" ] || { echo "Missing $1 in $PROPS" >&2; exit 1; }
+  printf '%s' "$value"
+}
 [ -f "$PROPS" ] || { echo "Missing $PROPS" >&2; exit 1; }
 
 # Prebuild rewrites the npm scripts for native runs; the project keeps its own.
 saved_package=$(mktemp)
 cp package.json "$saved_package"
+trap 'cp "$saved_package" package.json; rm -f "$saved_package"' EXIT
 npx expo prebuild --platform android --clean --no-install
-cp "$saved_package" package.json
-rm -f "$saved_package"
 
 (cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --console=plain)
 

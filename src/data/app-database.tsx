@@ -96,9 +96,12 @@ export function AppDatabase({ children }: { children: (repos: Repositories) => R
   useEffect(() => {
     let cancelled = false;
     const opened = connections.open();
-    opened
-      .then(async ({ db, key }) => {
-        await openAndPrepare(db, key);
+    const prepared = opened.then(async (connection) => {
+      await openAndPrepare(connection.db, connection.key);
+      return connection;
+    });
+    prepared
+      .then(({ db }) => {
         if (!cancelled) setOpening({ attempt, repos: createSqliteRepositories(db, { today, newId: randomUUID }) });
       })
       .catch((error: unknown) => {
@@ -107,7 +110,8 @@ export function AppDatabase({ children }: { children: (repos: Repositories) => R
       });
     return () => {
       cancelled = true;
-      connections.close(opened);
+      // Closed once the migrations and their copy are over, never in the middle of them.
+      connections.close(prepared.catch(() => opened));
     };
   }, [attempt]);
 

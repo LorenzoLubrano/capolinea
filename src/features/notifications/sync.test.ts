@@ -74,6 +74,27 @@ describe('syncNotifications', () => {
     expect(p.seen()).toEqual(['budgetNear:budget-food:2026-10']);
   });
 
+  it('shows at the next check a notice the phone failed to show', async () => {
+    const p = phone();
+    const present = p.device.present;
+    await sync(withSpending(5000), p);
+    p.device.present = () => Promise.reject(new Error('notification service'));
+    await expect(sync(withSpending(8500), p)).rejects.toThrow();
+    p.device.present = present;
+    await sync(withSpending(8500), p);
+
+    expect(p.presented.map((n) => n.key)).toEqual(['budgetNear:budget-food:2026-10']);
+  });
+
+  it('still shows a new notice when scheduling the others fails', async () => {
+    const p = phone();
+    await sync(withSpending(5000), p);
+    p.device.replaceScheduled = () => Promise.reject(new Error('alarm service'));
+    await expect(sync(withSpending(8500), p)).rejects.toThrow();
+
+    expect(p.presented.map((n) => n.key)).toEqual(['budgetNear:budget-food:2026-10']);
+  });
+
   it('keeps to the sixty earliest notifications, as phones keep a limited number', async () => {
     const p = phone();
     const many = Array.from({ length: 80 }, (_, i) =>
