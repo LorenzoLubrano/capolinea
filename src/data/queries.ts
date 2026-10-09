@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { forgetNotices } from '@/services/notice-log';
+
 import { SNAPSHOT_KEY, useRepositories } from './provider';
 import type {
   AccountDraft,
@@ -118,4 +120,5 @@ export const useRestorePerson = () => useSnapshotMutation((r, id: string) => r.r
 export const useSettleWith = () =>
   useSnapshotMutation((r, { personId, ...options }: { personId: string; date: string; accountId?: string; description?: string }) => r.settleWith(personId, options));
 export const useUndoSettle = () => useSnapshotMutation((r, record: SettleRecord) => r.undoSettle(record));
-export const useReplaceAll = () => useSnapshotMutation((r, data: Snapshot) => r.replaceAll(data));
+/** After a restore or a wipe, what is true in the new data is not news for the notifications. */
+export const useReplaceAll = () => useSnapshotMutation((r, data: Snapshot) => r.replaceAll(data).then(forgetNotices));

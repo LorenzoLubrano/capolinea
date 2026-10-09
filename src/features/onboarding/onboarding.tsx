@@ -16,7 +16,9 @@ import { appendKeypadKey, cleanAmountText, inputToMinor } from '@/domain/money';
 import type { AccountType, Id } from '@/domain/types';
 import { AmountDisplay, ChoiceRow, SaveBar, TextField } from '@/features/add/form-parts';
 import { it } from '@/i18n/it';
+import { usePermissionChange } from '@/features/notifications/notifications-planner';
 import { haptics } from '@/services/haptics';
+import { askForNotifications } from '@/services/notifications';
 import { useSettings } from '@/state/settings';
 import { useToast } from '@/state/toast';
 import { layout, radius, spacing, useTheme } from '@/theme';
@@ -279,8 +281,14 @@ export function PrivacyStep() {
   const setCover = useSettings((s) => s.setCoverInSwitcher);
   const setOnboarded = useSettings((s) => s.setOnboarded);
   const showToast = useToast((s) => s.show);
+  const [asking, setAsking] = useState(false);
 
-  const finish = () => {
+  const finish = async () => {
+    if (asking) return;
+    // The system asks about notifications once, here: the rules on by default need it.
+    setAsking(true);
+    if (await askForNotifications().catch(() => false)) usePermissionChange.getState().changed();
+    setAsking(false);
     haptics.success();
     useOnboardingDraft.setState({ accountId: null, budgetId: null });
     setOnboarded(true);
@@ -288,8 +296,8 @@ export function PrivacyStep() {
   };
 
   return (
-    <StepFrame step="privacy" title={it.onboarding.privacy.title} body={it.onboarding.privacy.body} footer={<FooterButton label={it.onboarding.privacy.done} onPress={finish} />}>
-      <SettingsGroup>
+    <StepFrame step="privacy" title={it.onboarding.privacy.title} body={it.onboarding.privacy.body} footer={<FooterButton label={it.onboarding.privacy.done} onPress={finish} busy={asking} />}>
+      <SettingsGroup footer={it.onboarding.privacy.notifications}>
         <SettingsSwitchRow
           icon="LockSimple"
           title={it.security.lock}

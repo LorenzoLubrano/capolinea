@@ -1,12 +1,16 @@
-import { View } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { AppState, View } from 'react-native';
 
 import { Chip } from '@/components/chip';
 import { Screen } from '@/components/screen';
-import { SettingsGroup, SettingsSwitchRow } from '@/components/settings-group';
+import { SettingsGroup, SettingsRow, SettingsSwitchRow } from '@/components/settings-group';
 import { AppText } from '@/components/text';
+import { usePermissionChange } from '@/features/notifications/notifications-planner';
 import { it } from '@/i18n/it';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
+import { allowNotifications, notificationsAllowed } from '@/services/notifications';
 import { useSettings, type NotificationRules } from '@/state/settings';
 import { radius, shadows, spacing, useTheme } from '@/theme';
 
@@ -32,7 +36,7 @@ function NotificationPreview({ rule }: { rule: NotificationRule }) {
       >
         <View style={{ width: 36, height: 36, borderRadius: radius.badge + 2, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' }}>
           <AppText variant="badge" tone="onInk">
-            S
+            C
           </AppText>
         </View>
         <View style={{ flex: 1, gap: spacing.xxs }}>
@@ -70,6 +74,30 @@ function Options<T extends number>({ values, value, label, onChange }: { values:
   );
 }
 
+/**
+ * Without permission the rules send nothing: say so on top, and ask (or open the phone's settings
+ * once the system no longer asks). Read again when the user comes back from those settings.
+ */
+function PermissionRow() {
+  const { data: allowed = true, refetch } = useQuery({ queryKey: ['notifications-allowed'], queryFn: notificationsAllowed });
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void refetch();
+    });
+    return () => subscription.remove();
+  }, [refetch]);
+  if (allowed) return null;
+  const allow = async () => {
+    if (await allowNotifications()) usePermissionChange.getState().changed();
+    void refetch();
+  };
+  return (
+    <SettingsGroup>
+      <SettingsRow icon="Bell" title={it.notificationSettings.blocked} hint={it.notificationSettings.blockedHint} onPress={() => void allow()} />
+    </SettingsGroup>
+  );
+}
+
 /** Notifiche: local rules, each with its threshold, and a preview of what they send. */
 export function NotificationsScreen() {
   const rules = useSettings((s) => s.notifications);
@@ -90,6 +118,7 @@ export function NotificationsScreen() {
   return (
     <Screen variant="stack">
       <View style={{ gap: spacing.xl }}>
+        <PermissionRow />
         <NotificationPreview rule={first} />
         <SettingsGroup title={it.notificationSettings.groups.budget}>
           {row(

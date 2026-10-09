@@ -727,6 +727,7 @@ export const it = {
     privacy: {
       title: 'Proteggi i tuoi numeri',
       body: 'Puoi cambiare tutto più tardi in Profilo › Sicurezza e privacy.',
+      notifications: 'Dopo «Fine» il telefono ti chiede se mandare notifiche: addebiti in arrivo, budget quasi finito, riepilogo del mese. Le scegli in Profilo › Notifiche.',
       done: 'Fine',
     },
     ready: 'Tutto pronto.',
@@ -879,7 +880,10 @@ export const it = {
     },
     daysBefore: (n: number) => (n === 1 ? '1 giorno prima' : `${n} giorni prima`),
     above: (amount: string) => `Oltre ${amount}`,
-    footer: 'Notifiche locali, nessun server. Nel prototipo non partono: qui scegli solo le regole.',
+    footer: 'Notifiche locali: le prepara il telefono, nessun server. Con la privacy attiva non mostrano cifre.',
+    channel: 'Avvisi',
+    blocked: 'Permetti le notifiche',
+    blockedHint: 'Ora il telefono non le lascia passare: le regole qui sotto non partono.',
   },
   currencySettings: {
     title: 'Valuta e formati',

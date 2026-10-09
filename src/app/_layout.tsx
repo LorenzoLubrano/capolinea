@@ -16,6 +16,7 @@ import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
 
 import { ToastHost } from '@/components/toast-host';
 import { DataProvider } from '@/data/provider';
+import { NotificationsPlanner } from '@/features/notifications/notifications-planner';
 import { LockGate } from '@/features/security/lock-screen';
 import { it } from '@/i18n/it';
 import { useReduceMotion } from '@/services/a11y';
@@ -124,6 +125,7 @@ function AppStack() {
       </Stack>
       <ToastHost />
       <LockGate />
+      <NotificationsPlanner />
     </ThemeProvider>
   );
 }

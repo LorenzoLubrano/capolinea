@@ -170,3 +170,14 @@ Seconde scelte di Lorenzo, dopo la consegna della Fermata 3:
 - Per ora niente letture per periodo e niente FlashList: Movimenti usa già una lista virtualizzata e i numeri non le chiedono. Si decide con la misura sul telefono, che in Node non si può fare (Hermes e una CPU mobile sono più lenti).
 - Per quella misura, solo in sviluppo: «Anni di dati» nel pannello prototipo (15 anni, circa 9.000 movimenti) e il tempo di ogni chiamata ai dati nel terminale di Metro (`[dati] snapshot … ms, … movimenti`).
 
+## 09/10/2026: fase 2, passo 5 (notifiche locali)
+
+Scelte di Lorenzo: il permesso si chiede alla fine del primo avvio; funzionano tutte e 9 le regole già disegnate; «Budget quasi finito» arriva alla soglia scelta.
+
+- Notifiche programmate (`features/notifications/plan.ts`): addebito in arrivo alle 9 del giorno scelto prima; promemoria serale alle 21 per sette sere, saltando quella di oggi se oggi è stato inserito qualcosa; riepilogo della settimana la domenica alle 20, con i numeri di Analisi; riepilogo del mese il primo alle 9, contro il budget. Si riprogrammano a ogni cambio di dati, regole o privacy; al massimo 60, le più vicine (i telefoni ne tengono un numero limitato).
+- Notifiche su evento (`events.ts`): budget alla soglia e budget superato (una volta per budget al mese), addebito registrato e spesa grande inseriti nell'ultima settimana (la spesa grande non vale per gli addebiti degli abbonamenti, che hanno la loro regola), traguardi degli obiettivi al 25, 50, 75 e 100% (se ne passano più insieme, solo il più alto).
+- Ogni evento ha una chiave; il registro (`services/notice-log.ts`, accanto alle impostazioni) tiene quelle già vere. Il primo controllo prende solo nota: installare, ripristinare un backup o accendere una regola non manda notizie vecchie. Il registro si azzera quando i dati vengono sostituiti (ripristino, eliminazione).
+- Senza permesso l'app prende comunque nota e non manda niente. In Impostazioni › Notifiche una riga «Permetti le notifiche» chiede di nuovo, o apre le impostazioni del telefono quando il sistema non chiede più.
+- Con la privacy attiva nessuna cifra, neanche nelle percentuali. Gli esempi in Impostazioni › Notifiche usano gli stessi testi dei messaggi veri; la lettera dell'anteprima è ora «C».
+- Canale Android «Avvisi», importanza normale, senza suono. Le notifiche si vedono anche ad app aperta. L'icona delle notifiche e il plugin di expo-notifications arrivano con l'APK (passo 6); in Expo Go c'è l'icona di Expo.
+
