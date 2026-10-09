@@ -1,6 +1,6 @@
 import { isRunningInExpoGo } from 'expo';
 import { getRandomBytes, randomUUID } from 'expo-crypto';
-import { File } from 'expo-file-system';
+import { Directory, File } from 'expo-file-system';
 import * as SplashScreen from 'expo-splash-screen';
 import { defaultDatabaseDirectory, openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -13,6 +13,7 @@ import { usePrototype } from '@/state/prototype';
 import { spacing, useTheme } from '@/theme';
 
 import type { Repositories } from './repositories';
+import { isMigrationCopy, migrationCopyName } from './sqlite/copies';
 import { copyEncryptedDatabaseTo, databaseKey, isPlainDatabase, keyStatement } from './sqlite/encryption';
 import { oneConnectionAtATime } from './sqlite/one-connection';
 import { createSqliteRepositories, initialiseDatabase } from './sqlite/repositories';
@@ -31,6 +32,23 @@ const connections = oneConnectionAtATime(async () => {
   return { db, key, closeAsync: () => db.closeAsync() };
 });
 
+/** Deleting the data or restoring a backup also deletes the copies made before migrations. */
+function withoutOldCopies(repos: Repositories): Repositories {
+  return {
+    ...repos,
+    replaceAll: async (data) => {
+      await repos.replaceAll(data);
+      try {
+        for (const entry of new Directory(`file://${defaultDatabaseDirectory}`).list()) {
+          if (entry instanceof File && isMigrationCopy(entry.name)) entry.delete();
+        }
+      } catch {
+        // Nothing to delete.
+      }
+    },
+  };
+}
+
 /** Today on the phone's clock; in development the prototype panel can move it. */
 const today = () => (__DEV__ && usePrototype.getState().today) || toLocalDate(new Date());
 
@@ -38,7 +56,7 @@ async function openAndPrepare(db: SQLiteDatabase, key: string | null) {
   if (key) await unlock(db, key);
   await initialiseDatabase(db, {
     // Next to the database, named after the version it had: the way back if a migration goes wrong.
-    backup: (from) => backUp(db, `${defaultDatabaseDirectory}/capolinea-v${from}-${Date.now()}.db`, key),
+    backup: (from) => backUp(db, `${defaultDatabaseDirectory}/${migrationCopyName(from, Date.now())}`, key),
   });
   if (__DEV__ && key) await checkEncryption(db, key);
 }
@@ -102,7 +120,7 @@ export function AppDatabase({ children }: { children: (repos: Repositories) => R
     });
     prepared
       .then(({ db }) => {
-        if (!cancelled) setOpening({ attempt, repos: createSqliteRepositories(db, { today, newId: randomUUID }) });
+        if (!cancelled) setOpening({ attempt, repos: withoutOldCopies(createSqliteRepositories(db, { today, newId: randomUUID })) });
       })
       .catch((error: unknown) => {
         if (__DEV__) console.error('Database not opened', error);

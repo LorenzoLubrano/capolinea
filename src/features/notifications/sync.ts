@@ -11,6 +11,8 @@ export interface NotificationDevice {
   replaceScheduled(planned: PlannedNotification[]): Promise<void>;
   /** Shows `notices` now. */
   present(notices: Notice[]): Promise<void>;
+  /** Removes the notifications already shown. */
+  dismissShown(): Promise<void>;
 }
 
 /** The keys of the events true at the last check; null before the first one. */

@@ -32,7 +32,15 @@ const int: Check = (v) => Number.isSafeInteger(v);
 const amount: Check = (v) => Number.isSafeInteger(v) && (v as number) >= 0;
 const num: Check = (v) => typeof v === 'number' && Number.isFinite(v);
 const currency: Check = (v) => typeof v === 'string' && /^[A-Z]{3}$/.test(v);
-const date: Check = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+/** A real calendar day, not just its shape: 2026-02-30 is refused. */
+const date: Check = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && isRealInstant(`${v}T00:00:00.000Z`, v);
+/** When the backup was made: an ISO time the preview can show. */
+const timestamp: Check = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v) && isRealInstant(v, v.slice(0, 10));
+
+function isRealInstant(text: string, day: string): boolean {
+  const time = Date.parse(text);
+  return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === day;
+}
 const month: Check = (v) => typeof v === 'string' && /^\d{4}-\d{2}$/.test(v);
 const oneOf =
   (...values: string[]): Check =>
@@ -186,7 +194,7 @@ export function parseBackup(text: string, { maxBytes = MAX_BYTES }: { maxBytes?:
   if (!isObject(raw) || raw.format !== BACKUP_FORMAT) return { ok: false, reason: 'format' };
   if (!int(raw.version) || raw.version !== BACKUP_VERSION) return { ok: false, reason: 'version' };
   const source = raw.data;
-  if (!isObject(source) || !str(raw.exportedAt) || !currency(source.currency) || !id(source.meId)) return { ok: false, reason: 'shape' };
+  if (!isObject(source) || !timestamp(raw.exportedAt) || !currency(source.currency) || !id(source.meId)) return { ok: false, reason: 'shape' };
 
   const collections: Record<string, Record<string, unknown>[]> = {};
   for (const [name, schema] of Object.entries(SCHEMAS)) {

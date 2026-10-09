@@ -34,6 +34,12 @@ describe('parseBackup', () => {
     expect(parseBackup(text, { maxBytes: 100 })).toEqual({ ok: false, reason: 'size' });
   });
 
+  it('refuses a backup date or a day that is not a real date', () => {
+    expect(parseBackup(edit((b) => (b.exportedAt = 'ieri sera')))).toEqual({ ok: false, reason: 'shape' });
+    expect(parseBackup(edit((b) => (b.exportedAt = '2026-13-45T10:00:00.000Z')))).toEqual({ ok: false, reason: 'shape' });
+    expect(parseBackup(edit((b) => (b.data.transactions[0].date = '2026-02-30'))).ok).toBe(false);
+  });
+
   it('refuses records that would break the app', () => {
     expect(parseBackup(edit((b) => (b.data.transactions[0].amountMinor = 12.5))).ok).toBe(false);
     expect(parseBackup(edit((b) => (b.data.transactions[0].date = '24/10/2026'))).ok).toBe(false);

@@ -36,7 +36,7 @@ export function LockGate() {
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'background') useLock.getState().wentToBackground(Date.now());
+      if (state === 'background') useLock.getState().wentToBackground(Date.now(), autoLock, hasPin);
       if (state === 'active') useLock.getState().cameBack(Date.now(), autoLock, hasPin);
     });
     return () => subscription.remove();
@@ -57,7 +57,7 @@ export function LockScreen() {
   const biometrics = useSettings((s) => s.biometrics);
   const startHidden = useSettings((s) => s.startHidden);
   const setPrivacy = useSettings((s) => s.setPrivacy);
-  const { failedAttempts, lockedOutUntil, fail, unlock } = useLock();
+  const { failedAttempts, waitLeftMs, fail, unlock, passWait } = useLock();
   // Locked since the start: the root layout hides the splash screen once this screen is shown.
   // Should that signal never come, the splash screen goes anyway: never an app stuck on it.
   useEffect(() => {
@@ -69,9 +69,8 @@ export function LockScreen() {
   const [digits, setDigits] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
-  // The countdown reads the clock, ticking once a second.
-  const [now, setNow] = useState(() => Date.now());
-  const waitMs = lockedOutUntil ? Math.max(0, lockedOutUntil - now) : 0;
+  const waitMs = waitLeftMs;
+  const waiting = waitLeftMs > 0;
   const canUseBiometrics = biometrics && kind !== null;
 
   const done = () => {
@@ -95,12 +94,18 @@ export function LockScreen() {
     return () => subscription.remove();
   }, []);
 
+  // The wait passes by the time measured here, never by the phone's clock, which can be moved.
   useEffect(() => {
-    if (!lockedOutUntil) return;
-    announce(it.lock.wait(formatWait(lockedOutUntil - Date.now())));
-    const timer = setInterval(() => setNow(Date.now()), 1000);
+    if (!waiting) return;
+    announce(it.lock.wait(formatWait(useLock.getState().waitLeftMs)));
+    let last = performance.now();
+    const timer = setInterval(() => {
+      const at = performance.now();
+      passWait(at - last);
+      last = at;
+    }, 1000);
     return () => clearInterval(timer);
-  }, [lockedOutUntil]);
+  }, [waiting, passWait]);
 
   useAnnounce(error);
 
@@ -142,9 +147,7 @@ export function LockScreen() {
     }
     if (ok) return done();
     haptics.warning();
-    const at = Date.now();
-    fail(at);
-    setNow(at);
+    fail();
     setDigits('');
     setError(it.lock.wrong(Math.max(0, FREE_ATTEMPTS - (failedAttempts + 1))));
   };

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 
 import { useSnapshot } from '@/data/queries';
@@ -10,6 +10,11 @@ import { syncNotifications } from './sync';
 
 // One sync at a time, in order: a quick series of changes never mixes two plans.
 let queue: Promise<void> = Promise.resolve();
+function enqueue(task: () => Promise<void>) {
+  queue = queue.then(task).catch((error: unknown) => {
+    if (__DEV__) console.warn('Notifications not synced', error);
+  });
+}
 
 /** Bumped when notifications become allowed: the plan is scheduled at once, not at the next change. */
 export const usePermissionChange = create<{ count: number; changed: () => void }>((set) => ({
@@ -26,13 +31,21 @@ export function NotificationsPlanner() {
   const permission = usePermissionChange((s) => s.count);
 
   useEffect(() => {
-    if (!data || !onboarded) return;
-    queue = queue
-      .then(() => syncNotifications(data, rules, { privacy, now: new Date() }, notificationDevice, noticeLog))
-      .catch((error: unknown) => {
-        if (__DEV__) console.warn('Notifications not synced', error);
-      });
+    // After «Elimina dati» nothing planned from the old data may still go off, nor stay on screen.
+    if (!onboarded) return enqueue(async () => {
+      await notificationDevice.replaceScheduled([]);
+      await notificationDevice.dismissShown();
+    });
+    if (!data) return;
+    enqueue(() => syncNotifications(data, rules, { privacy, now: new Date() }, notificationDevice, noticeLog));
   }, [data, rules, privacy, onboarded, permission]);
+
+  // Privacy turned on: notifications already shown may carry amounts.
+  const wasPrivate = useRef(privacy);
+  useEffect(() => {
+    if (privacy && !wasPrivate.current) enqueue(() => notificationDevice.dismissShown());
+    wasPrivate.current = privacy;
+  }, [privacy]);
 
   return null;
 }

@@ -83,7 +83,10 @@ export function ProfileScreen() {
 
         <SettingsGroup title={it.profile.yourData}>
           <SettingsRow icon="Export" title={it.profile.export} hint={it.profile.exportHint} onPress={() => router.push('/settings/export')} />
-          <SettingsRow icon={syncStatus === 'off' ? 'CloudSlash' : 'CloudCheck'} title={it.profile.sync} hint={it.sync.states[syncStatus].title} onPress={() => router.push('/settings/sync')} />
+          {/* The sync is still simulated: only in development, never promising a copy that does not exist. */}
+          {__DEV__ ? (
+            <SettingsRow icon={syncStatus === 'off' ? 'CloudSlash' : 'CloudCheck'} title={it.profile.sync} hint={it.sync.states[syncStatus].title} onPress={() => router.push('/settings/sync')} />
+          ) : null}
           <SettingsRow icon="Trash" title={it.profile.deleteData} destructive onPress={() => router.push('/settings/delete')} />
         </SettingsGroup>
 

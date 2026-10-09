@@ -24,6 +24,7 @@ function phone(allowed = true) {
     present: async (notices) => {
       presented.push(...notices);
     },
+    dismissShown: async () => undefined,
   };
   const log: NoticeLog = { read: () => seen, write: (keys) => (seen = keys) };
   return { device, log, scheduled, presented, seen: () => seen };

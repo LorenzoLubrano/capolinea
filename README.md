@@ -59,8 +59,10 @@ Gli aggiornamenti si installano sopra solo se sono firmati con lo stesso certifi
 - **PIN:**
   - è salvato come hash SHA-256 con sale, nell'archivio sicuro;
   - dal quinto tentativo sbagliato l'attesa cresce, da 30 secondi fino a 15 minuti, anche se chiudi l'app;
-  - si può sbloccare anche con volto o impronta.
-- **Modalità privacy:** nasconde gli importi, anche a TalkBack e VoiceOver e nelle notifiche.
+  - si può sbloccare anche con volto o impronta, solo se il telefono li considera sicuri (su Android spesso solo l'impronta);
+  - è il blocco dell'app, non la cifratura dei dati: non usare lo stesso PIN del telefono o della carta.
+- **Link dall'esterno:** l'app non apre nessuna schermata da un link `capolinea://`, così nessuno passa oltre il blocco.
+- **Modalità privacy:** nasconde gli importi, anche a TalkBack e VoiceOver e nelle notifiche. Sul telefono bloccato le notifiche dicono solo che ha scritto Capolinea, non cosa.
 - **Copri l'anteprima:** l'app appare vuota nel multitasking e blocca le catture di schermo.
 - **Esportazioni:** il CSV e il backup si condividono e la copia temporanea si cancella all'avvio successivo. Un backup viene controllato campo per campo prima di ripristinarlo.
 - **Permessi:**

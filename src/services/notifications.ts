@@ -1,7 +1,9 @@
 // Local notifications only, module by module: the package root also sets up remote push, which on
 // Android throws at import inside Expo Go («removed from Expo Go with the release of SDK 53»).
 import { cancelAllScheduledNotificationsAsync } from 'expo-notifications/build/cancelAllScheduledNotificationsAsync';
-import { AndroidImportance } from 'expo-notifications/build/NotificationChannelManager.types';
+import { deleteNotificationChannelAsync } from 'expo-notifications/build/deleteNotificationChannelAsync';
+import { dismissAllNotificationsAsync } from 'expo-notifications/build/dismissAllNotificationsAsync';
+import { AndroidImportance, AndroidNotificationVisibility } from 'expo-notifications/build/NotificationChannelManager.types';
 import { getPermissionsAsync, requestPermissionsAsync } from 'expo-notifications/build/NotificationPermissions';
 import { SchedulableTriggerInputTypes } from 'expo-notifications/build/Notifications.types';
 import { setNotificationHandler } from 'expo-notifications/build/NotificationsHandler';
@@ -13,7 +15,10 @@ import { Linking, Platform } from 'react-native';
 import type { NotificationDevice } from '@/features/notifications/sync';
 import { it } from '@/i18n/it';
 
-const CHANNEL = 'avvisi';
+// A channel's settings cannot change once created: the first one («avvisi») showed its text on the
+// lock screen, so it gave way to this one.
+const CHANNEL = 'avvisi-privati';
+const OLD_CHANNELS = ['avvisi'];
 // Expo Go cannot create channels (a native NullPointerException) and has its own: there the app
 // uses those. The installed app (APK) has its «Avvisi» channel.
 const OWN_CHANNEL = Platform.OS === 'android' && !isRunningInExpoGo();
@@ -29,7 +34,14 @@ let channel: Promise<unknown> | null = null;
 /** Android shows no permission prompt, and no notification, before a channel exists. */
 function ensureChannel() {
   if (!OWN_CHANNEL) return Promise.resolve();
-  channel ??= setNotificationChannelAsync(CHANNEL, { name: it.notificationSettings.channel, importance: AndroidImportance.DEFAULT });
+  // On a locked phone the notification says only that Capolinea wrote, not what.
+  channel ??= Promise.all(OLD_CHANNELS.map((id) => deleteNotificationChannelAsync(id))).then(() =>
+    setNotificationChannelAsync(CHANNEL, {
+      name: it.notificationSettings.channel,
+      importance: AndroidImportance.DEFAULT,
+      lockscreenVisibility: AndroidNotificationVisibility.PRIVATE,
+    }),
+  );
   return channel;
 }
 
@@ -71,6 +83,9 @@ export const notificationDevice: NotificationDevice = {
         trigger: { type: SchedulableTriggerInputTypes.DATE, date: notice.at, ...channelId },
       });
     }
+  },
+  async dismissShown() {
+    await dismissAllNotificationsAsync();
   },
   async present(notices) {
     await ensureChannel();

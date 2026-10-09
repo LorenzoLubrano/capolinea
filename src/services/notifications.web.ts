@@ -17,4 +17,5 @@ export const notificationDevice: NotificationDevice = {
   allowed: async () => false,
   replaceScheduled: async () => undefined,
   present: async () => undefined,
+  dismissShown: async () => undefined,
 };

@@ -3,10 +3,13 @@ export type AutoLock = 'immediate' | '1m' | '5m' | '15m';
 
 const DELAY_MS: Record<AutoLock, number> = { immediate: 0, '1m': 60_000, '5m': 5 * 60_000, '15m': 15 * 60_000 };
 
-/** Coming back from the background, the app locks if it stayed away at least the chosen delay. */
+/**
+ * Coming back from the background, the app locks if it stayed away at least the chosen delay. A
+ * clock that went back meanwhile hides how long that was: the app locks.
+ */
 export function shouldLockOnReturn(backgroundAt: number | null, now: number, autoLock: AutoLock): boolean {
   if (backgroundAt === null) return false;
-  return now - backgroundAt >= DELAY_MS[autoLock];
+  return now < backgroundAt || now - backgroundAt >= DELAY_MS[autoLock];
 }
 
 const MINUTE = 60_000;

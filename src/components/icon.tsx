@@ -190,6 +190,11 @@ export function Icon({
   color: string;
   weight?: IconWeight;
 }) {
-  const Component = icons[name as IconName] ?? icons.DotsThree;
+  const Component = icons[knownIcon(name)];
   return <Component size={size} color={color} weight={weight} />;
+}
+
+/** Own names only: a name from a backup like «constructor» must not reach a built-in of every object. */
+export function knownIcon(name: string): IconName {
+  return Object.hasOwn(icons, name) ? (name as IconName) : 'DotsThree';
 }

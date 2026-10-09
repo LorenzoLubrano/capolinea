@@ -97,7 +97,8 @@ export function PinSheet() {
   const saved = useSettings((s) => s.pin);
   const setPin = useSettings((s) => s.setPin);
   const showToast = useToast((s) => s.show);
-  const [step, setStep] = useState<Step>(mode === 'set' || !saved ? 'new' : 'current');
+  // A saved PIN is always asked first, whatever opened this sheet: nobody replaces it without knowing it.
+  const [step, setStep] = useState<Step>(saved ? 'current' : 'new');
   const [digits, setDigits] = useState('');
   const [chosen, setChosen] = useState('');
   const [error, setError] = useState<string | null>(null);

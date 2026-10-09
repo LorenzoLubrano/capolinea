@@ -40,8 +40,6 @@ function AppStack() {
   useAppSwitcherCover(useSettings((s) => s.coverInSwitcher));
   const onboarded = useSettings((s) => s.onboarded);
   const reduceMotion = useReduceMotion();
-  // Started with a PIN: the lock screen comes up at once, the splash screen covering until then.
-  const coldStart = useLock((s) => s.coldStart);
   // The window behind every screen follows the theme: a screen going back leaves a frame or two of
   // it uncovered, which flashed white in the dark theme.
   useEffect(() => void SystemUI.setBackgroundColorAsync(colors.background), [colors.background]);
@@ -106,10 +104,8 @@ function AppStack() {
           <Stack.Screen name="settings/notifications" options={{ ...pushed, title: it.notificationSettings.title }} />
           <Stack.Screen name="settings/currency" options={{ ...pushed, title: it.currencySettings.title }} />
           <Stack.Screen name="settings/export" options={{ ...pushed, title: it.exportScreen.title }} />
-          <Stack.Screen name="settings/sync" options={{ ...pushed, title: it.sync.title }} />
           <Stack.Screen name="settings/delete" options={{ ...pushed, title: it.deleteData.title }} />
           <Stack.Screen name="settings/info" options={{ ...pushed, title: it.info.title }} />
-          <Stack.Screen name="settings/sync-signin" options={{ ...sheet, sheetAllowedDetents: [0.6, 1] }} />
           <Stack.Screen name="accounts" options={{ ...pushed, title: it.accounts.title }} />
           <Stack.Screen name="account/[id]" options={{ ...pushed, title: '' }} />
           <Stack.Screen name="categories" options={{ ...pushed, title: it.categoryList.title }} />
@@ -123,16 +119,19 @@ function AppStack() {
         {/* Development only: a release build has no prototype panel, not even through a link. */}
         <Stack.Protected guard={onboarded && __DEV__}>
           <Stack.Screen name="prototype" options={{ ...pushed, title: it.prototype.title }} />
+          {/* The sync is simulated until it exists: not reachable in a release build. */}
+          <Stack.Screen name="settings/sync" options={{ ...pushed, title: it.sync.title }} />
+          <Stack.Screen name="settings/sync-signin" options={{ ...sheet, sheetAllowedDetents: [0.6, 1] }} />
         </Stack.Protected>
         <Stack.Protected guard={!onboarded}>
           <Stack.Screen name="onboarding" />
         </Stack.Protected>
         <Stack.Screen name="settings/pin" options={{ ...sheet, sheetAllowedDetents: [1] }} />
         <Stack.Screen name="restore" options={{ ...pushed, title: it.restore.title }} />
-        {/* Above everything, sheets included; no gesture, no animation to peek behind it. */}
+        {/* Above everything, sheets included; no gesture, and no animation: not a frame of the app shows. */}
         <Stack.Screen
           name="lock"
-          options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: coldStart ? 'none' : 'fade' }}
+          options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: 'none' }}
           // Started locked: the splash screen goes once the lock screen is on screen, not merely mounted.
           listeners={{ transitionEnd: (e) => (!e.data.closing && useLock.getState().coldStart ? void SplashScreen.hideAsync() : undefined) }}
         />

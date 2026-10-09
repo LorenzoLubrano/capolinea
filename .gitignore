@@ -44,3 +44,6 @@ example
 
 # impeccable: file temporanei
 .impeccable/questions/
+
+# impeccable live mode: local server state
+.impeccable/live/

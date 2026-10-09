@@ -212,3 +212,34 @@ Fatte da Claude su richiesta di Lorenzo, sull'emulatore `test36` (Android 16, Ex
 - Niente backup su Google Drive e niente passaggio a un telefono nuovo (`plugins/with-no-backup.js`; `allowBackup: false` da solo lascia il passaggio da Android 12): il database arriverebbe senza la sua chiave. Per cambiare telefono si usa il backup completo dell'app.
 - Nessun permesso di rete nella build di rilascio (`plugins/with-offline-release.js`): è Android a garantire che i dati non escono. Tolti anche i permessi portati dalle librerie e non usati: archivio esterno, sovrapposizione ad altre app, immagini, notifiche push di Firebase, install referrer del Play Store. Resta `DETECT_SCREEN_CAPTURE` (normale, nessun dato): expo-screen-capture lo usa all'avvio e senza l'app si chiudeva.
 - Notifiche programmate entro un'ora, senza allarme esatto (scelta di Lorenzo). Icona delle notifiche: il logo intero in bianco (scelta di Lorenzo, tra logo intero e sola moneta).
+
+## 09/10/2026: passo 7, verifica finale
+
+Revisione del codice e controllo di sicurezza fatti da due agenti separati, poi verificati e corretti.
+
+- **Link dall'esterno:** un link `capolinea://…` arrivato con l'app bloccata apriva la sua schermata sopra il blocco, per esempio quella del backup. Ora `src/app/+native-intent.tsx` li ignora tutti mentre l'app è aperta e, all'avvio, parte sempre dalla prima schermata.
+- **PIN:**
+  - Cambiarlo chiede sempre quello attuale, da qualunque parte si apra il foglio.
+  - L'attesa dopo i tentativi sbagliati è il tempo che resta, scalato con un orologio che non si può spostare, e non più un'ora sull'orologio del telefono: spostandolo avanti l'attesa spariva.
+  - Se l'orologio torna indietro mentre l'app è in background, al ritorno si blocca.
+  - Con «Subito», l'app si blocca già uscendo, quindi al ritorno non si vede neanche un fotogramma.
+  - La schermata di blocco compare senza animazione.
+  - Se il controllo del PIN dà errore, il tastierino resta usabile e il tentativo non conta.
+- **Biometria:** solo quella di classe forte. Su Android lo sblocco col volto via fotocamera spesso è debole e si inganna con una foto: sul S24 resta l'impronta.
+- **Notifiche:**
+  - Nuovo canale «Avvisi»: sul telefono bloccato mostra solo che ha scritto Capolinea. Le impostazioni di un canale non cambiano dopo la creazione, quindi il vecchio canale è stato cancellato.
+  - Accendendo la privacy si tolgono le notifiche già mostrate.
+  - «Elimina dati» cancella le notifiche programmate e quelle mostrate.
+  - Una notifica che il telefono non riesce a mostrare si riprova al controllo successivo.
+- **Dati cancellati:**
+  - Cancellazione sicura in SQLite e registro WAL svuotato dopo «Elimina dati» o un ripristino.
+  - Le copie fatte prima delle migrazioni vengono cancellate con loro.
+  - Il database si chiude solo a migrazioni e copia finite.
+- **Backup costruiti apposta:** un'icona chiamata come un metodo di ogni oggetto (`constructor`) faceva chiudere l'app; una data del backup non valida rompeva l'anteprima. Ora si accettano solo icone note e date vere, anche per i giorni dei movimenti.
+- **Sincronizzazione:** è ancora simulata, quindi nell'app installata non compare, per non far credere che esista una copia fuori dal telefono.
+- **Repository:** `.impeccable/live/` ignorato e un percorso locale tolto da un file di revisione.
+
+Rimandati, con il motivo:
+- Le esportazioni restano nella cache fino all'avvio successivo: cancellarle prima può rompere un allegato non ancora inviato.
+- I movimenti eliminati restano nel database (cifrato) per Annulla e per una futura sincronizzazione.
+- Una privacy delle notifiche separata dall'occhio della Home: da decidere con Lorenzo.

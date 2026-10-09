@@ -29,12 +29,18 @@ export async function checkPin(pin: string, record: PinRecord): Promise<boolean>
 
 export type BiometricKind = 'face' | 'fingerprint' | 'iris';
 
-/** Whether the phone can unlock with a face, a fingerprint or an iris, and has one enrolled. */
+/**
+ * Whether the phone can unlock with a face, a fingerprint or an iris, and has one enrolled. Only
+ * strong biometrics count: on Android a camera face unlock is often weak, fooled by a photo.
+ */
 export async function biometricSupport(): Promise<BiometricKind | null> {
   if (!native) return null;
   try {
     if (!(await LocalAuthentication.hasHardwareAsync()) || !(await LocalAuthentication.isEnrolledAsync())) return null;
+    if ((await LocalAuthentication.getEnrolledLevelAsync()) < LocalAuthentication.SecurityLevel.BIOMETRIC_STRONG) return null;
     const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+    // Android does not say which kind is the strong one: a fingerprint sensor nearly always is.
+    if (Platform.OS === 'android' && types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) return 'fingerprint';
     if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) return 'face';
     if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) return 'fingerprint';
     if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) return 'iris';
@@ -44,11 +50,16 @@ export async function biometricSupport(): Promise<BiometricKind | null> {
   }
 }
 
-/** Asks for the face or the fingerprint. The app's own PIN is the fallback, never the phone's code. */
+/** Asks for the face or the fingerprint, strong kinds only. The app's own PIN is the fallback, never the phone's code. */
 export async function confirmWithBiometrics(promptMessage: string, cancelLabel: string): Promise<boolean> {
   if (!native) return false;
   try {
-    const result = await LocalAuthentication.authenticateAsync({ promptMessage, cancelLabel, disableDeviceFallback: true });
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage,
+      cancelLabel,
+      disableDeviceFallback: true,
+      biometricsSecurityLevel: 'strong',
+    });
     return result.success;
   } catch {
     return false;

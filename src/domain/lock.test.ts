@@ -14,6 +14,10 @@ describe('shouldLockOnReturn', () => {
     expect(shouldLockOnReturn(left, left + 1, 'immediate')).toBe(true);
     expect(shouldLockOnReturn(null, left, 'immediate')).toBe(false);
   });
+
+  it('locks when the clock went back while the app was away: the time away is unknown', () => {
+    expect(shouldLockOnReturn(left, left - 60 * 60_000, '15m')).toBe(true);
+  });
 });
 
 describe('lockoutMs', () => {
