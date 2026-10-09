@@ -9,6 +9,7 @@ import {
 import { ArchivoNarrow_600SemiBold, ArchivoNarrow_700Bold } from '@expo-google-fonts/archivo-narrow';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { LogBox } from 'react-native';
@@ -26,7 +27,7 @@ import { clearExports } from '@/services/share-file';
 import { useLock } from '@/state/lock';
 import { prototypeFaults } from '@/state/prototype';
 import { useSettings } from '@/state/settings';
-import { fonts, radius, useTheme } from '@/theme';
+import { fonts, motion, radius, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,6 +42,9 @@ function AppStack() {
   const reduceMotion = useReduceMotion();
   // Started with a PIN: the lock screen comes up at once, the splash screen covering until then.
   const coldStart = useLock((s) => s.coldStart);
+  // The window behind every screen follows the theme: a screen going back leaves a frame or two of
+  // it uncovered, which flashed white in the dark theme.
+  useEffect(() => void SystemUI.setBackgroundColorAsync(colors.background), [colors.background]);
   // Exports left from the last session are deleted: the app keeps no copy of the data.
   useEffect(() => clearExports(), []);
   // Rendered once the fonts are loaded and the database is open. Locked, the lock screen hides it.
@@ -67,7 +71,7 @@ function AppStack() {
     headerTitleStyle: { fontFamily: fonts.bold, fontSize: 17, color: colors.ink },
     headerBackButtonDisplayMode: 'minimal',
     contentStyle: { backgroundColor: colors.background },
-    animation: reduceMotion ? 'fade' : 'default',
+    animation: reduceMotion ? 'fade' : motion.push,
   } as const;
 
   return (

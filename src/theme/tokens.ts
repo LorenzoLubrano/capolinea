@@ -49,6 +49,11 @@ export const motion = {
     settle: { duration: 400, dampingRatio: 1 },
     sheet: { duration: 300, dampingRatio: 0.8 },
   },
+  /**
+   * Pushed screens: in from the right, the screen below sliding a little left, and back along the
+   * same path. Android's own transition cuts the old screen out in 83 ms; iOS already does this.
+   */
+  push: 'ios_from_right',
 } as const;
 
 export const fonts = {

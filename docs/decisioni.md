@@ -190,3 +190,8 @@ Fatte da Claude su richiesta di Lorenzo, sull'emulatore `test36` (Android 16, Ex
 - Prestazioni con 8.970 movimenti: lettura 300-400 ms sull'emulatore; il ripristino passava da 15,9 s a 1,25 s scrivendo a blocchi (un'istruzione per più righe, al massimo 999 valori). La memoria dell'app in sviluppo (circa 700 MB) è la stessa con 166 o 9.000 movimenti: è il peso di Expo Go in sviluppo, non dei dati.
 - Da provare sul telefono vero: impronta e volto, i tempi veri, le notifiche programmate all'ora giusta.
 
+
+## 09/10/2026: ritorno indietro sul S24
+
+- Il flash segnalato da Lorenzo, ripreso fotogramma per fotogramma: a ogni ritorno la schermata che si chiudeva lasciava 1-2 fotogrammi bianchi pieni, cioè lo sfondo della finestra che non seguiva il tema scuro. Ora lo sfondo della finestra prende il colore del tema (expo-system-ui), anche quando lo si cambia in Aspetto.
+- Schermate spinte e passi del primo avvio su Android come su iPhone (`ios_from_right`): la nuova entra da destra e quella sotto scivola un po' a sinistra; tornando, la stessa strada al contrario. La transizione di Android 14+ toglieva la vecchia schermata in 83 ms. Su iPhone resta lo scorrimento nativo; con «Riduci animazioni» resta la dissolvenza.
