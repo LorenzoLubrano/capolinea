@@ -41,8 +41,8 @@ La direzione visiva si chiama **Linea** e riprende la metropolitana di Milano:
 
 1. Scarica `capolinea-<versione>.apk` dalle [Release](https://github.com/LorenzoLubrano/capolinea/releases).
 2. Controlla che il file sia quello pubblicato: la sua impronta SHA-256 è scritta nella release.
-   - Windows: `certutil -hashfile capolinea-1.0.0.apk SHA256`
-   - macOS e Linux: `sha256sum capolinea-1.0.0.apk`
+   - Windows: `certutil -hashfile capolinea-1.0.1.apk SHA256`
+   - macOS e Linux: `sha256sum capolinea-1.0.1.apk`
 3. Apri il file sul telefono e consenti l'installazione da questa fonte.
 
 L'APK è firmato con un certificato la cui impronta SHA-256 è
