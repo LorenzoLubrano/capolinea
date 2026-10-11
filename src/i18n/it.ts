@@ -191,7 +191,7 @@ export const it = {
     checkSplit: 'Controlla la divisione',
     atMost: (amount: string) => `Al massimo ${amount}`,
     typeAmount: 'Scrivi un importo',
-    keys: { comma: 'virgola', backspace: 'cancella' },
+    keys: { comma: 'virgola', backspace: 'cancella', show: 'Mostra il tastierino' },
   },
   split: {
     title: 'Dividi la spesa',

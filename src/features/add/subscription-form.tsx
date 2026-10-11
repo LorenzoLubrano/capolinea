@@ -24,6 +24,7 @@ import { shortDate } from '@/services/format/dates';
 import { frequencyLabel } from '@/services/format/frequency';
 import { formatMoney, speakable } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
+import { useKeypad } from '@/state/keypad';
 import { useSettings } from '@/state/settings';
 import { useToast } from '@/state/toast';
 import { layout, radius, spacing, useTheme } from '@/theme';
@@ -166,6 +167,7 @@ function SubscriptionDetails({
   const [accountId, setAccountId] = useState<Id>(editing?.accountId ?? defaultAccountId(data));
   const [picker, setPicker] = useState<'account' | 'date' | null>(null);
   const [allCategories, setAllCategories] = useState(false);
+  const foldKeypad = useKeypad((s) => s.fold);
   const allowLeave = useDiscardGuard({ name, input, frequency, anchorDate, categoryId, accountId });
 
   const amountMinor = inputToMinor(input);
@@ -355,6 +357,7 @@ function SubscriptionDetails({
               onPress={() => {
                 haptics.selection();
                 setCategoryId(c.id);
+                foldKeypad();
               }}
               leading={<LineBadge color={c.color} icon={c.icon} size={28} />}
             />

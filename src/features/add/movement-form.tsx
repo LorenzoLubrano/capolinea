@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Keyboard, ScrollView, View } from 'react-native';
 
 import { Calendar } from '@/components/calendar';
 import { Chip } from '@/components/chip';
@@ -26,6 +26,7 @@ import { useDiscardGuard } from '@/services/discard-guard';
 import { formatMoney } from '@/services/format/money';
 import { haptics } from '@/services/haptics';
 import { rememberedEntry, useLastEntry } from '@/state/entry-session';
+import { useKeypad } from '@/state/keypad';
 import { useSettings } from '@/state/settings';
 import { useSplitDraft } from '@/state/split-draft';
 import { useToast } from '@/state/toast';
@@ -153,6 +154,7 @@ function MovementFormBody({
   const [description, setDescription] = useState(editing?.description ?? '');
   const [note, setNote] = useState(editing?.notes ?? '');
   const rememberEntry = useLastEntry((s) => s.remember);
+  const foldKeypad = useKeypad((s) => s.fold);
   // Something written and not saved: the sheet asks before closing. What it opened with counts as
   // unchanged, except an amount carried over from another kind, which the user did type.
   const allowLeave = useDiscardGuard(
@@ -270,6 +272,8 @@ function MovementFormBody({
             setNote('');
             setDetails(false);
             setSplitDraft(null);
+            Keyboard.dismiss();
+            useKeypad.getState().unfold();
           } else {
             allowLeave();
             router.back();
@@ -373,6 +377,7 @@ function MovementFormBody({
                     haptics.selection();
                     setInput(minorToInput(t.amountMinor));
                     setCategoryId(t.categoryId);
+                    foldKeypad();
                     setMerchant(t.merchant);
                     if (accounts.some((a) => a.id === t.accountId)) setAccountId(t.accountId);
                   }}
@@ -419,6 +424,7 @@ function MovementFormBody({
                   onPress={() => {
                     haptics.selection();
                     setCategoryId(c.id === categoryId ? undefined : c.id);
+                    if (c.id !== categoryId) foldKeypad();
                   }}
                   leading={
                     kind === 'expense' ? (
@@ -469,7 +475,14 @@ function MovementFormBody({
           </View>
         ) : null}
 
-        <DetailsSection open={details} onToggle={() => setDetails(!details)} hint={it.add.detailsHints[kind]}>
+        <DetailsSection
+          open={details}
+          onToggle={() => {
+            if (!details) foldKeypad();
+            setDetails(!details);
+          }}
+          hint={it.add.detailsHints[kind]}
+        >
           {kind === 'expense' ? <TextField label={it.add.merchant} value={merchant} onChangeText={setMerchant} placeholder={it.add.merchantPlaceholder} /> : null}
           {kind === 'income' ? <TextField label={it.add.payer} value={merchant} onChangeText={setMerchant} placeholder={it.add.payerPlaceholder} /> : null}
           {kind === 'transfer' ? (

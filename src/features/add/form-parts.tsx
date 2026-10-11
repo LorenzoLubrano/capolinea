@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { TextInput, View, type TextInputProps } from 'react-native';
+import { useEffect, type ReactNode } from 'react';
+import { Keyboard, Pressable, TextInput, View, type TextInputProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -7,6 +7,7 @@ import { PressableScale } from '@/components/pressable-scale';
 import { AppText } from '@/components/text';
 import type { KeypadKey } from '@/domain/money';
 import { it } from '@/i18n/it';
+import { useKeypad } from '@/state/keypad';
 import { radius, spacing, type, useTheme } from '@/theme';
 
 import { Keypad } from './keypad';
@@ -18,10 +19,14 @@ export function groupInput(input: string): string {
   return decimals === undefined ? grouped : `${grouped},${decimals}`;
 }
 
-/** The amount being typed, large, with an optional line under it. */
+/** The amount being typed, large, with an optional line under it. With the keypad folded, a tap brings it back. */
 export function AmountDisplay({ input, label, caption }: { input: string; label: string; caption?: string }) {
-  return (
-    <View accessible accessibilityLabel={`${label}: ${groupInput(input)} euro`} style={{ alignItems: 'center', paddingVertical: spacing.sm }}>
+  const folded = useKeypad((s) => s.folded);
+  const unfold = useKeypad((s) => s.unfold);
+  const accessibilityLabel = `${label}: ${groupInput(input)} euro`;
+  const style = { alignItems: 'center', paddingVertical: spacing.sm } as const;
+  const content = (
+    <>
       <AppText variant="amountInput" tone={input ? 'primary' : 'tertiary'} numberOfLines={1} adjustsFontSizeToFit>
         {groupInput(input)}
         <AppText variant="displayCents" tone="secondary">
@@ -33,11 +38,35 @@ export function AmountDisplay({ input, label, caption }: { input: string; label:
           {caption}
         </AppText>
       ) : null}
-    </View>
+    </>
+  );
+  if (!folded) {
+    return (
+      <View accessible accessibilityLabel={accessibilityLabel} style={style}>
+        {content}
+      </View>
+    );
+  }
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={it.add.keys.show}
+      onPress={() => {
+        Keyboard.dismiss();
+        unfold();
+      }}
+      style={style}
+    >
+      {content}
+    </Pressable>
   );
 }
 
-/** Keypad and the save button, pinned under the form. The button says what is still missing. */
+/**
+ * Keypad and the save button, pinned under the form. The button says what is still missing. Once the
+ * amount is done the keypad folds away and only the button stays, above the system keyboard if open.
+ */
 export function SaveBar({
   onKey,
   onClear,
@@ -58,9 +87,26 @@ export function SaveBar({
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const folded = useKeypad((s) => s.folded);
+  const keyboardHeight = useKeypad((s) => s.keyboardHeight);
+  // Every form opens on the amount.
+  useEffect(() => {
+    useKeypad.getState().unfold();
+  }, []);
   return (
-    <View style={{ paddingHorizontal: spacing.gutter, paddingTop: spacing.sm, paddingBottom: insets.bottom + spacing.md, gap: spacing.smd, borderTopWidth: 1, borderTopColor: colors.hairline }}>
-      <Keypad onKey={onKey} onClear={onClear} />
+    <View
+      style={{
+        paddingHorizontal: spacing.gutter,
+        paddingTop: spacing.sm,
+        // The keyboard height React Native reports leaves out the navigation bar under it.
+        paddingBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom + spacing.sm : insets.bottom + spacing.md,
+        gap: spacing.smd,
+        borderTopWidth: 1,
+        borderTopColor: colors.hairline,
+      }}
+    >
+      {/* Never under the system keyboard, even with a field still focused from before. */}
+      {folded || keyboardHeight > 0 ? null : <Keypad onKey={onKey} onClear={onClear} />}
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
         {another ? (
           <PressableScale
@@ -106,12 +152,14 @@ export function TextField({
   keyboardType?: TextInputProps['keyboardType'];
 }) {
   const { colors } = useTheme();
+  const fold = useKeypad((s) => s.fold);
   return (
     <View style={{ gap: spacing.xs }}>
       <AppText variant="footnote" tone="secondary">
         {label}
       </AppText>
       <TextInput
+        onFocus={fold}
         accessibilityLabel={label}
         value={value}
         onChangeText={onChangeText}
