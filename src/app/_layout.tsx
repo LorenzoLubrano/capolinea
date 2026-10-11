@@ -16,6 +16,7 @@ import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
 
+import { DiscardDialog } from '@/components/discard-dialog';
 import { ToastHost } from '@/components/toast-host';
 import { DataProvider } from '@/data/provider';
 import { NotificationsPlanner } from '@/features/notifications/notifications-planner';
@@ -137,6 +138,7 @@ function AppStack() {
         />
       </Stack>
       <ToastHost />
+      <DiscardDialog />
       <LockGate />
       <NotificationsPlanner />
     </ThemeProvider>

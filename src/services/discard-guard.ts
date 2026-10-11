@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 
 import { it } from '@/i18n/it';
+import { useDiscardPrompt } from '@/state/discard-prompt';
 
 /**
  * Keeps a sheet with something written from closing by mistake: on iOS the swipe pulls back
- * instead of dismissing, and Back, Annulla or a swipe that gets through ask first. Values equal to
+ * instead of dismissing, on Android the sheet stops dragging (patches/react-native-screens), and
+ * Back, Annulla or a swipe that gets through ask first. Values equal to
  * the ones the sheet opened with (or to `baseline`, when given) count as nothing written. Returns
  * `allowLeave`, to call before closing on purpose (after saving or deleting).
  */
@@ -25,6 +27,10 @@ export function useDiscardGuard(values: Record<string, unknown>, baseline?: Reco
   usePreventRemove(guard, ({ data }) => {
     if (leaving.current) {
       navigation.dispatch(data.action);
+      return;
+    }
+    if (Platform.OS === 'android') {
+      useDiscardPrompt.getState().ask(() => navigation.dispatch(data.action));
       return;
     }
     Alert.alert(it.discard.title, it.discard.body, [
